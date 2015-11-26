@@ -1,0 +1,2632 @@
+%#!uplatex -shell-escape sample
+%#!uplatex sample
+%#LPR dvipdfmx -p a4 -r 1200 sample
+% #LPR dvips -Ppdf -f sample.dvi | lpr
+%#MAKEINDEX mendex -g -s mystyle.ist sample
+%#!platex -shell-escape sample
+%#!platex sample
+%%% sudo tlmgr update --self --all
+\documentclass[a4j,uplatex,dvipdfmx]{jsarticle}
+\usepackage{amsmath}
+\usepackage{emath}
+\let\EMforeach=\foreach
+\usepackage{graphicx,tikz}
+\usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
+	patterns,topaths,through,calc,intersections,%
+	shapes.geometric,shapes.misc,shapes.multipart}
+%emathとmathabxを読み込む時のエラー対策
+\let\therefore=\relax
+\let\because=\relax
+\usepackage{mathabx}
+\usepackage{tikzsetup}
+%\usepackage{newtxtext,newtxmath}
+\makeatletter
+%% \mytikzarc[option](中心){半径}{開始角}{終了角}
+%% \mytikzarc*[option](中心){半径}{開始角}{終了角}
+%% 中心・半径・開始角・終了角を指定して弧を描く
+%% *をつけると弧と中心を結び扇形を描く
+%% optionにはfillなどTikZのオプションをいれる．
+\newif\ifmytikzoutline
+\mytikzoutlinefalse
+\define@key{mytikzarc}{sector}[true]{\mytikzoutlinetrue}%
+\def\mytikzarc{\@ifstar{\@mytikzarc<sector>}{\@mytikzarc<>}}
+\def\@mytikzarc<#1>{\@ifnextchar[{\@@mytikzarc<#1>}{\@@mytikzarc<#1>[]}}
+\def\@@mytikzarc<#1>[#2](#3)#4#5#6{%
+ \def\@mytikz@arc@option{}%
+ \setkeys{mytikzarc}{#1}%
+ \ifmytikzoutline
+  \draw[#2] (#3)--($(#3)+(#5:#4)$) arc [start angle=#5,end angle=#6,radius=#4]--cycle;
+ \else
+  \draw[#2] ($(#3)+(#5:#4)$) arc [start angle=#5,end angle=#6,radius=#4];
+ \fi
+ \mytikzoutlinefalse
+}%
+%% \mytikzbunten<オプション1>[オプション2](端点1)(端点2){分割数}
+%% 2点(端点1)(端点2)を結ぶ線分を<分割数>等分しこの線分と垂直な線分を各点に配置する
+\define@key{mytikzbunten}{length}{\def\@mytikzbuntenlength{#1}}%default=1.5pt
+\def\mytikzbunten{\@ifnextchar<{\@mytikzbunten}{\@mytikzbunten<>}}
+\def\@mytikzbunten<#1>{\@ifnextchar[{\@@mytikzbunten<#1>}{\@@mytikzbunten<#1>[]}}
+\def\@@mytikzbunten<#1>[#2](#3)(#4)#5{%
+ \def\@mytikzbuntenlength{1.5pt}%
+ \setkeys{mytikzbunten}{#1}%
+ \ISub{#5}{1}\@MTBLN
+ \foreach \NUM in {1,...,\@MTBLN}{%
+  \draw[#2] let \p1=($(#3)!\NUM/#5!(#4)$) in
+   (\x1,\y1)--($(\x1,\y1)!\@mytikzbuntenlength!90:(#4)$)
+   (\x1,\y1)--($(\x1,\y1)!\@mytikzbuntenlength!-90:(#4)$);
+ }%
+}%
+\makeatother
+\begin{document}
+\section{基本的なコマンド}
+\begin{itemize}
+ \item \verb!\draw = \path[draw]!
+ \item \verb!\fill = \path[fill]!
+ \item \verb!\filldraw = \path[fill,draw] or \path [fill] [draw]]!
+ \item \verb!\pattern = \path[pattern]!
+ \item \verb!\shade = \path[shade]!
+ \item \verb!\shadedraw = \path[shade,draw]!
+ \item \verb!\clip = \path[clip]!
+ \item \verb!\useasboundingbox = \path[use as bouding box]!
+\end{itemize}
+\section{colorオプション}
+\begin{itemize}
+ \item \verb@color=color1!number!color2@
+
+       \verb!color1:color2=number:(100-number)!の割合で色を塗る．
+       \verb@!color2@を省略すると\verb!white!と見做される．
+       \verb@!number!color2@を省略すると\verb!color1!のみで色を塗る．
+       \begin{center}
+	\begin{tikzpicture}
+	 \draw [color=red!50!blue] (0,0)--(2,0);
+	 \draw [fill,color=yellow!30] (0,.5) circle (.5cm);
+	 \draw [fill,color=green] (1,.5) rectangle (1.5,1);
+	\end{tikzpicture}
+	\begin{verbatim}
+	\begin{tikzpicture}
+	 \draw [color=red!50!blue] (0,0)--(2,0);
+	 \draw [fill,color=yellow!30] (0,.5) circle (.5cm);
+	 \draw [fill,color=green] (1,.5) rectangle (1.5,1);
+	\end{tikzpicture}
+	\end{verbatim}
+       \end{center}
+ \item \verb!\colorlet{color name}{color def}!で自由に色を定義できる．
+       \begin{center}
+	\colorlet{hogehoge}{blue!25!yellow}
+	\tikz \draw[fill,color=hogehoge] (0,0) circle (1em);
+	\begin{verbatim}
+	\colorlet{hogehoge}{blue!25!yellow}
+	\tikz \draw[fill,color=hogehoge] (0,0) circle (1em);
+	\end{verbatim}
+       \end{center}
+\end{itemize}
+
+\section{関数の描画}
+\begin{itemize}
+ \item \verb@plot[local option] coordinate {(coord1)(coord2)...(coordn)}@
+
+       この指定方法は
+       \verb@\draw[local option] (coord1)--(coord2)--...--(coordn)@
+       と同じである．
+
+       \tikz \draw plot coordinates {(0,0)(1,0)(1,1)(-30:2)};
+       \verb@\tikz \draw plot coordinates {(0,0)(1,0)(1,1)(-30:2)};@
+ \item \verb@plot[local option] file {file name}@
+
+       これはすでに作成済みの\verb@.table@ファイルから座標を読み込むものである．
+       必要ならばマニュアルの224ページを参照すること．
+ \item \verb@plot[local option] (coordinate expression)@
+
+       関数式の指定で任意の関数を描画する方法．
+       \begin{itemize}
+	\item \verb@variable=macro@
+
+	      関数の変数を指定する．
+	      defaultでは\verb@\x@である．
+	\item \verb@samples=number@
+
+	      描画に使用する制御点の個数を指定する．
+	      defaultでは\verb@25@である．
+	\item \verb@domain=start:end@
+
+	      関数の定義域を指定する．
+	      defaultでは\verb@start=-5@，\verb@end=5@である．
+	\item \verb@samples at={sample list}@
+
+	      制御点のうちどれを使用するかを指定する．
+       \end{itemize}
+       \begin{tikzpicture}[domain=0:4,>=stealth]
+	\scriptsize
+	\draw[very thin,color=gray](-0.1,-1.1)grid(3.9,3.9);
+
+	\draw[->](-.2,0)--(4.2,0)node[xshift=-3pt,yshift=-4pt]{$x$};
+	\draw[->](0,-.2)--(0,4.2)node[xshift=-4pt,yshift=-3pt]{$y$};
+
+	\draw[color=red]plot(\x,\x)node[right]{$y=x$};
+	\draw[color=blue]plot(\x,{sin(\x r)})node[right]{$y=\sin x$};
+	\draw[color=orange]plot(\x,{exp(\x)*1/20})node[right]{$y=\Frac1{20}e^x$};
+
+	\draw[scale=0.5,domain=-3.1415:3.1415,smooth,variable=\t]
+	 plot({\t*sin(\t r)},{\t*cos(\t r)})node[left]{$C$};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[domain=0:4,>=stealth]
+	 \scriptsize
+	 \draw[very thin,color=gray](-0.1,-1.1)grid(3.9,3.9);
+
+	 \draw[->](-.2,0)--(4.2,0)node[xshift=-3pt,yshift=-4pt]{$x$};
+	 \draw[->](0,-.2)--(0,4.2)node[xshift=-4pt,yshift=-3pt]{$y$};
+
+	 \draw[color=red]plot(\x,\x)node[right]{$y=x$};
+	 \draw[color=blue]plot(\x,{sin(\x r)})node[right]{$y=\sin x$};
+	 \draw[color=orange]plot(\x,{exp(\x)*1/20})node[right]{$y=\Frac1{20}e^x$};
+
+	 \draw[scale=0.5,domain=-3.1415:3.1415,smooth,variable=\t]
+	  plot({\t*sin(\t r)},{\t*cos(\t r)})node[left]{$C$};
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@plot[local option] function {gunplot formula}@
+
+       この指定方法は\verb@--shell-escape@オプションが必要になり，
+       \verb@\jobname.idname.gnuplot@および\verb@\jobname.idname.table@という
+       補助ファイルが作られる．
+       \begin{itemize}
+	\item \verb@parametric=true or false@
+
+	      媒介変数を使用するかどうかを指定する．
+	      defaultで\verb@true@であり，
+	      \verb@parametric@とすると自動で\verb@true@が適用される．
+	\item \verb@id=idname@
+
+	      補助ファイルは基本的に\verb@\jobname.idname.gnuplot@，
+	      \verb@\jobname.idname.table@という書式であるが，
+	      この\verb@idname@の部分を指定する．
+	      通常は一意の名称を使用する．
+	\item \verb@row gnuplot@
+	\item \verb@evry plot@
+
+	      すべてのプロットで使用するスタイルなどを指定する．
+	      例えば，補助ファイルをすべて\verb@./plots@ディレクトリに作成する場合は
+	      ex:\verb@\tikzset{every plot/.style={prefix=plots/}}@
+	      と設定する．
+       \end{itemize}
+       \begin{tikzpicture}[domain=0:4,>=stealth]
+	\scriptsize
+	\draw[very thin,color=gray](-0.1,-1.1)grid(3.9,3.9);
+
+	\draw[->](-.2,0)--(4.2,0)node[xshift=-3pt,yshift=-4pt]{$x$};
+	\draw[->](0,-.2)--(0,4.2)node[xshift=-4pt,yshift=-3pt]{$y$};
+
+	\draw[color=red]plot[id=tikz-sample-function-x]
+	 function{x}node[right]{$y=x$};
+	\draw[color=blue]plot[id=tikz-sample-function-sin]
+	 function{sin(x)}node[right]{$y=\sin x$};
+	\draw[color=orange]plot[id=tikz-sample-function-exp]
+	 function{exp(x)*1/20}node[right]{$y=\Frac1{20}e^x$};
+
+	\draw[scale=0.5,domain=-3.1415:3.1415,smooth,parametric,%
+	 id=tikz-sample-function-param]
+	 plot function{t*sin(t),t*cos(t)}node[left]{$C$};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[domain=0:4,>=stealth]
+	 \scriptsize
+	 \draw[very thin,color=gray](-0.1,-1.1)grid(3.9,3.9);
+
+	 \draw[->](-.2,0)--(4.2,0)node[xshift=-3pt,yshift=-4pt]{$x$};
+	 \draw[->](0,-.2)--(0,4.2)node[xshift=-4pt,yshift=-3pt]{$y$};
+
+	 \draw[color=red]plot[id=tikz-sample-function-x]
+	  function{x}node[right]{$y=x$};
+	 \draw[color=blue]plot[id=tikz-sample-function-sin]
+	  function{sin(x)}node[right]{$y=\sin x$};
+	 \draw[color=orange]plot[id=tikz-sample-function-exp]
+	  function{exp(x)*1/20}node[right]{$y=\Frac1{20}e^x$};
+
+	 \draw[scale=0.5,domain=-3.1415:3.1415,smooth,parametric,%
+	  id=tikz-sample-function-param]
+	  plot function{t*sin(t),t*cos(t)}node[left]{$C$};
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{線の描画}
+\subsection{線の太さの数値による指定}
+\begin{itemize}
+ \item \verb@line width=dimension@
+
+       \verb@dimension@に単位付き数値で指定する．
+       defaultは0.4pt (thin)である．
+
+       \tikz \draw[line width=10pt] (0,0)--(1,0);
+       \verb@\tikz \draw[line width=10pt] (0,0)--(1,0);@
+\end{itemize}
+\subsection{線の太さの名前による指定}
+\begin{itemize}
+ \item \verb@ultra thin@：線に太さを0.1ptに設定する．
+
+       \tikz \draw[ultra thin] (0,0)--(1,0);
+       \verb@\tikz \draw[ultra thin] (0,0)--(1,0);@
+ \item \verb@very thin@：線に太さを0.2ptに設定する．
+
+       \tikz \draw[very thin] (0,0)--(1,0);
+       \verb@\tikz \draw[very thin] (0,0)--(1,0);@
+ \item \verb@thin@：線に太さを0.4ptに設定する．
+
+       \tikz \draw[thin] (0,0)--(1,0);
+       \verb@\tikz \draw[thin] (0,0)--(1,0);@
+ \item \verb@semithick@：線の太さを0.6ptに設定する．
+
+       \tikz \draw[semithick] (0,0)--(1,0);
+       \verb@\tikz \draw[semithick] (0,0)--(1,0);@
+ \item \verb@thick@：線の太さを0.8ptに設定する．
+
+       \tikz \draw[thick] (0,0)--(1,0);
+       \verb@\tikz \draw[thick] (0,0)--(1,0);@
+ \item \verb@very thick@：線の太さを1.2ptに設定する．
+
+       \tikz \draw[very thick] (0,0)--(1,0);
+       \verb@\tikz \draw[very thick] (0,0)--(1,0);@
+ \item \verb@ultra thick@：線の太さを1.6ptに設定する．
+
+       \tikz \draw[ultra thick] (0,0)--(1,0);
+       \verb@\tikz \draw[ultra thick] (0,0)--(1,0);@
+\end{itemize}
+\subsection{線の端末の処理}
+\begin{itemize}
+ \item \verb@line cap=type@
+
+       \verb@type@には，``\verb@round@''，``\verb@rect@''，``\verb@butt@''の3種類があり，
+       defaultは\verb@butt@であり両端点は与えられた始点および終点の場所で終わる．
+       \verb@rect@は\verb@butt@の両端に線の太さの半分だけ長方形が付け加えられる．
+       \verb@round@は\verb@butt@の両端に線の太さの半分の半円が付け加えられる．
+
+       \begin{tikzpicture}
+	\draw[color=green] (0,-.5)--(0,1.5) (1,-.5)--(1,1.5);
+	\begin{scope}[line width=10pt]
+	 \draw[line cap=round] (0,0)--(1,0);
+	 \draw[line cap=rect] (0,.5)--(1,0.5);
+	 \draw[line cap=butt] (0,1)--(1,1);
+	\end{scope}
+	\draw[color=white,line width=1pt] (0,0)--(1,0) (0,.5)--(1,.5) (0,1)--(1,1);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[color=green] (0,-.5)--(0,1.5) (1,-.5)--(1,1.5);
+	 \begin{scope}[line width=10pt]
+	  \draw[line cap=round] (0,0)--(1,0);
+	  \draw[line cap=rect] (0,.5)--(1,0.5);
+	  \draw[line cap=butt] (0,1)--(1,1);
+	 \end{scope}
+	 \draw[color=white,line width=1pt] (0,0)--(1,0) (0,.5)--(1,.5) (0,1)--(1,1);
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+\subsection{線分の繋ぎ方}
+\begin{itemize}
+ \item \verb@line join=type@
+
+       \verb@type@には，``round''，``bevel''，``miter''の3種類あり，
+       defaultは``miter''である．\vspace{1zh}
+
+       \begin{tikzpicture}[line width=10pt]
+	\draw[line join=round] (0,0)--++(.5,1)--++(.5,-1);
+	\draw[line join=bevel] (1.5,0)--++(.5,1)--++(.5,-1);
+	\draw[line join=miter] (3,0)--++(.5,1)--++(.5,-1);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=10pt]
+	 \draw[line join=round] (0,0)--++(.5,1)--++(.5,-1);
+	 \draw[line join=bevel] (1.5,0)--++(.5,1)--++(.5,-1);
+	 \draw[line join=miter] (3,0)--++(.5,1)--++(.5,-1);
+	\end{tikzpicture}
+       \end{verbatim}
+
+       また，default(\verb@miter@)かつ非常に鋭角なコーナーのとき，
+       折れ点から伸ばす部分が線の太さの10倍になると自動で\verb@bevel@になるようにしてある．
+       これを変更するには\verb@miter limit@オプションで変更する．
+       defalutでは\verb@10@が設定してある．
+
+       \begin{tikzpicture}[line width=5pt]
+	\draw (0,0)--++(5,.5)--++(-5,.5);
+	\draw[miter limit=25] (6,0)--++(5,.5)--++(-5,.5);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=5pt]
+	 \draw (0,0)--++(5,.5)--++(-5,.5);
+	 \draw[miter limit=25] (6,0)--++(5,.5)--++(-5,.5);
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+\subsection{破線の数値による指定}
+\begin{itemize}
+ \item \verb@dash pattern=pattern@
+
+       \verb@pattern@に具体的に破線の使用を記述する．
+
+       \tikz \draw[dash pattern=on 2pt off 3pt on 4pt off 4pt]
+       (0pt,0pt)--(3.5cm,0pt);\\
+       \verb@\tikz \draw[dash pattern=on 2pt off 3pt on 4pt off 4pt](0pt,0pt)--(3.5cm,0pt);@
+ \item \verb@dash phase=dimension@
+
+       破線の開始を\verb@dimension@の分だけずらす．
+       defaultでは\verb@0pt@．
+
+       \begin{tikzpicture}[dash pattern=on 20pt off 10pt]
+	\draw[dash phase=0pt] (0pt,3pt)--(3.5cm,3pt);
+	\draw[dash phase=10pt] (0pt,0pt)--(3.5cm,0pt);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[dash pattern=on 20pt off 10pt]
+	 \draw[dash phase=0pt] (0pt,3pt)--(3.5cm,3pt);
+	 \draw[dash phase=10pt] (0pt,0pt)--(3.5cm,0pt);
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+\subsubsection{破線・点線の名前による指定}
+\begin{itemize}
+ \item \verb@solid@
+
+       \tikz \draw[solid] (0,0)--(2,0);
+       \verb@\tikz \draw[solid] (0,0)--(2,0);@
+ \item \verb@dotted@
+
+       \tikz \draw[dotted] (0,0)--(2,0);
+       \verb@\tikz \draw[dotted] (0,0)--(2,0);@
+ \item \verb@densely dotted@
+
+       \tikz \draw[densely dotted] (0,0)--(2,0);
+       \verb@\tikz \draw[densely dotted] (0,0)--(2,0);@
+ \item \verb@loosely dotted@
+
+       \tikz \draw[loosely dotted] (0,0)--(2,0);
+       \verb@\tikz \draw[loosely dotted] (0,0)--(2,0);@
+ \item \verb@dashed@
+
+       \tikz \draw[dashed] (0,0)--(2,0);
+       \verb@\tikz \draw[dashed] (0,0)--(2,0);@
+ \item \verb@densely dashed@
+
+       \tikz \draw[densely dashed] (0,0)--(2,0);
+       \verb@\tikz \draw[densely dashed] (0,0)--(2,0);@
+ \item \verb@loosely dashed@
+
+       \tikz \draw[loosely dashed] (0,0)--(2,0);
+       \verb@\tikz \draw[loosely dashed] (0,0)--(2,0);@
+ \item \verb@dashdotted@
+
+       \tikz \draw[dashdotted] (0,0)--(2,0);
+       \verb@\tikz \draw[dashdotted] (0,0)--(2,0);@
+ \item \verb@densely dashdotted@
+
+       \tikz \draw[densely dashdotted] (0,0)--(2,0);
+       \verb@\tikz \draw[densely dashdotted] (0,0)--(2,0);@
+ \item \verb@loosely dashdotted@
+
+       \tikz \draw[loosely dashdotted] (0,0)--(2,0);
+       \verb@\tikz \draw[loosely dashdotted] (0,0)--(2,0);@
+ \item \verb@dashdotdotted@
+
+       \tikz \draw[dashdotdotted] (0,0)--(2,0);
+       \verb@\tikz \draw[dashdotdotted] (0,0)--(2,0);@
+ \item \verb@densely dashdotdotted@
+
+       \tikz \draw[densely dashdotdotted] (0,0)--(2,0);
+       \verb@\tikz \draw[densely dashdotdotted] (0,0)--(2,0);@
+ \item \verb@loosely dashdotdotted@
+
+       \tikz \draw[loosely dashdotdotted] (0,0)--(2,0);
+       \verb@\tikz \draw[loosely dashdotdotted] (0,0)--(2,0);@
+\end{itemize}
+\subsection{矢線の設定}
+\begin{itemize}
+ \item \verb@arrows=<start arrow kind>-<end arrow kind>@
+
+       \verb@-@の前後にそれぞれ矢線の始点・終点の形状を指定する．
+       \verb@\usetikzlibrary@で\verb@arrows@を読み込んでおくと様々な矢線の形状を利用できるようになる．
+       \begin{itemize}
+	\item \tikz \draw[to-to] (0,0)--(1,0);
+	      \verb@\tikz \draw[to-to] (0,0)--(1,0);@
+	\item \tikz \draw[to reversed-to reversed] (0,0)--(1,0);
+	      \verb@\tikz \draw[to reversed-to reversed] (0,0)--(1,0);@
+	\item \tikz \draw[implies-implies] (0,0)--(1,0);
+	      \verb@\tikz \draw[implies-implies] (0,0)--(1,0);@
+	\item \tikz \draw[double,implies-implies] (0,0)--(1,0);
+	      \verb@\tikz \draw[double,implies-implies] (0,0)--(1,0);@
+	\item \tikz \draw[<->] (0,0)--(1,0);
+	      \verb@\tikz \draw[<->] (0,0)--(1,0);@
+	\item \tikz \draw[>-<] (0,0)--(1,0);
+	      \verb@\tikz \draw[>-<] (0,0)--(1,0);@
+	\item \tikz \draw[<<->>] (0,0)--(1,0);
+	      \verb@\tikz \draw[<<->>] (0,0)--(1,0);@
+	\item \tikz \draw[>>-<<] (0,0)--(1,0);
+	      \verb@\tikz \draw[>>-<<] (0,0)--(1,0);@
+	\item \tikz \draw[|<->|] (0,0)--(1,0);
+	      \verb@\tikz \draw[|<->|] (0,0)--(1,0);@
+	\item \tikz \draw[latex-latex] (0,0)--(1,0);
+	      \verb@\tikz \draw[latex-latex] (0,0)--(1,0);@
+	\item \tikz \draw[latex reversed-latex reversed] (0,0)--(1,0);
+	      \verb@\tikz \draw[latex reversed-latex reversed] (0,0)--(1,0);@
+	\item \tikz \draw[stealth-stealth] (0,0)--(1,0);
+	      \verb@\tikz \draw[stealth-stealth] (0,0)--(1,0);@
+	\item \tikz \draw[stealth reversed-stealth reversed] (0,0)--(1,0);
+	      \verb@\tikz \draw[stealth reversed-stealth reversed] (0,0)--(1,0);@
+	\item \tikz \draw[o-o] (0,0)--(1,0);
+	      \verb@\tikz \draw[o-o] (0,0)--(1,0);@
+	\item \tikz \draw[*-*] (0,0)--(1,0);
+	      \verb@\tikz \draw[*-*] (0,0)--(1,0);@
+	\item \tikz \draw[diamond-diamond] (0,0)--(1,0);
+	      \verb@\tikz \draw[diamond-diamond] (0,0)--(1,0);@
+	\item \tikz \draw[open diamond-open diamond] (0,0)--(1,0);
+	      \verb@\tikz \draw[open diamond-open diamond] (0,0)--(1,0);@
+	\item \tikz \draw[square-square] (0,0)--(1,0);
+	      \verb@\tikz \draw[square-square] (0,0)--(1,0);@
+	\item \tikz \draw[open square-open square] (0,0)--(1,0);
+	      \verb@\tikz \draw[open square-open square] (0,0)--(1,0);@
+       \end{itemize}
+\end{itemize}
+
+\section{円・弧の描画}
+\begin{itemize}
+ \item \verb@coordinate circle [radius=dimension]@
+
+       \verb@coordinate@を中心として半径\verb@dimension@の円を描く．
+
+       \begin{tikzpicture}
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw (1,1) circle [radius=1cm];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw (1,1) circle [radius=1cm];
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@coordinate arc [start angle=degree1,end angle=degree2,radius=dimension]@
+
+       \verb@coordinate@を始点とした半径\verb@dimension@，開始角\verb@degree1@，
+       終了角\verb@degree2@の弧を描く．
+
+       \begin{tikzpicture}
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw (2,1) arc [start angle=0,end angle=60,radius=1cm];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw (2,1) arc [start angle=0,end angle=60,radius=1cm];
+	\end{tikzpicture}
+       \end{verbatim}
+       \verb@start angle@または\verb@end angle@のどちらか一方と
+       \verb@delta angle=degree@として中心角を指定する方法もある．
+       また，\verb@radius@の代わりに\verb@x radius@，\verb@y radius@を使用すると楕円の弧となる．
+
+       ただし，このままで非常に使いにくいから
+       \verb@\mytikzarc[option](中心){半径}{開始角}{終了角}@
+       というコマンドを自作した．
+       コマンドのすぐ後ろに\verb@*@をつけると弧と中心を結んだ扇形を描く．
+       \verb@option@は\verb@\draw@のオプションである．
+
+       \begin{tikzpicture}
+	\draw[gray,very thin](0,0)grid(3,2);
+	\mytikzarc*[fill,blue,opacity=.5](2,1){1cm}{30}{120}
+	\mytikzarc[fill,red,opacity=.5](45:1){.5cm}{-45}{45}
+       \end{tikzpicture}
+	\begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \mytikzarc*[fill,blue,opacity=.5](2,1){1cm}{30}{120}
+	 \mytikzarc[fill,red,opacity=.5](45:1){.5cm}{-45}{45}
+	\end{tikzpicture}
+	\end{verbatim}
+       \verb@sector@を省略して\verb@fill@を指定すると扇形ではなく弓形の塗りつぶしとなる．
+ \item \verb@\draw coordinate1 to [out=degree1,in=degree2] coordinate2@
+
+       ２点\verb@coordinate1@，\verb@coordinate2@を結ぶ線分と角度\verb@degree1@で
+       点\verb@coordinate1@から出発して点\verb@coordinate2@へ角度\verb@degree2@で
+       到着する滑らなかな曲線を描く．
+
+       \begin{tikzpicture}
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0) to [out=30,in=150] (3,0);
+	\draw(3,1) to [out=30,in=150] (0,1);
+	\draw(3,2) to [out=-150,in=-30] (0,2);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw(0,0) to [out=30,in=150] (3,0);
+	 \draw(3,1) to [out=30,in=150] (0,1);
+	 \draw(3,2) to [out=-150,in=-30] (0,2);
+	\end{tikzpicture}
+	       \end{verbatim}
+	\end{itemize}
+
+\section{点および交点の設定}
+\subsection{点の設定}
+\begin{itemize}
+ \item \verb@\coordinate (点の名前) at (座標)@
+
+       \verb@\path coordinate@の短縮形．
+       \verb@\draw@などで線を引いている途中でも\verb@(座標) coordinate (点の名前)@で
+       点の名前を設定できる．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\coordinate (O) at (0,0);
+	\draw(0,1)--(3,1) coordinate (A)--(1,0);
+	\draw(O)--(A);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \coordinate (O) at (0,0);
+	 \draw(0,1)--(3,1) coordinate (A)--(1,0);
+	 \draw(O)--(A);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@\node [オプション] (点の名前) at (座標) {ラベル}@
+
+       \verb@\path node@の短縮形．
+       \verb@\draw@などで線を引いている途中でも\verb@(座標) node [オプション] (点の名前) {ラベル}@
+       で点の名前などを設定できる．
+       \verb@node@には形・大きさが存在する．
+       \verb@coordinate@は大きさが0の\verb@node@である．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\node (O) at (0,0) {O};
+	\node (A) at (2,1) {A};
+	\draw (O)--(A)--(3,0);
+%	\draw (O)--(2,1) node [blue] (A) {A}--(3,0);
+       \end{tikzpicture}
+       \begin{itemize}
+	\item 位置
+	      \begin{itemize}
+	       \item \verb@above@，\verb@below@，\verb@right@，\verb@left@
+
+		     それぞれ指定した座標の上，下，右，左に\verb@node@を設定する．
+		     座標に名前をつけてその上，下，右，左にラベルを表示するのではないことに注意．
+
+		     \begin{tikzpicture}[line width=1pt]
+		      \draw[gray,very thin](0,0)grid(3,2);
+		      \node[fill,red!20,opacity=.5,text=black](O)at(0,0)[below]{O};
+		      \node[fill,red!20,opacity=.5,text=black](A)at(3,1)[above]{A};
+		      \draw(O)--(A);
+		      \fill[blue](O.north)circle[radius=1pt](A.south)circle[radius=1pt];
+		     \end{tikzpicture}
+			\begin{verbatim}
+			 \begin{tikzpicture}[line width=1pt]
+			  \draw[gray,very thin](0,0)grid(3,2);
+			  \node[fill,red!20,opacity=.5,text=black](O)at(0,0)[below]{O};
+			  \node[fill,red!20,opacity=.5,text=black](A)at(3,1)[above]{A};
+			  \draw(O)--(A);
+			  \fill[blue](O.north)circle[radius=1pt](A.south)circle[radius=1pt];
+			 \end{tikzpicture}
+			\end{verbatim}
+	       \item \verb@anchor=north,south,east,west@
+
+		     それぞれ指定した座標に\verb@node@の
+		     北，南，東，西が重なるように\verb@node@を設定する．
+
+		     \begin{tikzpicture}[line width=1pt]
+		      \draw[gray,very thin](0,0)grid(3,2);
+		      \node[fill,red!20,opacity=.5,text=black](O)at(0,0)[anchor=south]{O};
+		      \node[fill,red!20,opacity=.5,text=black](A)at(3,1)[anchor=north]{A};
+		      \draw(O)--(A);
+		      \fill[blue](O.south)circle[radius=1pt](A.north)circle[radius=1pt];
+		     \end{tikzpicture}
+			\begin{verbatim}
+			 \begin{tikzpicture}[line width=1pt]
+			  \draw[gray,very thin](0,0)grid(3,2);
+			  \node[fill,red!20,opacity=.5,text=black](O)at(0,0)[anchor=south]{O};
+			  \node[fill,red!20,opacity=.5,text=black](A)at(3,1)[anchor=north]{A};
+			  \draw(O)--(A);
+			  \fill[blue](O.south)circle[radius=1pt](A.north)circle[radius=1pt];
+			 \end{tikzpicture}
+			\end{verbatim}
+	       \item \verb@ノード名.north,south,east,west@
+
+		     \begin{tikzpicture}
+		      \draw(0,0)grid(3,2);
+		      \node[fill,red!20,text=black](A)at(2,1){A};
+		      \scriptsize
+		      \path node at(A.north){N} node at(A.south){S};
+		      \node at(A.west){W};
+		      \node at(A.east){E};
+		     \end{tikzpicture}
+			\begin{verbatim}
+			 \begin{tikzpicture}
+			  \draw(0,0)grid(3,2);
+			  \node[fill,red!20,text=black](A)at(2,1){A};
+			  \scriptsize
+			  \path node at(A.north){N} node at(A.south){S};
+			  \node at(A.west){W};
+			  \node at(A.east){E};
+			 \end{tikzpicture}
+			\end{verbatim}
+	      \end{itemize}
+	\item ラベル
+	      オプションで\verb@label=位置:ラベル@と指定してラベルの位置をずらす．
+
+	      \begin{tikzpicture}
+	       \draw[gray,very thin](0,0)grid(3,2);
+	       \node[fill,red!20,opacity=.5,text=black](O)at(0,0)[label=south:O]{};
+	       \node[fill,red!20,opacity=.5,text=black](A)at(3,1)[label=north:A]{};
+	       \node[fill,red!20,opacity=.5,text=black](B)at(2,2)[label=below:B]{};
+	       \draw(O)--(A);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \draw[gray,very thin](0,0)grid(3,2);
+		 \node[fill,red!20,opacity=.5,text=black](O)at(0,0)[label=south:O]{};
+		 \node[fill,red!20,opacity=.5,text=black](A)at(3,1)[label=north:A]{};
+		 \node[fill,red!20,opacity=.5,text=black](B)at(2,2)[label=below:B]{};
+		 \draw(O)--(A);
+		\end{tikzpicture}
+	      \end{verbatim}
+
+	      ただし，\verb@node@には大きさがあるので上記のように2つの\verb@node@を線で結ぶと
+	      \verb@node@の近辺は描かれない．
+	      そこで下記のように\verb@coordinate@を使ってラベルと配置したほうが良いだろう．
+	      \verb@inner sep@を設定することによって点とラベルとの距離も任意に設定できる．
+	      ただし，\verb@label=num:label@と指定することもできるが(\verb@num@は角度)，
+	      この場合は\verb@inner sep@での指定は効果が無いようである．
+
+	      \begin{tikzpicture}
+	       \draw[gray,very thin](0,0)grid(3,2);
+	       \coordinate (O) at (0,0);
+	       \coordinate (A) at (3,1);
+	       \draw (O)--(A);
+	       \node[label=-135:{\scriptsize O},inner sep=0pt] at (O){};
+	       \node[anchor=south,inner sep=2pt] at (A){\scriptsize A};
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \draw[gray,very thin](0,0)grid(3,2);
+		 \coordinate (O) at (0,0);
+		 \coordinate (A) at (3,1);
+		 \draw (O)--(A);
+		 \node[label=-135:{\scriptsize O},inner sep=0pt] at (O){};
+		 \node[anchor=south,inner sep=2pt] at (A){\scriptsize A};
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item 形状
+	      \verb@circle@，\verb@rectangle@，\verb@coordinate@
+	      の３種類が設定可能．デフォルトは\verb@rectangle@であり，
+	      ライブラリで拡張可能である．
+	      オプションに\verb@draw@をつけると輪郭が描かれ，
+	      \verb@fill@をつけると内部が塗りつぶされる．
+	      また，\verb@inner sep=dimension@で
+	      \verb@node@内のラベルと外枠との距離を指定できる．
+	      デフォルトは\verb@.3333em@である．
+
+	      \begin{tikzpicture}
+	       \draw[gray,very thin](0,0)grid(3,2);
+	       \node[draw,red!20,opacity=.5,text=black](O)at(0,0){O};
+	       \node[fill,red!20,opacity=.5,text=black](A)at(1,1){A};
+	       \node[fill,circle,red!20,opacity=.5,text=black](B)at(2,2){B};
+	       \node[fill,coordinate,red!20,opacity=.5,text=black](C)at(3,1){C};
+	       \node[fill,circle,inner sep=0pt,red!20,opacity=.5,text=black](D)at(3,0){D};
+	      \end{tikzpicture}
+		\begin{verbatim}
+		 \begin{tikzpicture}
+		  \draw[gray,very thin](0,0)grid(3,2);
+		  \node[draw,red!20,opacity=.5,text=black](O)at(0,0){O};
+		  \node[fill,red!20,opacity=.5,text=black](A)at(1,1){A};
+		  \node[fill,circle,red!20,opacity=.5,text=black](B)at(2,2){B};
+		  \node[fill,coordinate,red!20,opacity=.5,text=black](C)at(3,1){C};
+		  \node[fill,circle,inner sep=0pt,red!20,opacity=.5,text=black](D)at(3,0){D};
+		 \end{tikzpicture}
+		\end{verbatim}
+       \end{itemize}
+ \item 内分点・外分点など
+       \begin{itemize}
+	\item \verb@$(A)!num!(B)$@で
+	      線分ABを$\mathtt{num}:(1-\mathtt{num})$に内分($0<\mathtt{num}<1$なら内分点，
+	      $\mathtt{num}<0$または$1<\mathtt{num}$ならば外分点)する点を表す．
+	      別の言い方をすれば，$\mathtt{num}\times\Vec{AB}$の端点を表す．
+	\item \verb@$(A)!num!angle:(B)$@では
+	      $\Vec{AB}$を\verb@num@倍したものを点Aを中心として\verb@angle@回転させた端点を表す．
+	\item \verb@$(A)!dim!(B)$@とすると
+	      線分AXの長さが\verb@dim@となる直線AB上の点Xを表す．
+	      これは\verb@$(A)!num!angle:(B)$@と同様に回転させることもできる．
+	\item \verb@$(A)!(P)!(B)$@は
+	      点Pから直線ABに下ろした垂線の足の座標を表す．
+       \end{itemize}
+       \begin{tikzpicture}
+	\draw[help lines] (0,-1)grid(3,1);
+	\coordinate (A) at (0,0);
+	\coordinate (B) at (3,0);
+	\coordinate (C) at ($(A)!.3!(B)$);
+	\draw(A)--(B);
+	\foreach \num in {.1,.2,...,.9}
+	 \draw($(A)!\num!(B)+(0,-.1)$)--($(A)!\num!(B)+(0,.1)$);
+	\foreach \point in {A,B,C}{
+	 \fill[red,opacity=.5] (\point) circle [radius=2pt];
+	 \node at(\point)[below]{\scriptsize\point};
+	}
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[help lines] (0,-1)grid(3,1);
+	 \coordinate (A) at (0,0);
+	 \coordinate (B) at (3,0);
+	 \coordinate (C) at ($(A)!.3!(B)$);
+	 \draw(A)--(B);
+	 \foreach \num in {.1,.2,...,.9}
+	  \draw($(A)!\num!(B)+(0,-.1)$)--($(A)!\num!(B)+(0,.1)$);
+	 \foreach \point in {A,B,C}{
+	  \fill[red,opacity=.5] (\point) circle [radius=2pt];
+	  \node at(\point)[below]{\scriptsize\point};
+	 }
+	\end{tikzpicture}
+       \end{verbatim}
+       \begin{tikzpicture}
+	\draw[help lines] (0,-1)grid(3,1);
+	\coordinate (A) at (0,0);
+	\coordinate (B) at (1,0);
+	\coordinate (C) at ($(A)!3!(B)$);
+	\draw(A)--(B);
+	\foreach \point in {A,B,C}{
+	 \fill[red,opacity=.5] (\point) circle [radius=2pt];
+	 \node at(\point)[below]{\scriptsize\point};
+	}
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[help lines] (0,-1)grid(3,1);
+	 \coordinate (A) at (0,0);
+	 \coordinate (B) at (1,0);
+	 \coordinate (C) at ($(A)!3!(B)$);
+	 \draw(A)--(B);
+	 \foreach \point in {A,B,C}{
+	  \fill[red,opacity=.5] (\point) circle [radius=2pt];
+	  \node at(\point)[below]{\scriptsize\point};
+	 }
+	\end{tikzpicture}
+       \end{verbatim}
+       \begin{tikzpicture}[>=stealth,line width=1pt]
+	\draw[help lines](0,0)grid(3,2);
+	\coordinate[label=left:A](A) at (0,1);
+	\coordinate[label=left:B](B) at (0,0);
+	\coordinate[label=right:C](C) at ($(A)!3!90:(B)$);
+	\foreach \point in {A,B,C}{
+	 \fill[red,opacity=.5](\point)circle[radius=2pt];
+	}
+	\draw[->](A)--(B);
+	\draw[->](A)--(C);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[>=stealth,line width=1pt]
+	 \draw[help lines](0,0)grid(3,2);
+	 \coordinate[label=left:A](A) at (0,1);
+	 \coordinate[label=left:B](B) at (0,0);
+	 \coordinate[label=right:C](C) at ($(A)!3!90:(B)$);
+	 \foreach \point in {A,B,C}{
+	  \fill[red,opacity=.5](\point)circle[radius=2pt];
+	 }
+	 \draw[->](A)--(B);
+	 \draw[->](A)--(C);
+	\end{tikzpicture}
+       \end{verbatim}
+
+       さらに，次のように繰り返し使うこともできる．
+
+       \begin{tikzpicture}
+	\coordinate[label=left:A](A)at(0,0);
+	\coordinate[label=right:B](B)at(2,1);
+	\coordinate[label=above:C](C)at($(A)!.5!(B)!{sin(60)*2}!90:(B)$);
+	\draw(A)--(B)--(C)--cycle;
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \coordinate[label=left:A](A)at(0,0);
+	 \coordinate[label=right:B](B)at(2,1);
+	 \coordinate[label=above:C](C)at($(A)!.5!(B)!{sin(60)*2}!90:(B)$);
+	 \draw(A)--(B)--(C)--cycle;
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+\subsection{交点の設定}
+\begin{itemize}
+ \item 直交する２直線の交点
+
+       \verb@((Pの座標)|-(Qの座標))@
+       Pを通る垂直線とQを通る水平線との交点．
+
+       \begin{tikzpicture}
+	\draw[gray,very thin](0,0)grid(3,2);
+	\coordinate(P)at(0,1);
+	\coordinate(Q)at(2,2);
+	\node at (P){P};
+	\node at (Q){Q};
+	\fill(P|-Q) circle [radius=2pt];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \coordinate(P)at(0,1);
+	 \coordinate(Q)at(2,2);
+	 \node at (P){P};
+	 \node at (Q){Q};
+	 \fill(P|-Q) circle [radius=2pt];
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \verb@((Pの座標)-|(Qの座標))@
+       Pを通る水平線とQを通る垂直線との交点．
+
+       \begin{tikzpicture}
+	\draw[gray,very thin](0,0)grid(3,2);
+	\coordinate(P)at(0,1);
+	\coordinate(Q)at(2,2);
+	\node at (P){P};
+	\node at (Q){Q};
+	\fill(P-|Q) circle [radius=2pt];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \coordinate(P)at(0,1);
+	 \coordinate(Q)at(2,2);
+	 \node at (P){P};
+	 \node at (Q){Q};
+	 \fill(P-|Q) circle [radius=2pt];
+	\end{tikzpicture}
+       \end{verbatim}
+ \item 任意のパスの交点
+
+       異なる2つのパスに\verb@name path=path1@と\verb@name path=path2@を設定し，
+       \verb@name intersections=@
+       \verb@{of=path1 and path2}@で交点を設定する．
+       交点の名前はデフォルトでは\verb@intersection-1@，\verb@intersection-2@，$\ldots$と
+       つけられるが，\verb@name intersections@の引数に
+       \verb@by={A,B,C,...}@と指定することもできる．
+
+       \begin{tikzpicture}[>=stealth]
+	\draw[->](-2,0)--(2,0) node [below left]{\scriptsize$x$};
+	\draw[->](0,-1.5)--(0,3) node [below left]{\scriptsize$y$};
+	\draw[name path=para] plot [domain=-2:2] (\x,{pow(\x,2)-1});
+	\draw[name path=circ] (0,0) circle [radius=1];
+	\path [name intersections={of=para and circ,by={A,B,C}}];
+	\fill (A) circle [radius=2pt] (B) circle [radius=2pt] (C) circle [radius=2pt];
+	\node at (A)[below left]{A};
+	\node at (B)[below right]{B};
+	\node at (C)[below right]{C};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[>=stealth]
+	 \draw[->](-2,0)--(2,0) node [below left]{\scriptsize$x$};
+	 \draw[->](0,-1.5)--(0,3) node [below left]{\scriptsize$y$};
+	 \draw[name path=para] plot [domain=-2:2] (\x,{pow(\x,2)-1});
+	 \draw[name path=circ] (0,0) circle [radius=1];
+	 \path [name intersections={of=para and circ,by={A,B,C}}];
+	 \fill (A) circle [radius=2pt] (B) circle [radius=2pt] (C) circle [radius=2pt];
+	 \node at (A)[below left]{A};
+	 \node at (B)[below right]{B};
+	 \node at (C)[below right]{C};
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{Coordinate Systems}
+\subsection{Canvas, XYZ, and Polar Coordinate Systems}
+\subsubsection{Coordinate system canvas}
+\begin{itemize}
+ \item \verb@canvas cs:x@，\verb@canvas cs:y@
+
+       それぞれ原点からの$x$軸，$y$軸方向への距離を指定する．
+
+       \begin{tikzpicture}
+	\draw[help lines](0,0)grid(3,2);
+	\fill(canvas cs:x=1cm,y=1.5cm)circle[radius=2pt];
+	\fill(canvas cs:x=2cm,y=-5mm+2pt)circle[radius=2pt];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[help lines](0,0)grid(3,2);
+	 \fill(canvas cs:x=1cm,y=1.5cm)circle[radius=2pt];
+	 \fill(canvas cs:x=2cm,y=-5mm+2pt)circle[radius=2pt];
+	\end{tikzpicture}
+       \end{verbatim}
+       これらの指定は，コンマで区切られた2つの dimension を使って簡単に記述することができる．
+
+       \begin{tikzpicture}
+	\draw[help lines](0,0)grid(3,2);
+	\fill(1cm,1.5cm)circle[radius=2pt];
+	\fill(2cm,-5mm+2pt)circle[radius=2pt];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw[help lines](0,0)grid(3,2);
+	 \fill(1cm,1.5cm)circle[radius=2pt];
+	 \fill(2cm,-5mm+2pt)circle[radius=2pt];
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+\subsubsection{Coordinate system xyz}
+\begin{itemize}
+ \item \verb@xyz cs:x@，\verb@xyz cs:y@，\verb@xyz cs:z@
+
+       それぞれ$x$軸，$y$軸，$z$軸の単位ベクトルを何倍するかを指定する．
+
+       \begin{tikzpicture}[->]
+	\draw(0,0)--(xyz cs:x=2);
+	\draw(0,0)--(xyz cs:y=2);
+	\draw(0,0)--(xyz cs:z=2);
+	\begin{scope}[red,line width=1pt]
+	 \draw(0,0)--(xyz cs:x=1);
+	 \draw(0,0)--(xyz cs:y=1);
+	 \draw(0,0)--(xyz cs:z=1);
+	\end{scope}
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[->]
+	 \draw(0,0)--(xyz cs:x=2);
+	 \draw(0,0)--(xyz cs:y=2);
+	 \draw(0,0)--(xyz cs:z=2);
+	 \begin{scope}[red,line width=1pt]
+	  \draw(0,0)--(xyz cs:x=1);
+	  \draw(0,0)--(xyz cs:y=1);
+	  \draw(0,0)--(xyz cs:z=1);
+	 \end{scope}
+	\end{tikzpicture}
+       \end{verbatim}
+       これも，カンマで区切られた3つの数値によって簡単に記述することができるが，
+       canvas coordinate system とは異なり，dimension を記述することはできない．
+
+       \begin{tikzpicture}[->]
+	\draw(0,0)--(2,0);
+	\draw(0,0)--(0,2,0);
+	\draw(0,0)--(0,0,2);
+	\begin{scope}[red,line width=1pt]
+	 \draw(0,0)--(1,0);
+	 \draw(0,0)--(0,1,0);
+	 \draw(0,0)--(0,0,1);
+	\end{scope}
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[->]
+	 \draw(0,0)--(2,0);
+	 \draw(0,0)--(0,2,0);
+	 \draw(0,0)--(0,0,2);
+	 \begin{scope}[red,line width=1pt]
+	  \draw(0,0)--(1,0);
+	  \draw(0,0)--(0,1,0);
+	  \draw(0,0)--(0,0,1);
+	 \end{scope}
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+\subsubsection{Coordinate system canvas polar}
+\begin{itemize}
+ \item \verb@canvas polar cs:angle@，\verb@canvas polar cs:radius@
+
+       それぞれ極座標の偏角(60分法)と動径を指定する．
+
+       \tikz\draw(0,0)--(canvas polar cs:angle=30,radius=1cm);
+       \verb@\tikz\draw(0,0)--(canvas polar cs:angle=30,radius=1cm);@
+
+       これはコロンで区切られた数値と dimension によって簡単に記述することができる．
+
+       \tikz\draw(0,0)--(30:1cm);
+       \verb@\tikz\draw(0,0)--(30:1cm);@
+\end{itemize}
+\subsection{Node Coorinate System}
+\subsubsection{Coordinate system node}
+\begin{itemize}
+ \item \verb@node cs:name@
+
+       予め設定されたノードへアクセスする．
+ \item \verb@node cs:anchor@
+
+       ノードのアンカーを指定する．
+
+       \begin{tikzpicture}
+	\node(shape)at(0,2)[draw]{|class Shape|};
+	\node(rect)at(-2,0)[draw]{|class Rectangle|};
+	\node(circle)at(2,0)[draw]{|class Circle|};
+	\node(ellipse)at(6,0)[draw]{|class Ellipse|};
+	\fill[red!50](0,1)circle[radius=2pt];
+	\draw(node cs:name=circle,anchor=north)|-(0,1);
+	\draw(node cs:name=ellipse,anchor=north)|-(0,1);
+	\draw[-open triangle 90](node cs:name=rect,anchor=north)
+	 |- (0,1) -| (node cs:name=shape,anchor=south);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \node(shape)at(0,2)[draw]{|class Shape|};
+	 \node(rect)at(-2,0)[draw]{|class Rectangle|};
+	 \node(circle)at(2,0)[draw]{|class Circle|};
+	 \node(ellipse)at(6,0)[draw]{|class Ellipse|};
+	 \fill[red!50](0,1)circle[radius=2pt];
+	 \draw(node cs:name=circle,anchor=north)|-(0,1);
+	 \draw(node cs:name=ellipse,anchor=north)|-(0,1);
+	 \draw[-open triangle 90](node cs:name=rect,anchor=north)
+	  |- (0,1) -| (node cs:name=shape,anchor=south);
+	\end{tikzpicture}
+       \end{verbatim}
+       これは\verb@name@と\verb@anchor@をピリオドでつなぎ，次のように省略して指定できる．
+
+       \begin{tikzpicture}
+	\node(shape)at(0,2)[draw]{|class Shape|};
+	\node(rect)at(-2,0)[draw]{|class Rectangle|};
+	\node(circle)at(2,0)[draw]{|class Circle|};
+	\node(ellipse)at(6,0)[draw]{|class Ellipse|};
+	\fill[red!50](0,1)circle[radius=2pt];
+	\draw(circle.north)|-(0,1);
+	\draw(ellipse.north)|-(0,1);
+	\draw[-open triangle 90](rect.north)
+	 |- (0,1) -| (shape.south);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \node(shape)at(0,2)[draw]{|class Shape|};
+	 \node(rect)at(-2,0)[draw]{|class Rectangle|};
+	 \node(circle)at(2,0)[draw]{|class Circle|};
+	 \node(ellipse)at(6,0)[draw]{|class Ellipse|};
+	 \fill[red!50](0,1)circle[radius=2pt];
+	 \draw(circle.north)|-(0,1);
+	 \draw(ellipse.north)|-(0,1);
+	 \draw[-open triangle 90](rect.north)
+	  |- (0,1) -| (shape.south);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@node cs:angle@
+
+       \verb@anchor@を使ってキーワードで指定する代わりに角度(60分法)で指定する．
+
+       \begin{tikzpicture}
+	\node(start)[draw,shape=circle]{start};
+	\foreach \angle in {-90,-80,...,90}
+	 \draw(node cs:name=start,angle=\angle)
+	  .. controls +(\angle:1cm) and +(-1,0) .. (2.5,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \node(start)[draw,shape=circle]{start};
+	 \foreach \angle in {-90,-80,...,90}
+	  \draw(node cs:name=start,angle=\angle)
+	   .. controls +(\angle:1cm) and +(-1,0) .. (2.5,0);
+	\end{tikzpicture}
+       \end{verbatim}
+       これも\verb@name@と\verb@angle@をピリオドでつなぎ，次のように省略して指定できる．
+
+       \begin{tikzpicture}
+	\node(start)[draw,shape=circle]{start};
+	\foreach \angle in {-90,-80,...,90}
+	 \draw(start.\angle)
+	  .. controls +(\angle:1cm) and +(-1,0) .. (2.5,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \node(start)[draw,shape=circle]{start};
+	 \foreach \angle in {-90,-80,...,90}
+	  \draw(start.\angle)
+	   .. controls +(\angle:1cm) and +(-1,0) .. (2.5,0);
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{座標・数値の保存}
+\begin{itemize}
+ \item \verb@\p<digit>@，\verb@\x<digit>@，\verb@\y<digit>@，\verb@\n<digit>@
+
+       \verb@\p1@に$\Zahyo{3,5}$が設定されたとき，
+       \verb@\x1=3@，\verb@\y1=5@が設定される．
+       これを利用すると，指定した2点のうち一方を中心として他方を通る円の作図などができる．
+       \verb@\n<digit>@には任意の数値を代入できる．
+
+       \begin{tikzpicture}[scale=.5]
+	\coordinate[label=left:A](A) at (1,1);
+	\coordinate[label=right:B](B) at (3,2);
+	\draw(A)--(B);
+	\draw(A) let \p1=($(B)-(A)$),\n1={veclen(\x1,\y1)} in circle [radius=\n1];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \coordinate[label=left:A](A) at (1,1);
+	 \coordinate[label=right:B](B) at (3,2);
+	 \draw(A)--(B);
+	 \draw(A) let \p1=($(B)-(A)$),\n1={veclen(\x1,\y1)} in circle [radius=\n1];
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \begin{tikzpicture}[scale=.5]
+	\coordinate[label=left:A](A) at (1,1);
+	\coordinate[label=right:B](B) at (3,2);
+	\draw(A)--(B);
+	\draw let \p1=($(B)-(A)$),\n1={veclen(\x1,\y1)}
+	 in (A) circle [radius=\n1]
+	    (B) circle [radius=\n1];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \coordinate[label=left:A](A) at (1,1);
+	 \coordinate[label=right:B](B) at (3,2);
+	 \draw(A)--(B);
+	 \draw let \p1=($(B)-(A)$),\n1={veclen(\x1,\y1)}
+	  in (A) circle [radius=\n1]
+	     (B) circle [radius=\n1];
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \verb@p<digit>@，\verb@x<digit>@，\verb@y<digit>@，\verb@n<digit>@
+       の\verb@<digit>@は\verb@{name}@のように置き換えることができる．
+
+       \begin{tikzpicture}[scale=.5]
+	\coordinate[label=left:A](A) at (1,1);
+	\coordinate[label=right:B](B) at (3,2);
+	\draw(A)--(B);
+	\draw let \p{dis}=($(B)-(A)$),\n{r}={veclen(\x{dis},\y{dis})}
+	 in (A) circle [radius=\n{r}]
+	    (B) circle [radius=\n{r}];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \coordinate[label=left:A](A) at (1,1);
+	 \coordinate[label=right:B](B) at (3,2);
+	 \draw(A)--(B);
+	 \draw let \p{dis}=($(B)-(A)$),\n{r}={veclen(\x{dis},\y{dis})}
+	  in (A) circle [radius=\n{r}]
+	     (B) circle [radius=\n{r}];
+	\end{tikzpicture}
+       \end{verbatim}
+       ただ，これらの例は\verb@through@ライブラリを利用すれば次のように簡単に描画できる．
+
+       \begin{tikzpicture}[scale=.5]
+	\coordinate[label=left:A](A) at (1,1);
+	\coordinate[label=right:B](B) at (3,2);
+	\draw(A)--(B);
+	\node[draw,circle through=(B),label=left:$D$]at(A){};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[scale=.5]
+	 \coordinate[label=left:A](A) at (1,1);
+	 \coordinate[label=right:B](B) at (3,2);
+	 \draw(A)--(B);
+	 \node[draw,circle through=(B),label=left:$D$]at(A){};
+	\end{tikzpicture}
+       \end{verbatim}
+
+       以上のことを駆使すると次のような描画ができる．
+
+       \pgfdeclarelayer{background}
+       \pgfsetlayers{background,main}
+       \begin{tikzpicture}[thick,help lines/.style={thin,draw=black!50}]
+	\def\A{\textcolor{input}{$A$}}\def\B{\textcolor{input}{$B$}}
+	\def\C{\textcolor{output}{$C$}}\def\D{$D$}\def\E{$E$}
+	\colorlet{input}{blue!80!black}
+	\colorlet{triangle}{orange}
+	\colorlet{output}{red!70!black}
+	\coordinate [label=left:\A] (A) at ($ (0,0) + .1*(rand,rand) $);
+	\coordinate [label=right:\B] (B) at ($ (1.25,0.25) + .1*(rand,rand) $);
+	\draw [input] (A) -- (B);
+	\node [name path=D,help lines,draw,label=left:\D] (D) at (A) [circle through=(B)] {};
+	\node [name path=E,help lines,draw,label=right:\E] (E) at (B) [circle through=(A)] {};
+	\path [name intersections={of=D and E,by={[label=above:\C]C}}];
+	\draw [output] (A) -- (C) -- (B);
+	\foreach \point in {A,B,C}
+	\fill [black,opacity=.5] (\point) circle (2pt);
+	\begin{pgfonlayer}{background}
+	 \fill[triangle!80] (A) -- (C) -- (B) -- cycle;
+	\end{pgfonlayer}
+	\node [below right, text width=10cm,align=justify] at (4,3) {
+	 \small\textbf{Proposition I}\par
+	 \emph{To construct an \textcolor{triangle}{equilateral triangle}
+	 on a given \textcolor{input}{finite straight line}.}
+	 \par\vskip1em
+	 Let \A\B\ be the given \textcolor{input}{finite straight line}. \dots
+	};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\pgfdeclarelayer{background}
+	\pgfsetlayers{background,main}
+	\begin{tikzpicture}[thick,help lines/.style={thin,draw=black!50}]
+	 \def\A{\textcolor{input}{$A$}}\def\B{\textcolor{input}{$B$}}
+	 \def\C{\textcolor{output}{$C$}}\def\D{$D$}\def\E{$E$}
+	 \colorlet{input}{blue!80!black}
+	 \colorlet{triangle}{orange}
+	 \colorlet{output}{red!70!black}
+	 \coordinate [label=left:\A] (A) at ($ (0,0) + .1*(rand,rand) $);
+	 \coordinate [label=right:\B] (B) at ($ (1.25,0.25) + .1*(rand,rand) $);
+	 \draw [input] (A) -- (B);
+	 \node [name path=D,help lines,draw,label=left:\D] (D) at (A) [circle through=(B)] {};
+	 \node [name path=E,help lines,draw,label=right:\E] (E) at (B) [circle through=(A)] {};
+	 \path [name intersections={of=D and E,by={[label=above:\C]C}}];
+	 \draw [output] (A) -- (C) -- (B);
+	 \foreach \point in {A,B,C}
+	  \fill [black,opacity=.5] (\point) circle (2pt);
+	 \begin{pgfonlayer}{background}
+	  \fill[triangle!80] (A) -- (C) -- (B) -- cycle;
+	 \end{pgfonlayer}
+	 \node [below right, text width=10cm,align=justify] at (4,3) {
+	  \small\textbf{Proposition I}\par
+	  \emph{To construct an \textcolor{triangle}{equilateral triangle}
+	  on a given \textcolor{input}{finite straight line}.}
+	  \par\vskip1em
+	  Let \A\B\ be the given \textcolor{input}{finite straight line}. \dots
+	 };
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+
+\section{スタイルの設定}
+\begin{itemize}
+ \item \verb@\tikzset@
+
+       大域的に特定のスタイルを定義する．
+       \verb@\tikzset{スタイル名/.style={各種設定}}@とプリアンブルなどに記述するか
+       \verb@tikzpicture@や\verb@scope@環境の引数として
+       \verb@[スタイル名/.style={各種設定}]@と記述する．
+       また，デフォルト値を設定した上でパラメータを用いてその都度変更することもできる．
+
+       \begin{tikzpicture}[my grid/.style={green!50,ultra thin}]
+	\draw[my grid](0,0)grid(3,2);
+       \end{tikzpicture}
+       \begin{tikzpicture}[my grid/.style={#1!50,ultra thin},my grid/.default=blue]
+	\draw[my grid](0,0)grid(2,2);
+	\draw[my grid=red](3,0)grid(5,2);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[my grid/.style={green!50,ultra thin}]
+	 \draw[my grid](0,0)grid(3,2);
+	\end{tikzpicture}
+	\begin{tikzpicture}[my grid/.style={#1!50,ultra thin},my grid/.default=blue]
+	 \draw[my grid](0,0)grid(2,2);
+	 \draw[my grid=red](3,0)grid(5,2);
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{不透明度の設定}
+\begin{itemize}
+ \item \verb@draw opacity=value@
+
+       線に対する透明度の指定を行う．
+       \verb@value@には\verb@0@から\verb@1@の数値が入り，
+       \verb@1@は完全は不透明，\verb@0@は完全な透明となる．
+       \verb@.5@はその間である．
+
+       \begin{tikzpicture}[line width=1ex]
+	\draw(0,0)--(3,1);
+	\filldraw[fill=yellow!75!black,draw opacity=.5](1,0)rectangle(2,1);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1ex]
+	 \draw(0,0)--(3,1);
+	 \filldraw[fill=yellow!75!black,draw opacity=.5](1,0)rectangle(2,1);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@opacity=value@
+
+       線および塗りつぶしに対する透明度の指定を行う．
+       \verb@value@には\verb@0@から\verb@1@の数値が入り，
+       \verb@1@は完全は不透明，\verb@0@は完全な透明となる．
+       \verb@.5@はその間であり\verb@semitransparent@と同じである．
+       下の例で分かるように，\verb@fill@だけではなく\verb@draw@に対しても有効であるから
+       上の\verb@draw opacity@は実際には使わない．
+
+       \begin{tikzpicture}
+	\fill[red](0,0)rectangle(1,0.5);
+	\fill[opacity=.25](0.5,0)rectangle(1.5,.25);
+	\draw[opacity=.5,blue,line width=5pt](0,.25)--(1.25,.25);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \fill[red](0,0)rectangle(1,0.5);
+	 \fill[opacity=.25](0.5,0)rectangle(1.5,.25);
+	 \draw[opacity=.5,blue,line width=5pt](0,.25)--(1.25,.25);
+	\end{tikzpicture}
+       \end{verbatim}
+       また，透明度はキーワードでも指定できる．
+       \begin{itemize}
+	\item \verb@transparent@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[transparent](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[transparent](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@ultra nearly transparent@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[ultra nearly transparent](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[ultra nearly transparent](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@very nearly transparent@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[very nearly transparent](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[very nearly transparent](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@nearly transparent@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[nearly transparent](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[nearly transparent](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@semitransparent@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[semitransparent](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[semitransparent](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@nearly opaque@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[nearly opaque](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[nearly opaque](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@very nearly opaque@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[very nearly opaque](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[very nearly opaque](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@ultra nearly opaque@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[ultra nearly opaque](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[ultra nearly opaque](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+	\item \verb@opaque@
+
+	      \begin{tikzpicture}
+	       \fill[red](0,0)rectangle(1,0.5);
+	       \fill[opaque](0.5,0)rectangle(1.5,.25);
+	      \end{tikzpicture}
+	      \begin{verbatim}
+		\begin{tikzpicture}
+		 \fill[red](0,0)rectangle(1,0.5);
+		 \fill[opaque](0.5,0)rectangle(1.5,.25);
+		\end{tikzpicture}
+	      \end{verbatim}
+       \end{itemize}
+ \item \verb@fill opacity=value@
+
+       \verb@opacity@と違い透明度の設定は塗りつぶし部分だけに適用され，
+       線の部分には適用されない．
+       \verb@1@は完全は不透明，\verb@0@は完全な透明となる．
+       \verb@.5@はその間である．
+
+       \begin{tikzpicture}[thick,fill opacity=.5]
+	\filldraw[fill=red](0:1cm)circle[radius=12mm];
+	\filldraw[fill=green](120:1cm)circle[radius=12mm];
+	\filldraw[fill=blue](-120:1cm)circle[radius=12mm];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[thick,fill opacity=.5]
+	 \filldraw[fill=red](0:1cm)circle[radius=12mm];
+	 \filldraw[fill=green](120:1cm)circle[radius=12mm];
+	 \filldraw[fill=blue](-120:1cm)circle[radius=12mm];
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \begin{tikzpicture}
+	\fill[red](0,0)rectangle(3,2);
+	\node at (0,0){\huge A};
+	\node[fill opacity=.5]at(3,2){\huge B};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \fill[red](0,0)rectangle(3,2);
+	 \node at (0,0){\huge A};
+	 \node[fill opacity=.5]at(3,2){\huge B};
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@text opacity=value@
+
+       テキストの透明度を設定する．
+       \verb@opacity@では図もテキストも全てに透明度を設定するので，
+       場合によってはテキストが見にくくなる．
+       そこで，\verb@opacity@とは別に\verb@text opacity@でテキストの透明度を設定する．
+       \verb@1@は完全は不透明，\verb@0@は完全な透明となる．
+       \verb@.5@はその間である．
+
+       \begin{tikzpicture}[every node/.style={fill,draw}]
+	\draw[line width=2mm,blue!50,line cap=round](0,0)grid(3,2);
+	\node[opacity=.5]at(1.5,2){Upper node};
+	\node[draw opacity=.8,fill opacity=.2,text opacity=1]
+	 at(1.5,0){Lower node};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[every node/.style={fill,draw}]
+	 \draw[line width=2mm,blue!50,line cap=round](0,0)grid(3,2);
+	 \node[opacity=.5]at(1.5,2){Upper node};
+	 \node[draw opacity=.8,fill opacity=.2,text opacity=1]
+	  at(1.5,0){Lower node};
+	\end{tikzpicture}
+       \end{verbatim}
+       ちなみに透明度を指定した図が重なると透明度は加算される．
+
+       \begin{tikzpicture}[fill opacity=.5]
+	\fill[red](0,0)circle[radius=1cm];
+	\fill[red](1,0)circle[radius=1cm];
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[fill opacity=.5]
+	 \fill[red](0,0)circle[radius=1cm];
+	 \fill[red](1,0)circle[radius=1cm];
+	\end{tikzpicture}
+       \end{verbatim}
+       これを防ぐ方法が次の``Transparency Groups''である．
+\end{itemize}
+
+\section{Transparency Groups}
+\begin{itemize}
+ \item \verb@transparency group@
+
+       複数の図をグループ登録し透過度を揃える．
+
+       \begin{tikzpicture}[opacity=.5]
+	\draw[line width=5mm](0,0)--(2,2);
+	\draw[line width=5mm](2,0)--(0,2);
+       \end{tikzpicture}
+       \begin{tikzpicture}[opacity=.5]
+	\begin{scope}[transparency group]
+	 \draw[line width=5mm](0,0)--(2,2);
+	 \draw[line width=5mm](2,0)--(0,2);
+	\end{scope}
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[opacity=.5]
+	 \draw[line width=5mm](0,0)--(2,2);
+	 \draw[line width=5mm](2,0)--(0,2);
+	\end{tikzpicture}
+	\begin{tikzpicture}[opacity=.5]
+	 \begin{scope}[transparency group]
+	  \draw[line width=5mm](0,0)--(2,2);
+	  \draw[line width=5mm](2,0)--(0,2);
+	 \end{scope}
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \begin{tikzpicture}
+	\node at(0,0)[forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	\node [opacity=.5]at(2,0)
+	 [forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+       \end{tikzpicture}
+       \begin{tikzpicture}
+	\node at(0,0)[forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	\begin{scope}[opacity=.5,transparency group]
+	 \node at(2,0)[forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	\end{scope}
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \node at(0,0)[forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	 \node [opacity=.5]at(2,0)
+	  [forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	\end{tikzpicture}
+	\begin{tikzpicture}
+	 \node at(0,0)[forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	 \begin{scope}[opacity=.5,transparency group]
+	  \node at(2,0)[forbidden sign,line width=2ex,draw=red,fill=white]{Smoking};
+	 \end{scope}
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{その他}
+\begin{itemize}
+ \item \verb@decoration=keyword@
+
+       \begin{tikzpicture}
+	\node (a){A};
+	\node (b)at(2,1){B};
+	\draw(a)--(b);
+	\draw[decorate,decoration=brace](a)--(b);
+	\draw[decorate,decoration={brace,mirror},red](a)--(b);
+	\draw[decorate,decoration={brace,mirror,raise=5pt},blue](a)--(b);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \node (a){A};
+	 \node (b)at(2,1){B};
+	 \draw(a)--(b);
+	 \draw[decorate,decoration=brace](a)--(b);
+	 \draw[decorate,decoration={brace,mirror},red](a)--(b);
+	 \draw[decorate,decoration={brace,mirror,raise=5pt},blue](a)--(b);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@x=value@，\verb@y=value@，\verb@z=value@
+
+       それぞれ$x$，$y$，$z$軸方向の単位ベクトルを指定する．
+       長さだけの場合は絶対値だけ変更し，
+       ベクトルで指定するとそのベクトルがそれぞれ$x$，$y$，$z$軸方向の単位ベクトルとなる．
+       \verb@x@，\verb@y@，\verb@z@のdefaultはそれぞれ
+       \verb@1cm@，\verb@1cm@，\verb@-3.85mm@である．
+
+       \begin{tikzpicture}
+	\draw(0,0)--+(1,0);
+	\draw[x=2cm,color=red](0,.5)--+(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw(0,0)--+(1,0);
+	 \draw[x=2cm,color=red](0,.5)--+(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \tikz\draw[x=1.5cm](0,0)grid(2,2);
+       \verb@\tikz\draw[x=1.5cm](0,0)grid(2,2);@
+
+       \begin{tikzpicture}
+	\draw(0,0)--(1,1);
+	\draw[x={(2cm,.5cm)},color=red](0,0)--(1,1);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \draw(0,0)--(1,1);
+	 \draw[x={(2cm,.5cm)},color=red](0,0)--(1,1);
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \begin{tikzpicture}[smooth]
+	\draw plot coordinates{(1,0)(2,.5)(3,0)(3,1)};
+	\draw[x={(0cm,1cm)},y={(1cm,0cm)},color=red] plot coordinates{(1,0)(2,.5)(3,0)(3,1)};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[smooth]
+	 \draw plot coordinates{(1,0)(2,.5)(3,0)(3,1)};
+	 \draw[x={(0cm,1cm)},y={(1cm,0cm)},color=red] plot coordinates{(1,0)(2,.5)(3,0)(3,1)};
+	\end{tikzpicture}
+       \end{verbatim}
+
+       \begin{tikzpicture}[z=-1cm,->,thick]
+	\draw[color=red](0,0,0)--(1,0.0);
+	\draw[color=blue](0,0,0)--(0,1,0);
+	\draw[color=orange](0,0,0)--(0,0,1);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[z=-1cm,->,thick]
+	 \draw[color=red](0,0,0)--(1,0.0);
+	 \draw[color=blue](0,0,0)--(0,1,0);
+	 \draw[color=orange](0,0,0)--(0,0,1);
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{座標の変換}
+\begin{itemize}
+ \item \verb@shift=coordinate@，\verb@xshift=dimension@，\verb@yshift=dimension@
+
+       アイテムをそれぞれ指定した分だけ移動させる．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[very thin,gray](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[shift={(1,1)},blue](0,0)--(1,1)--(1,0);
+	\draw[shift={(30:1cm)},red](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[very thin,gray](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[shift={(1,1)},blue](0,0)--(1,1)--(1,0);
+	 \draw[shift={(30:1cm)},red](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[xshift=2cm,blue](0,0)--(1,1)--(1,0);
+	\draw[xshift=-10pt,red](0,0)--(1,1)--(1,0);
+	\draw[yshift=1cm,orange](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       
+ \item \verb@shift only@
+
+       基準点への\verb@rotate@は維持するが，
+       その後のアイテムへの\verb@rotate@を無効化する．
+       \verb@shift@での基準点の移動だけ\verb@rotate@の影響下に置くという感じ．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[rotate=30,xshift=2cm,blue](0,0)--(1,1)--(1,0);
+	\draw[xshift=2cm,rotate=30,orange](0,0)--(1,1)--(1,0);
+	\draw[rotate=30,xshift=2cm,shift only,red](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[very thin](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[rotate=30,xshift=2cm,blue](0,0)--(1,1)--(1,0);
+	 \draw[xshift=2cm,rotate=30,orange](0,0)--(1,1)--(1,0);
+	 \draw[rotate=30,xshift=2cm,shift only,red](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@scale=factor@，\verb@xscale=factor@，\verb@yscale=factor@
+
+       基準点を中心としてそれぞれ全方位，$x$軸方向，$y$軸方向に\verb@factor@倍する．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[scale=2,blue](0,0)--(1,1)--(1,0);
+	\draw[scale=-1,red](0,0)--(1,1)--(1,0);
+	\draw[xscale=2,orange](0,0)--(1,1)--(1,0);
+	\draw[xscale=-1,green](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[scale=2,blue](0,0)--(1,1)--(1,0);
+	 \draw[scale=-1,red](0,0)--(1,1)--(1,0);
+	 \draw[xscale=2,orange](0,0)--(1,1)--(1,0);
+	 \draw[xscale=-1,green](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@scale around={factor:coordinate}@
+
+       後ろに続くアイテムを\verb@coordinate@を中心にして\verb@factor@倍する．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[scale=2,blue](0,0)--(1,1)--(1,0);
+	\draw[scale around={2:(1,1)},red](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[scale=2,blue](0,0)--(1,1)--(1,0);
+	 \draw[scale around={2:(1,1)},red](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@rotate=degree@
+
+       基準点を中心に\verb@degree@回転させる(60分法)．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[rotate=40,blue](0,0)--(1,1)--(1,0);
+	\draw[rotate=-20,red](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[rotate=40,blue](0,0)--(1,1)--(1,0);
+	 \draw[rotate=-20,red](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@rotate around={degree:coordinate}@
+
+       後ろに続くアイテムを\verb@coordinate@を中心として\verb@degree@回転させる(60分法)．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[rotate around={40:(1,1)},blue](0,0)--(1,1)--(1,0);
+	\draw[rotate around={-20:(45:2*sqrt(2))},red](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[rotate around={40:(1,1)},blue](0,0)--(1,1)--(1,0);
+	 \draw[rotate around={-20:(45:2*sqrt(2))},red](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@cm={a,b,c,d,coordinate}@
+
+       \verb@coordinate@が$\Zahyo{t_x,t_y}$のとき，
+       座標$\Zahyo{x,y}$が
+       $\left(
+       \begin{array}{cc}
+	a&b \\
+	c&d
+       \end{array}\right)\left(
+       \begin{array}{c}
+	x\\
+	y
+       \end{array}
+       \right)+\left(
+       \begin{array}{c}
+	t_x\\
+	t_y
+       \end{array}
+       \right)$
+       によって移される変換で後ろに続く座標を移動する．
+
+       \begin{tikzpicture}[line width=1pt]
+	\draw[gray,very thin](0,0)grid(3,2);
+	\draw(0,0)--(1,1)--(1,0);
+	\draw[cm={1,1,0,1,(0,0)},blue](0,0)--(1,1)--(1,0);
+	\draw[cm={cos(60),-sin(60),sin(60),cos(60),(2,1)},red](0,0)--(1,1)--(1,0);
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}[line width=1pt]
+	 \draw[gray,very thin](0,0)grid(3,2);
+	 \draw(0,0)--(1,1)--(1,0);
+	 \draw[cm={1,1,0,1,(0,0)},blue](0,0)--(1,1)--(1,0);
+	 \draw[cm={cos(60),-sin(60),sin(60),cos(60),(2,1)},red](0,0)--(1,1)--(1,0);
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@reset cm@
+
+       \verb@cm@で設定された行列を単位行列にする．
+       これは現在のスコープだけでなく大域的に適用されるので，
+       自分が何を行っているのか理解しているのでなければ使ってはいけない．
+       基本的に\verb@cm@は上の例のような使い方や\verb@scope@環境での指定だと思うので，
+       \verb@reset cm@は使うことはないだろう．
+\end{itemize}
+
+\section{塗りつぶし}
+\begin{itemize}
+ \item 黒・青・赤で以下のパターンが使える．
+
+       \tikz \fill[pattern=horizontal lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=horizontal lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=vertical lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=vertical lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=north east lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=north east lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=north west lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=north west lines](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=grid](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=grid](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=crosshatch](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=crosshatch](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=dots](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=dots](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=crosshatch dots](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=crosshatch dots](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=fivepointed stars](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=fivepointed stars](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=sixpointed stars](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=sixpointed stars](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=bricks](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=bricks](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+
+       \tikz \fill[pattern=checkerboard](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;
+       \verb@\tikz \fill[pattern=checkerboard](0,0)--(1,0)--(1,.5)--(0,.5)--cycle;@
+\end{itemize}
+
+\section{繰り返し処理}
+\begin{itemize}
+ \item \verb@\foreach [option] variable in list commands@
+
+       \verb@list@の先頭から最後まで順に\verb@variable@を代入して
+       \verb@commands@を実行する．
+
+       \foreach \x in {1,2,3,0} {[\x]}
+       \verb@\foreach \x in {1,2,3,0} {[\x]}@
+
+       \verb@list@は\TeX の制御綴も利用でき，\verb@\expandafter@などで
+       \verb@\foreach@の前に展開する必要はない．
+
+       \def\templist{1,2,3,0}%
+       \foreach \x in \templist {[\x]}
+       \begin{verbatim}
+	\def\templist{1,2,3,0}
+	\foreach \x in \templist {[\x]}
+       \end{verbatim}
+
+       \tikz \foreach \x in {0,1,2,3}
+        \draw (\x,0) circle [radius=2mm];
+       \begin{verbatim}
+	\tikz \foreach \x in {0,1,2,3}
+	 \draw (\x,0) circle [radius=2mm];
+       \end{verbatim}
+
+       \verb@\foreach@を入れ子にすることも可能である．
+
+       \begin{tikzpicture}
+	\foreach \x in {0,1,2,3}
+	 \foreach \y in {0,1,2,3}
+	  {%
+	   \draw (\x,\y) circle [radius=2mm];
+	   \fill (\x,\y) circle [radius=1mm];
+	  }
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \foreach \x in {0,1,2,3}
+	  \foreach \y in {0,1,2,3}
+	   {%
+	    \draw (\x,\y) circle [radius=2mm];
+	    \fill (\x,\y) circle [radius=1mm];
+	   }
+	\end{tikzpicture}
+       \end{verbatim}
+ \item \verb@...@記法
+
+       \verb@list@には\verb@...@で省略した書き方も可能である．
+       そしてこの省略記法は非常にインテリジェントである．
+
+       \foreach \x in {0,1,...,6} {\x,}
+       \verb@\foreach \x in {0,1,...,6} {\x,}@
+
+       \foreach \x in {1,3,...,11} {\x,}
+       \verb@\foreach \x in {1,3,...,11} {\x,}@
+
+       \foreach \x in {1,3,...,10} {\x,}
+       \verb@\foreach \x in {1,3,...,10} {\x,}@
+
+       \foreach \x in {0,0.1,...,.5} {\x,}
+       \verb@\foreach \x in {0,0.1,...,.5} {\x,}@
+       ただし，$0.1$は2進法では無限小数となるので小数の計算は苦手である．
+       $0.5$，$0.25$，$0.125$などは大丈夫かな？
+
+       \foreach \x in {0,0.125,...,.5} {\x,}
+       \verb@\foreach \x in {0,0.125,...,.5} {\x,}@
+
+       \foreach \x in {9,8,a,b,...,g,2,2.125,...,2.5} {\x,}
+       \verb@\foreach \x in {9,8,a,b,...,g,2,2.125,...,2.5} {\x,}@
+
+       \foreach \x in {2^1,2^...,2^7} {$\x$,}
+       \verb@\foreach \x in {2^1,2^...,2^7} {$\x$,}@
+
+       \foreach \x in {0\pi,.5\pi,...\pi,3\pi} {$\x$,}
+       \verb@\foreach \x in {0\pi,.5\pi,...\pi,3\pi} {$\x$,}@
+
+       \foreach \x in {A_1,..._1,H_1} {$\x$,}
+       \verb@\foreach \x in {A_1,..._1,H_1} {$\x$,}@
+
+       \foreach \x in {a_1,a_...,a_6} {$\x$,}
+       \verb@\foreach \x in {a_1,a_...,a_6} {$\x$,}@
+
+       もちろん，図の描画にも利用できる．
+
+       \tikz \foreach \position in {(0,0),(1,1),(2,0),(3,1)}
+        \draw \position rectangle +(.25,.5);
+       \begin{verbatim}
+	\tikz \foreach \position in {(0,0),(1,1),(2,0),(3,1)}
+	 \draw \position rectangle +(.25,.5);
+       \end{verbatim}
+
+       \tikz \draw (0,0)
+        \foreach \x in {1,...,3} {--(\x,1)--(\x,0)};
+       \begin{verbatim}
+	\tikz \draw (0,0)
+	 \foreach \x in {1,...,3} {--(\x,1)--(\x,0)};
+       \end{verbatim}
+
+       \tikz \draw \foreach \p in {1,...,3}
+        {(\p,1)--(\p,3)(1,\p)--(3,\p)};
+       \begin{verbatim}
+	\tikz \draw \foreach \p in {1,...,3}
+	 {(\p,1)--(\p,3)(1,\p)--(3,\p)};
+       \end{verbatim}
+
+       \verb@variable@を\verb@/@(slash)で区切って複数の変数を指定することもできる．
+       変数列中でいくつかの変数の省略が起きた場合は，省略された変数の直前に使用された変数が代用される．
+
+       \begin{tikzpicture}
+	\foreach \x/\xtext in {0,...,3,2.72/e}
+	 \draw (\x,0) node {$\xtext$};
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \foreach \x/\xtext in {0,...,3,2.72/e}
+	  \draw (\x,0) node {$\xtext$};
+	\end{tikzpicture}
+       \end{verbatim}
+       \tikz \foreach \x/\y/\r in {0/0/2mm,1/1/3mm,2/0/1mm}
+        \draw (\x,\y) circle [radius=\r];
+       \begin{verbatim}
+	\tikz \foreach \x/\y/\r in {0/0/2mm,1/1/3mm,2/0/1mm}
+	 \draw (\x,\y) circle [radius=\r];
+       \end{verbatim}
+       \tikz \foreach \p/\r in {{(0,0)/2mm},{(1,1)/3mm},{(2,0)/1mm}}
+        \draw \p circle [radius=\r];
+       \begin{verbatim}
+	\tikz \foreach \p/\r in {{(0,0)/2mm},{(1,1)/3mm},{(2,0)/1mm}}
+	 \draw \p circle [radius=\r];
+       \end{verbatim}
+ \item \verb@evaluate@オプション
+
+       \verb@\foreach \x in {...}@では\verb@\x@をリストの形式そのままに出力するが，
+       \verb@\foreach \x [evaluate=\x] in {...}@では\verb@\x@の値を計算して出力する．
+
+       \foreach \x [evaluate=\x] in {2^0,2^...,2^5} {$\x$,}
+       \verb@\foreach \x [evaluate=\x] in {2^0,2^...,2^5} {$\x$,}@
+
+       また，\verb@\foreach \x [evaluate=\x as \xeval] in {...}@では，
+       \verb@\xeval@に\verb@\x@を計算した結果が代入される．
+
+       \foreach \x [evaluate=\x as \xeval] in {2^0,2^...,2^5} {$\x=\xeval$,}
+       \begin{verbatim}
+	\foreach \x [evaluate=\x as \xeval] in {2^0,2^...,2^5} {$\x=\xeval$,}
+       \end{verbatim}
+       さらに，\verb@using@を利用して計算させることもできる．
+
+       \tikz \foreach \x [evaluate=\x as \shade using \x*10] in {0,1,...,10}
+        \node [fill=red!\shade!yellow,minimum size=0.65cm] at (\x,0) {\x};
+       \begin{verbatim}
+	\tikz \foreach \x [evaluate=\x as \shade using \x*10] in {0,1,...,10}
+	 \node [fill=red!\shade!yellow,minimum size=0.65cm] at (\x,0) {\x};
+       \end{verbatim}
+ \item \verb@remember@オプション
+
+       \verb@remember=\x as \lastx (initially A)@とすることで，
+       直前で使用された\verb@\x@の値を\verb@\lastx@に代入して利用する．
+       この例の\verb@\lastx@の初期値はAである．
+
+       \foreach \x [remember=\x as \lastx (initially A)] in {B,...,H}
+        {$\overrightarrow{\lastx\x}$,}
+       \begin{verbatim}
+	\foreach \x [remember=\x as \lastx (initially A)] in {B,...,H}
+	 {$\overrightarrow{\lastx\x}$,}
+       \end{verbatim}
+ \item \verb@count@オプション
+
+       \verb@list@の何番目の元を使用しているかカウントする制御綴を指定する．
+
+       \tikz [x=.75cm,y=.75cm]
+        \foreach \x [count=\xcounter] in {a,...,e}
+         \foreach \y [count=\ycounter] in {\x,...,e}
+          \node [draw,top color=white,bottom color=blue!50,minimum size=.666cm]
+           at (\xcounter,-\ycounter) {$\mathstrut\x\y$};
+       \begin{verbatim}
+	\tikz [x=.75cm,y=.75cm]
+	 \foreach \x [count=\xcounter] in {a,...,e}
+	  \foreach \y [count=\ycounter] in {\x,...,e}
+	   \node [draw,top color=white,bottom color=blue!50,minimum size=.666cm]
+	    at (\xcounter,-\ycounter) {$\mathstrut\x\y$};
+       \end{verbatim}
+ \item \verb@\breakforeach@
+
+       文字通りに\verb@\foreach@を中断させる．
+
+       \begin{tikzpicture}
+	\draw[help lines](1,1)grid(4,4);
+	\foreach \x in {1,...,4}
+	 \foreach \y in {1,...,4}
+	  {
+	   \fill [red!50] (\x,\y) ellipse [x radius=3pt,y radius=6pt];
+	   \ifnum \x<\y
+	    \breakforeach
+	   \fi
+	  }
+       \end{tikzpicture}
+       \begin{verbatim}
+	\begin{tikzpicture}
+	 \foreach \x in {1,...,4}
+	  \foreach \y in {1,...,4}
+	   {
+	    \fill [red!50] (\x,\y) ellipse [x radius=3pt,y radius=6pt];
+	    \ifnum \x<\y
+	     \breakforeach
+	    \fi
+	   }
+	\end{tikzpicture}
+       \end{verbatim}
+\end{itemize}
+
+\section{各種計算}
+\subsection{通常の計算}
+\begin{itemize}
+ \item \verb@\pgfmathparse{add(1,2)}@，
+       \verb@\pgfmathparse{1+2}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{add(1,2)}\pgfmathresult
+ \item \verb@\pgfmathparse{subtract(10,2)}@，
+       \verb@\pgfmathparse{10-2}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{subtract(10,2)}\pgfmathresult
+ \item \verb@\pgfmathparse{neg(4)}@\\
+       \verb@\pgfmathresult@
+       \pgfmathparse{neg(4)}\pgfmathresult
+ \item \verb@\pgfmathparse{multiply(4,3)}@，
+       \verb@\pgfmathparse{4*3}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{multiply(4,3)}\pgfmathresult
+ \item \verb@\pgfmathparse{divide(75,6)}@，
+       \verb@\pgfmathparse{75/6}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{divide(75,6)}\pgfmathresult
+ \item \verb@\pgfmathparse{div(75,6)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{div(75,6)}\pgfmathresult
+       \hfill【注】割り算の結果の整数部分
+ \item \verb@\pgfmathparse{factorial(4)}@，
+       \verb@\pgfmathparse{4!}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{factorial(4)}\pgfmathresult
+ \item \verb@\pgfmathparse{sqrt(10)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{sqrt(10)}\pgfmathresult
+ \item \verb@\pgfmathparse{pow(2,7)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{pow(2,7)}\pgfmathresult
+ \item \verb@\pgfmathparse{e}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{e}\pgfmathresult
+ \item \verb@\pgfmathparse{exp(1)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{exp(1)}\pgfmathresult
+ \item \verb@\pgfmathparse{ln(e)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{ln(e)}\pgfmathresult
+ \item \verb@\pgfmathparse{log10(100)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{log10(100)}\pgfmathresult
+ \item \verb@\pgfmathparse{log2(128)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{log2(128)}\pgfmathresult
+ \item \verb@\pgfmathparse{abs(-6)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{abs(-6)}\pgfmathresult
+ \item \verb@\pgfmathparse{mod(20,6)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{mod(20,6))}\pgfmathresult
+ \item \verb@\pgfmathparse{Mod(-20,6)}@\\
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{Mod(-20,6))}\pgfmathresult
+\end{itemize}
+\subsection{丸め計算}
+\begin{itemize}
+ \item 小数点以下を切り捨てた整数値を返す．\\
+       \verb@\pgfmathparse{round(6.125)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{round(6.125))}\pgfmathresult\\
+       \verb@\pgfmathparse{round(-6.125)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{round(-6.125))}\pgfmathresult\\
+       \verb@\pgfmathparse{round(6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{round(6))}\pgfmathresult\\
+       \verb@\pgfmathparse{round(-6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{round(-6))}\pgfmathresult
+ \item 引数以下の整数値を返す．\\
+       \verb@\pgfmathparse{floor(6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{floor(6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{floor(-6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{floor(-6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{floor(6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{floor(6))}\pgfmathresult\\
+       \verb@\pgfmathparse{floor(-6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{floor(-6))}\pgfmathresult
+ \item 引数以上の整数値を返す．\\
+       \verb@\pgfmathparse{ceil(6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{ceil(6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{ceil(-6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{ceil(-6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{ceil(6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{ceil(6))}\pgfmathresult\\
+       \verb@\pgfmathparse{ceil(-6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{ceil(-6))}\pgfmathresult
+ \item 引数の整数部分を返す．\\
+       \verb@\pgfmathparse{int(6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{int(6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{int(-6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{int(-6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{int(6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{int(6))}\pgfmathresult\\
+       \verb@\pgfmathparse{int(-6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{int(-6))}\pgfmathresult
+ \item 引数の小数部分を返す．\\
+       \verb@\pgfmathparse{frac(6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{frac(6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{frac(-6.625)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{frac(-6.625))}\pgfmathresult\\
+       \verb@\pgfmathparse{frac(6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{frac(6))}\pgfmathresult\\
+       \verb@\pgfmathparse{frac(-6)}@
+       \verb@\pgfmathresult-->@
+       \pgfmathparse{frac(-6))}\pgfmathresult
+\end{itemize}
+\subsection{三角関数関連}
+\begin{itemize}
+ \item \verb@\pgfmathparse{pi} \pgfmathresult-->@
+       \pgfmathparse{pi} \pgfmathresult
+ \item \verb@\pgfmathparse{pi r} \pgfmathresult-->@
+       \pgfmathparse{pi r} \pgfmathresult\\
+       \hfill【注】数値の直後に\verb@r@をつけると弧度法から60分法に変換する．
+ \item \verb@\pgfmathparse{rad(180)} \pgfmathresult-->@
+       \pgfmathparse{rad(180)} \pgfmathresult
+ \item \verb@\pgfmathparse{deg(pi)} \pgfmathresult-->@
+       \pgfmathparse{deg(pi)} \pgfmathresult
+ \item \verb@\pgfmathparse{sin(60)} \pgfmathresult-->@
+       \pgfmathparse{sin(60)} \pgfmathresult\\
+       \verb@\pgfmathparse{sin(pi/3 r)} \pgfmathresult-->@
+       \pgfmathparse{sin(pi/3 r)} \pgfmathresult
+ \item \verb@\pgfmathparse{cos(60)} \pgfmathresult-->@
+       \pgfmathparse{cos(60)} \pgfmathresult\\
+       \verb@\pgfmathparse{cos(pi/3 r)} \pgfmathresult-->@
+       \pgfmathparse{cos(pi/3 r)} \pgfmathresult
+ \item \verb@\pgfmathparse{tan(60)} \pgfmathresult-->@
+       \pgfmathparse{tan(60)} \pgfmathresult\\
+       \verb@\pgfmathparse{tan(pi/3 r)} \pgfmathresult-->@
+       \pgfmathparse{tan(pi/3 r)} \pgfmathresult
+ \item \verb@\pgfmathparse{sec(60)} \pgfmathresult-->@
+       \pgfmathparse{sec(60)} \pgfmathresult\\
+       \verb@\pgfmathparse{sec(pi/3 r)} \pgfmathresult-->@
+       \pgfmathparse{sec(pi/3 r)} \pgfmathresult
+ \item \verb@\pgfmathparse{cosec(60)} \pgfmathresult-->@
+       \pgfmathparse{cosec(60)} \pgfmathresult\\
+       \verb@\pgfmathparse{cosec(pi/3 r)} \pgfmathresult-->@
+       \pgfmathparse{cosec(pi/3 r)} \pgfmathresult
+ \item \verb@\pgfmathparse{cot(60)} \pgfmathresult-->@
+       \pgfmathparse{cot(60)} \pgfmathresult\\
+       \verb@\pgfmathparse{cot(pi/3 r)} \pgfmathresult-->@
+       \pgfmathparse{cot(pi/3 r)} \pgfmathresult
+ \item \verb@\pgfmathparse{asin(.5)} \pgfmathresult-->@
+       \pgfmathparse{asin(.5)} \pgfmathresult\\
+       \verb@\pgfmathparse{rad(asin(.5))} \pgfmathresult-->@
+       \pgfmathparse{rad(asin(.5))} \pgfmathresult
+ \item \verb@\pgfmathparse{acos(.5)} \pgfmathresult-->@
+       \pgfmathparse{acos(.5)} \pgfmathresult\\
+       \verb@\pgfmathparse{rad(acos(.5))} \pgfmathresult-->@
+       \pgfmathparse{rad(acos(.5))} \pgfmathresult
+ \item \verb@\pgfmathparse{atan(1)} \pgfmathresult-->@
+       \pgfmathparse{atan(1)} \pgfmathresult\\
+       \verb@\pgfmathparse{rad(atan(1))} \pgfmathresult-->@
+       \pgfmathparse{rad(atan(1))} \pgfmathresult
+ \item \verb@\pgfmathparse{atan2(1,sqrt(3)} \pgfmathresult-->@
+       \pgfmathparse{atan2(1,sqrt(3))} \pgfmathresult\\
+       \verb@\pgfmathparse{rad(atan2(1,sqrt(3)))} \pgfmathresult-->@
+       \pgfmathparse{rad(atan2(1,sqrt(3)))} \pgfmathresult\\
+       \hfill【注】\verb@atan2(x,y)@は原点と$\Zahyo{x,y}$を結んだ直線と$x$軸のなす角度．
+\end{itemize}
+\subsection{論理関数}
+\begin{itemize}
+ \item \verb@\pgfmathequal{x}{y}@
+       \verb@\pgfmathparse{equal(x,y)}@
+
+       $x=y$ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathgreater{x}{y}@
+       \verb@\pgfmathparse{greater(x,y)}@
+
+       $x>y$ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathless{x}{y}@
+       \verb@\pgfmathparse{less(x,y)}@
+
+       $x<y$ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathnotequal{x}{y}@
+       \verb@\pgfmathparse{notequal(x,y)}@
+
+       $x\Noteq y$ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathnotgreater{x}{y}@
+       \verb@\pgfmathparse{notgreater(x,y)}@
+
+       $x\leqq y$ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathnotless{x}{y}@
+       \verb@\pgfmathparse{notless(x,y)}@
+
+       $x\geqq y$ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathand{A}{B}@
+       \verb@\pgfmathparse{and(A,B)}@
+
+       条件$A$，$B$がともに真ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathor{A}{B}@
+       \verb@\pgfmathparse{or(A,B)}@
+
+       条件$A$，$B$のどちらかが真ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathnot{A}@
+       \verb@\pgfmathparse{not(A)}@
+
+       条件$A$が偽ならば1，そうでなければ0を返す．
+ \item \verb@\pgfmathifthenelse{A,X,Y}@
+       \verb@\pgfmathparse{ifthenelse(A,X,Y)}@
+
+       条件$A$が真ならば$X$，そうでなければ$Y$を返す．
+ \item \verb@\pgfmathtrue@
+       \verb@\pgfmathparse{true}@
+
+       常に1を返す．
+ \item \verb@\pgfmathfalse@
+       \verb@\pgfmathparse{false}@
+
+       常に0を返す．
+\end{itemize}
+\subsection{ランダム関数}
+\begin{itemize}
+ \item \verb@\pgfmathrnd@
+       \verb@\pgfmathparse{rnd}@
+
+       $0$以上$1$以下の数値を返す．
+ \item \verb@pgfmathrand@
+       \verb@\pgfmathparse{rand}@
+
+       $-1$以上$1$以下の数値を返す．
+ \item \verb@\pgfmathrandom{m,n}@
+       \verb@\pgfmathparse{random(m,n)}@
+
+       この関数は引数を0個または1個または2個とり，
+       0個の場合は\verb@\pgfmathrnd@と同じく$0$以上$1$以下の数値を返す．
+       \verb@\pgfmathrandom{m}@のように1個の場合は$1$以上$m$以下の整数値を返す．
+       \verb@\pgfmathrandom{m,n}@のように2個の場合は$m$以上$n$以下の整数値を返す．
+\end{itemize}
+\subsection{底の変換関数}
+\begin{itemize}
+ \item \verb@\pgfmathhex{x}@
+       \verb@\pgfmathparse{hex(x)}@
+
+       10進法から16進法へ変換する(小文字)．
+ \item \verb@\pgfmathHex{x}@
+       \verb@\pgfmathparse{Hex(x)}@
+
+       10進法から16進法へ変換する(大文字)．
+ \item \verb@\pgfmathoct{x}@
+       \verb@\pgfmathparse{oct(x)}@
+
+       10進法から8進法へ変換する．
+ \item \verb@\pgfmathbin{x}@
+       \verb@\pgfmathparse{bin(x)}@
+
+       10進法から2進法へ変換する．
+\end{itemize}
+\subsection{その他の関数}
+\begin{itemize}
+ \item \verb@\pgfmathparse{min(a,b,c,...)}@
+
+       引数内で最小の数値を返す．
+
+       \pgfmathparse{min(-2,-1,0,1,2,)}$\pgfmathresult$
+       \verb@\pgfmathparse{min(-2,-1,0,1,2,)}$\pgfmathresult$@
+ \item \verb@\pgfmathparse{max(a,b,c,...)}@
+
+       引数内で最大の数値を返す．
+
+       \pgfmathparse{max(-2,-1,0,1,2,)}$\pgfmathresult$
+       \verb@\pgfmathparse{max(-2,-1,0,1,2,)}$\pgfmathresult$@
+ \item \verb@\pgfmathveclen{x}{y}@
+       \verb@\pgfmathparse{veclen(x,y)}@
+
+       ベクトル$\Zahyo{x,y}$の長さを返す．
+
+       \pgfmathparse{veclen(5,12)}\pgfmathresult
+       \verb@\pgfmathparse{veclen(5,12)}\pgfmathresult@
+ \item \verb@\pgfmatharray{x}{n}@
+       \verb@\pgfmathparse{array(x,n)}@
+
+       配列$x$の$n$番目の要素を返す(配列は0番目から始まる)．
+
+       \pgfmathparse{array({-2,-1,0,1,2},3)}\pgfmathresult
+       \verb@\pgfmathparse{array({-2,-1,0,1,2},3)}\pgfmathresult@
+ \item \verb@\pgfmathsinh{x}@
+       \verb@\pgfmathparse{sinh(x)}@
+
+       双曲線正弦関数の値を返す．
+       $\sinh x=\Frac{e^x-e^{-x}}2$．
+ \item \verb@\pgfmathcosh{x}@
+       \verb@\pgfmathparse{cosh(x)}@
+
+       双曲線余弦関数の値を返す．
+       $\cosh x=\Frac{e^x+e^{-x}}2$．
+ \item \verb@\pgfmathtanh{x}@
+       \verb@\pgfmathparse{tanh(x)}@
+
+       双曲線正弦関数の値を返す．
+       $\tanh x=\Frac{\sinh x}{\cosh x}$．
+ \item \verb@\pgfmathwidth{"strings"}@
+       \verb@\pgfmathparse{width("strings")}@
+
+       strings の長さを返す．
+ \item \verb@\pgfmathheight{"strings"}@
+       \verb@\pgfmathparse{height("strings")}@
+
+       strings の高さを返す．
+ \item \verb@\pgfmathdepth{"strings"}@
+       \verb@\pgfmathparse{depth("strings")}@
+
+       strings の深さを返す．
+\end{itemize}
+\subsection{新しい関数の定義}
+与えられた引数の2倍の値を返す関数\verb@double@は
+次のように定義して使用する．
+この例では\verb@\pgfmathresult@の値は$88.6$である．
+\begin{verbatim}
+\makeatletter
+\pgfmathdeclarefunction{double}{1}{
+ \begingroup
+  \pgf@x=#1pt\relax
+  \multiply\pgf@x by2\relax
+  \pgfmathreturn\pgf@x
+ \endgroup
+}
+\makeatother
+\pgfmathparse{double(44.3)}\pgfmathresult
+\end{verbatim}
+
+この定義で同時に\verb@\pgfmathdouble{x}@も定義される．
+また，\verb@\pgfmathdeclarefunction@における定義では
+\verb/\pgf@x/の他に\verb/\pgf@y/，\verb/\c@pgf@counta/，
+\verb/\c@pgf@countb/がある．
+
+\begin{tikzpicture}[out=45,in=135,distance=1cm]
+ \draw (0,0) to (1,0);
+ \draw (0,0) to (2,0);
+ \draw[name=a] (0,0) to (3,0);
+ \node (a.north){hoge};
+\end{tikzpicture}
+
+\begin{tikzpicture}
+ \draw[gray,very thin](0,0)grid(3,2);
+% [xshift={-((3-1)*\n)/2},rotate=30]
+ \mytikzbunten<length=2pt>(1,1)(0:3){5}%
+ \draw(1,1)--(0:3);
+\end{tikzpicture}
+
+
+\begin{tikzpicture}
+ %座標軸
+ \draw [thick, -stealth](-0.5,0)--(5,0) node [anchor=north]{$x$};
+ \draw [thick, -stealth](0,-0.5)--(0,2) node [anchor=east]{$y$};
+ \node [anchor=north west] at (0,0) {O};
+ %y=log(x)
+ \draw [very thick, domain=0.7:4.5, samples=200] plot (\x, {ln(\x)});
+ \node [anchor=north] at (4.5,1.4) {$y=\log x$};
+ %y=x/e
+ \draw [domain=-0.4:4.5] plot (\x, \x/e);
+ \node [anchor=east] at (4,1.8) {$y=\frac{x}{e}$};
+ %y=(x-1)/(e-1)
+ \draw [domain=0.4:4] plot (\x, {(\x-1)/(e-1)});
+ \node [anchor=south, font=\scriptsize, fill=white, inner sep=0pt] at (0,0.4) {$y=\frac{1}{e-1}(x-1)$};
+ %補助線
+ \draw [dashed] (0,1) node [anchor=east] {$1$} -- (e,1) -- (e,0) node [anchor=north] {$e$};
+ \draw [dashed] (1,0) node [anchor=north] {$1$} --(1,1);
+\end{tikzpicture}
+
+\begin{tikzpicture}
+ \node [name=circle1,shape=circle,draw]{Circle};
+ \node [name=rectangle1,shape=rectangle,draw]at(circle1.south){rectangle};
+ \node [name=diamond1,shape=diamond,aspect=2,draw]at(rectangle1.south){diamond};
+ \node [name=ellipse1,shape=ellipse,draw]at(diamond1.south){ellipse};
+ \node [name=trapezium1,shape=trapezium,trapezium left angle=60,%
+  trapezium right angle=-60,draw]at(ellipse1.south){trapezium};
+ \node [name=chamfered1,shape=chamfered rectangle,%
+  chamfered rectangle corners={north west,north east},draw]at(trapezium1.south){chamfered1};
+ \node [name=chamfered2,shape=chamfered rectangle,%
+  chamfered rectangle corners={south west,south east},draw]at(chamfered1.south){chamfered2};
+ \node [name=rounded rectangle1,shape=rounded rectangle,draw]at(chamfered2.south){rounded rectangle};
+\end{tikzpicture}
+
+\begin{tikzpicture}[>=stealth]
+ \scriptsize
+ \mytikzstermbox*{始め}%
+ \mytikzopbox*{$X\leftarrow1$}
+ \mytikzarrow*
+ \mytikzopbox*{$Y\leftarrow X^2$}
+ \mytikzarrow*
+ \mytikziobox*{$X$，$Y$を入力}
+ \mytikzarrow*
+ \mytikzopbox*{$X\leftarrow X+1$}
+ \mytikzarrow*
+ \mytikzifbox*<shift={(0,-1.25)}>{$X<10$}
+ \mytikzarrow*
+ \mytikzlooparrow{box5}{arrow2}{west}{-1}%
+ \node at(box5.west)[above left]{Yes};
+ \node at(box5.west)[below left]{$X<10$};
+ \node at(box5.south)[below left]{No};
+ \node at(box5.south)[below right]{$X\geqq10$};
+ \mytikzetermbox*<shift={(0,-1.25)}>{終わり}%
+ \mytikzarrow*
+\end{tikzpicture}
+
+\begin{tikzpicture}[>=stealth]
+ \scriptsize\ttfamily
+ \mytikzsetflowchartshift{(0,-1)}%
+ \mytikzshowflowchartname
+ \mytikzstermbox{始め}
+ \mytikziobox{Nを入力する}
+ \mytikzarrow
+ \mytikzifbox{N>9}
+ \mytikzarrow
+ \mytikzsrepbox{A=1 to N}
+ \mytikzarrow
+ \mytikzsrepbox{B=1 to N}
+ \mytikzarrow
+ \mytikzifbox<shift={(0,-1.25)}>{B=2INT(B/2)}
+ \mytikzarrow
+ \mytikzifbox<shift={(0,-1.25)}>{B=A}
+ \mytikzarrow
+ \mytikzsrepbox{C=1 to N}
+ \mytikzarrow
+ \mytikzifbox{C=A}
+ \mytikzarrow
+ \mytikzifbox{C=B}
+ \mytikzarrow
+ \mytikziobox{100A+10B+Cを出力}
+ \mytikzarrow
+ \mytikzerepbox{C}
+ \mytikzarrow
+ \mytikzerepbox{B}
+ \mytikzarrow
+ \mytikzerepbox{A}
+ \mytikzarrow
+ \mytikzetermbox{終わり}
+ \mytikzarrow
+ \mytikzlooparrow{box3}{arrow14}{east}{1.6}
+ \mytikzlooparrow{box4}{arrow14}{east}{1.4}
+ \mytikzlooparrow{box10}{arrow11}{east}{1}
+ \mytikzlooparrow{box9}{arrow11}{east}{1.1}
+ \mytikzlooparrow{box7}{arrow12}{east}{1.3}
+ \mytikzlooparrow{box6}{arrow12}{east}{.85}
+ \node at(box3.east)[above right]{YES};
+ \node at(box3.south)[below left]{NO};
+ \node at(box6.east)[above right]{YES};
+ \node at(box6.south)[below left]{NO};
+ \node at(box7.east)[above right]{YES};
+ \node at(box7.south)[below left]{NO};
+ \node at(box9.east)[above right]{YES};
+ \node at(box9.south)[below left]{NO};
+ \node at(box10.east)[above right]{YES};
+ \node at(box10.south)[below left]{NO};
+\end{tikzpicture}
+\begin{tikzpicture}[>=stealth]
+ \scriptsize\ttfamily
+ \mytikzsetflowchartshift{(0,-1)}%
+ \mytikzshowflowchartname
+ \mytikzstermbox{始め}
+ \mytikziobox{Nを入力する}
+ \mytikzarrow
+ \mytikzifbox{N>9}
+ \mytikzarrow
+ \mytikzsrepbox{A=1 to N}
+ \mytikzarrow
+ \mytikzsrepbox{B=1 to N}
+ \mytikzarrow
+ \mytikzifbox<shift={(0,-1.25)}>{B=2INT(B/2)}
+ \mytikzarrow
+ \mytikzifbox<shift={(0,-1.25)}>{B=A}
+ \mytikzarrow
+ \mytikzsrepbox{C=1 to N}
+ \mytikzarrow
+ \mytikzifbox{C=A}
+ \mytikzarrow
+ \mytikzifbox<shift={(0,-1.25)}>{C=B*INT(C/B)}
+ \mytikzarrow
+ \mytikziobox<shift={(0,-1.25)}>{100A+10B+Cを出力}
+ \mytikzarrow
+ \mytikzerepbox{C}
+ \mytikzarrow
+ \mytikzerepbox{B}
+ \mytikzarrow
+ \mytikzerepbox{A}
+ \mytikzarrow
+ \mytikzetermbox{終わり}
+ \mytikzarrow
+ \mytikzlooparrow{box3}{arrow14}{east}{1.6}
+ \mytikzlooparrow{box4}{arrow14}{east}{1.4}
+ \mytikzlooparrow{box10}{arrow11}{east}{.4}
+ \mytikzlooparrow{box9}{arrow11}{east}{1.2}
+ \mytikzlooparrow{box7}{arrow12}{east}{1.3}
+ \mytikzlooparrow{box6}{arrow12}{east}{.85}
+ \node at(box3.east)[above right]{YES};
+ \node at(box3.south)[below left]{NO};
+ \node at(box6.east)[above right]{YES};
+ \node at(box6.south)[below left]{NO};
+ \node at(box7.east)[above right]{YES};
+ \node at(box7.south)[below left]{NO};
+ \node at(box9.east)[above right]{YES};
+ \node at(box9.south)[below left]{NO};
+ \node at(box10.east)[above right]{YES};
+ \node at(box10.south)[below left]{NO};
+\end{tikzpicture}
+
+\begin{tikzpicture}[>=stealth]
+ \scriptsize
+ \ttfamily
+ \mytikzstermbox{始め}
+ \mytikziobox{Bを入力する}
+ \mytikzarrow
+ \mytikziobox{Mを入力する}
+ \mytikzarrow
+ \mytikzopbox{N=0}
+ \mytikzarrow
+ \mytikzopbox{N=N+1}
+ \mytikzarrow
+ \mytikzopbox{B=1.05*(B-M)}
+ \mytikzarrow
+ \mytikzifbox{B>0}
+ \mytikzarrow
+ \mytikziobox{Nを出力}
+ \mytikzarrow
+ \mytikzetermbox{終わり}
+ \mytikzarrow
+ \mytikzlooparrow{box7}{arrow4}{east}{.6}
+ \node at(box7.east)[above right]{YES};
+ \node at(box7.south)[below left]{NO};
+\end{tikzpicture}
+\begin{tikzpicture}[>=stealth]
+ \scriptsize
+ \ttfamily
+ \mytikzstermbox{始め}
+ \mytikziobox{Nを入力する}
+ \mytikzarrow
+ \mytikziobox{Mを入力する}
+ \mytikzarrow
+ \mytikzopbox{I=N}
+ \mytikzarrow
+ \mytikzopbox{B=M}
+ \mytikzarrow
+ \mytikzopbox{B=B/1.05+M}
+ \mytikzarrow
+ \mytikzopbox{I=I-1}
+ \mytikzarrow
+ \mytikzifbox{I>1}
+ \mytikzarrow
+ \mytikziobox{INT(B+1)を出力}
+ \mytikzarrow
+ \mytikzetermbox{終わり}
+ \mytikzarrow
+ \mytikzlooparrow{box8}{arrow4}{east}{.6}
+ \node at(box8.east)[above right]{YES};
+ \node at(box8.south)[below left]{NO};
+\end{tikzpicture}
+\end{document}
