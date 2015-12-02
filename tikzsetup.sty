@@ -6140,39 +6140,48 @@
   \fi
  \end{tikzpicture}%
 }%
-%% \Teisei<#1>[#2](#3){#4}(#5){#6} %%12/03/2015 オプションの入れ替え
-%% #1:斜線の方向
-%%    backslash(defalt)
-%%    slash
-%%    horizontal
-%%    vertical
-%%    cross
-%% #2:斜線のオプション
-%% #3:node内の#4のオプション
+%% \Teisei<#1>[#2](#3){#4}[#5](#6){#7} 12/03/2015 訂正文字列の位置を変更できるようにする
+%% #1:斜線のオリジナルオプション
+%%  backslash(default):右上から左下
+%%  slash:右下から左上
+%%  horizontal:水平線
+%%  vertical:垂直線
+%%  cross:backslash & slash
+%% #2:斜線に関するTikZオプション(line width,red等)
+%% #3:#4に対するTikZオプション
 %% #4:斜線を引く対象
-%% #5:node内の#6のオプション
-%% #6:#5の代替文字列
-\NewDocumentCommand\Teisei{D<>{}O{}D(){}mD(){}m}{%
- \def\@teisei@style{10}%
+%% #5:#7の#4にTikZの位置に関するオプション
+%%  north east(default):#4の右上
+%%  north west:#4の左上
+%%  north:#4の上
+%%  south east:#4の右下
+%%  south west:#4の左下
+%%  south:#4の下
+%%  east:#4の右
+%%  west:#4の左
+%% #6:#7に対するTikZオプション(font等)
+%% #7:訂正後の文字列
+\NewDocumentCommand\Teisei{D<>{}O{}D(){}mO{north east}D(){}m}{%
+ \def\@Teisei@style{10}%
  \setkeys{teisei}{#1}%
  \ifmmode
-  \def\@teisei@mmode{1}%
+  \def\@Teisei@mmode{1}%
  \else
-  \def\@teisei@mmode{0}%
+  \def\@Teisei@mmode{0}%
  \fi
  \begin{tikzpicture}[baseline=(@O@.base)]
-  \node(@O@)[#3]{\ifnum\@teisei@mmode=\@ne\relax$#4$\else#4\fi};
-  \node at(@O@.north east)[font=\scriptsize,#5]{\ifnum\@teisei@mmode=\@ne\relax$#6$\else#6\fi};
-  \ifcase\@teisei@style
-   \draw[red,#2](@O@.south west)--(@O@.north east);
+  \node(@O@)[inner sep=0pt,outer sep=2pt,#3]{\ifnum\@Teisei@mmode=\@ne\relax$#4$\else#4\fi};
+  \node at(@O@.#5)[inner sep=0pt,font=\scriptsize,#6]{\ifnum\@Teisei@mmode=\@ne\relax$#7$\else#7\fi};
+  \ifcase\@Teisei@style
+   \draw[black!25,very thin,#2](@O@.south west)--(@O@.north east);
   \or
-   \draw[red,#2](@O@.west)--(@O@.east);
+   \draw[black!25,very thin,#2](@O@.west)--(@O@.east);
   \or
-   \draw[red,#2](@O@.north)--(@O@.south);
+   \draw[black!25,very thin,#2](@O@.north)--(@O@.south);
   \or
-   \draw[red,#2](@O@.south west)--(@O@.north east)(@O@.north west)--(@O@.south east);
+   \draw[black!25,very thin,#2](@O@.south west)--(@O@.north east)(@O@.north west)--(@O@.south east);
   \else
-   \draw[red,#2](@O@.north west)--(@O@.south east);
+   \draw[black!25,very thin,#2](@O@.north west)--(@O@.south east);
   \fi
  \end{tikzpicture}%
 }%
