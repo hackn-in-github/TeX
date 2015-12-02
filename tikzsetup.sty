@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[11/19/2015 Ver.0.095]%
+\ProvidesPackage{tikzsetup}[12/03/2015 Ver.0.096]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6140,7 +6140,7 @@
   \fi
  \end{tikzpicture}%
 }%
-%% \Teisei<#1>[#2](#3)|#4|{#5}{#6}
+%% \Teisei<#1>[#2](#3){#4}(#5){#6} %%12/03/2015 オプションの入れ替え
 %% #1:斜線の方向
 %%    backslash(defalt)
 %%    slash
@@ -6148,11 +6148,11 @@
 %%    vertical
 %%    cross
 %% #2:斜線のオプション
-%% #3:node内の#5のオプション
-%% #4:node内の#6のオプション
-%% #5:斜線を引く対象
+%% #3:node内の#4のオプション
+%% #4:斜線を引く対象
+%% #5:node内の#6のオプション
 %% #6:#5の代替文字列
-\NewDocumentCommand\Teisei{D<>{}O{}D(){}D||{}mm}{%
+\NewDocumentCommand\Teisei{D<>{}O{}D(){}mD(){}m}{%
  \def\@teisei@style{10}%
  \setkeys{teisei}{#1}%
  \ifmmode
@@ -6161,8 +6161,8 @@
   \def\@teisei@mmode{0}%
  \fi
  \begin{tikzpicture}[baseline=(@O@.base)]
-  \node(@O@)[#3]{\ifnum\@teisei@mmode=\@ne\relax$#5$\else#5\fi};
-  \node at(@O@.north east)[font=\scriptsize,#4]{\ifnum\@teisei@mmode=\@ne\relax$#6$\else#6\fi};
+  \node(@O@)[#3]{\ifnum\@teisei@mmode=\@ne\relax$#4$\else#4\fi};
+  \node at(@O@.north east)[font=\scriptsize,#5]{\ifnum\@teisei@mmode=\@ne\relax$#6$\else#6\fi};
   \ifcase\@teisei@style
    \draw[red,#2](@O@.south west)--(@O@.north east);
   \or
