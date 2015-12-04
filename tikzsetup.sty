@@ -5312,17 +5312,25 @@
 % color
 % linecolor=black,innrelinecolor=black,middlelinecolor=black
 % outerlinecolor=black,backgroundcolor=white,fontcolor=black
-\def\Attention{\@ifnextchar<{\@Attention}{\@Attention<>}}%
-\def\@Attention<#1>{\@ifnextchar({\@@Attention<#1>}{\@@Attention<#1>()}}%
-\def\@@Attention<#1>(#2){\@ifnextchar[{\@@@Attention<#1>(#2)}{\@@@Attention<#1>(#2)[]}}%
-\def\@@@Attention<#1>(#2)[#3]{%
- \begin{Framebox}%
-   <rounded corners=5pt,inner sep=5pt,fill=red!30,#1>%
-   (#2)%
-   [linecolor=red!30,linewidth=2pt,backgroundcolor=red!5,#3]%
-   {Attention}%
+%\def\Attention{\@ifnextchar<{\@Attention}{\@Attention<>}}%
+%\def\@Attention<#1>{\@ifnextchar({\@@Attention<#1>}{\@@Attention<#1>()}}%
+%\def\@@Attention<#1>(#2){\@ifnextchar[{\@@@Attention<#1>(#2)}{\@@@Attention<#1>(#2)[]}}%
+%\def\@@@Attention<#1>(#2)[#3]{%
+% \begin{Framebox}%
+%   <rounded corners=5pt,inner sep=5pt,fill=red!30,#1>%
+%   (#2)%
+%   [linecolor=red!30,linewidth=2pt,backgroundcolor=red!5,#3]%
+%   {Attention}%
+%}%
+%\def\endAttention{\end{Framebox}}%
+\NewDocumentEnvironment{Attention}{D<>{}D(){}O{}}{% 12/04/2015 singleextraを使い簡略化
+ \mdframed[%
+  singleextra={\node[inner sep=5pt,rounded corners=5pt,fill=red!30,#1]at(P-|O)[xshift=12.5mm]{Attention};},%
+  roundcorner=10pt,linewidth=2pt,linecolor=red!30,backgroundcolor=red!5,innertopmargin=4mm,#3
+ ]%
+}{%
+ \endmdframed
 }%
-\def\endAttention{\end{Framebox}}%
 %% Framebox 環境 (枠で囲む，ページで分割可能)
 %% \begin{Framebox}<#1>(#2)[#3]{#4}
 %%  ほげほげふがふが
