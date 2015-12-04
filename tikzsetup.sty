@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/03/2015 Ver.0.096]%
+\ProvidesPackage{tikzsetup}[12/04/2015 Ver.0.097]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6233,6 +6233,218 @@
 \NewDocumentCommand\ArrayBackSlash@sub@pos{mmm}{%
  \path(.5,-.5)--(-.5,.5)node[#2,#1]{\ifnum\@a@b@s@mmode=\@ne\relax$#3$\else#3\fi};%
 }%
+%% \Mark 関連の全面改定 12/04/2015
+\newwrite\MarkAnswerWrite
+\newif\ifMarkCompactMode
+\newif\ifMarkVerticalLine
+\newcounter{MarkFirst}%
+\newcounter{MarkEnd}%
+\NewDocumentCommand\MarkBoxReset{s}{%
+ \CenterWritetrue
+ \resetcounter{MarkFirst}%
+ \resetcounter{MarkEnd}%
+ \resetcounter{equation}%
+ \resetcounter{figure}%
+ \resetcounter{table}%
+ \immediate\openout\MarkAnswerWrite\jobname.ans
+}%
+\NewDocumentCommand\PutMarkAnswer{m}{%
+ \immediate\closeout\MarkAnswerWrite
+ \pgfmathparse{width("#1")}%
+ \@tempdima=\pgfmathresult pt\relax
+ \@tempdima=.5\@tempdima\relax
+ \advance\@tempdima by4mm\relax
+ \begin{mdframed}%
+  [roundcorner=7.5pt,middlelinewidth=1pt,%
+   innertopmargin=3mm,innerbottommargin=3mm,%
+   singleextra={\node[fill=white]at(P|-O)[xshift=-\@tempdima]{#1};%
+                \node[font=\bfseries,fill=white]at(P-|O)[xshift=8mm]{解　答};}]
+  \input{\jobname.ans}%
+ \end{mdframed}
+ \CenterWritefalse
+}%
+\tikzset{MarkNode/.style={font=\bfseries},MarkLine/.style={very thick}}%
+\tikzset{MarkCompactNode/.style={font=\mdseries},MarkCompactLine/.style={thin},%
+         MarkCompactDash/.style={dash pattern=on1.5pt off1.5pt}}%
+\tikzset{RefMarkNode/.style={font=\mdseries},RefMarkLine/.style={thin}}%
+\NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{%
+ \IfBooleanT{#1}{\scriptsize\zw=1zw\relax}%
+ \setcounter{MarkFirst}{\numexpr\c@MarkEnd+1}%
+ \def\@Mark@Strings{}%
+ \def\@Mark@Array{"x"}%
+ \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
+  \global\advance\c@MarkEnd by\@ne\relax
+  \edef\@Mark@Strings{\@Mark@Strings\アイウ{MarkEnd}}%
+  \edef\@Mark@Array{\@Mark@Array,"\アイウ{MarkEnd}"}%
+ }%
+ \expandafter\def\expandafter\@Mark@Array\expandafter{\expandafter{\@Mark@Array}}%
+ \ifmeasuring@\else
+  \ifCenterWrite
+   \immediate\write\MarkAnswerWrite{%
+    $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$%
+   }%
+  \fi
+  \IfValueT{#2}{%
+   \@ifundefined{Hy@Message}{%
+    \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}}}%
+   }{%
+    \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}{}{}{}}}%
+   }%
+  }%
+  \IfValueT{#3}{%
+   \def\@Mark@RefName@Array{"x"}%
+   \@for\member:=#3\do{%
+    \edef\@Mark@RefName@Array{\@Mark@RefName@Array,"\member"}%
+   }%
+   \expandafter\def\expandafter\@Mark@RefName@Array\expandafter{\expandafter{\@Mark@RefName@Array}}%
+   \@ifundefined{Hy@Message}{%
+    \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+     \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
+     \let\@refname\pgfmathresult
+     \pgfmathparse{array(\@Mark@Array,\C)}%
+     \let\@refstring\pgfmathresult
+     \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}}}%
+    }%
+   }{%
+    \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+     \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
+     \let\@refname\pgfmathresult
+     \pgfmathparse{array(\@Mark@Array,\C)}%
+     \let\@refstring\pgfmathresult
+     \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}{}{}{}}}%
+    }%
+   }%
+  }%
+ \fi
+ \leavevmode
+ \hbox{%
+  \ifMarkCompactMode
+  \else
+   \kern1pt
+  \fi
+  \IfBooleanT{#1}{\vrule width0pt depth.75zh}%
+  \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
+   \node[white](@O@)at(.5,.5){あ};
+   \ifMarkCompactMode
+    \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+     \pgfmathparse{array(\@Mark@Array,\C)}%
+     \let\@mark@string=\pgfmathresult
+     \node[MarkCompactNode,#4]at(\C-.5,.5){\@mark@string};
+     \ifnum\C=\@ne\relax
+     \else
+      \ifMarkVerticalLine
+       \draw[MarkCompactDash,#5](\C-1,0)--(\C-1,1);
+      \fi
+     \fi
+    }%
+    \draw[MarkCompactLine,#5](0,0)rectangle(\C,1);
+   \else
+    \IfBooleanTF{#1}{%
+     \node[draw,MarkNode,MarkLine,#4](@O@){\@Mark@Strings};
+    }{%
+     \ifnum\numexpr\c@MarkEnd-\c@MarkFirst>\@ne\relax
+      \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+       \pgfmathparse{array(\@Mark@Array,\C)}%
+       \let\@mark@string=\pgfmathresult
+       \node[MarkNode,#4]at(\C-.5,.5){\@mark@string};
+      }%
+      \draw[MarkLine,#5](-.25,-.5)rectangle(\C+.25,1.5);
+     \else
+      \node[MarkNode,#4]at(1.5,.5){\@Mark@Strings};
+      \draw[MarkLine,#5](-.25,-.5)rectangle(3.25,1.5);
+     \fi
+    }%
+   \fi
+  }%
+  \ifMarkCompactMode
+  \else
+   \kern1pt
+  \fi
+ }%
+}%
+\NewDocumentCommand\RefMark{s D<>{}D(){}m}{%
+ \@ifundefined{r@mark:#4}{%
+  \leavevmode
+  \hbox{%
+   \kern1pt\relax
+   \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
+    \node[red,draw,text width=3\zw,align=center](@O@){??};
+   }%
+   \kern1pt\relax
+  }%
+ }{%
+  \edef\@temp@string{\csname r@mark:#4\endcsname}%
+  \edef\@temp@string{\expandafter\@firstoftwo\@temp@string}%
+  {%
+   \c@tempcnta=\z@\relax
+   \def\@Ref@Mark@Array{"x"}%
+   \expandafter\@tfor\expandafter\member\expandafter:\expandafter=\@temp@string\do{%
+    \ifx\member\@empty
+    \else
+     \edef\@Ref@Mark@Array{\@Ref@Mark@Array,"\member"}%
+     \advance\c@tempcnta by\@ne\relax
+    \fi
+   }%
+   \expandafter\def\expandafter\@Ref@Mark@Array\expandafter{\expandafter{\@Ref@Mark@Array}}%
+   \edef\@RefMarkNum{\the\c@tempcnta}%
+   \leavevmode
+   \hbox{%
+    \ifMarkCompactMode
+    \else
+     \kern1pt\relax
+    \fi
+    \IfBooleanT{#1}{\vrule width0pt depth.75zh\scriptsize\zw=1zw\relax}%
+    \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
+     \ifMarkCompactMode
+      \foreach\N in {1,...,\@RefMarkNum}{%
+       \pgfmathparse{array(\@Ref@Mark@Array,\N)}%
+       \let\@refmark@string=\pgfmathresult
+       \ifx\@refmark@string\@empty
+       \else
+        \node[MarkCompactNode,#2]at(\N-.5,.5){\@refmark@string};
+       \fi
+       \ifMarkVerticalLine
+        \ifnum\N=\@ne\relax
+        \else
+         \draw[MarkCompactDash,#3](\N-1,0)--(\N-1,1);
+        \fi
+       \fi
+      }%
+      \draw[MarkCompactLine,#3](0,0)rectangle(\@RefMarkNum,1);
+     \else
+     \IfBooleanTF{#1}{%
+      \node[draw,RefMarkNode,RefMarkLine,#2](@O@){\@temp@string};
+     }{%
+      \node[white](@O@)at(.5,.5){あ};
+      \ifnum\@RefMarkNum>\tw@\relax
+       \foreach\N in {1,...,\@RefMarkNum}{%
+        \pgfmathparse{array(\@Ref@Mark@Array,\N)}%
+        \let\@refmark@string=\pgfmathresult
+        \ifx\@refmark@string\@empty
+        \else
+         \node[RefMarkNode,#2]at(\N-.5,.5){\@refmark@string};
+        \fi
+       }%
+       \draw[RefMarkLine,#3](-.25,-.5)rectangle(\@RefMarkNum+.25,1.5);
+      \else
+       \node[RefMarkNode,#2]at(1.5,.5){\@temp@string};
+       \draw[RefMarkLine,#3](-.25,-.5)rectangle(3.25,1.5);
+      \fi
+     }%
+     \fi
+    }%
+    \ifMarkCompactMode
+    \else
+     \kern1pt\relax
+    \fi
+   }%
+  }%
+ }%
+}%
+\let\Mark=\MarkBox
+\let\refMark=\RefMarkBox
+\let\MarkReset=\MarkBoxReset
+\let\MarkAnswer=\PutMarkAnswer
 %%何ものかがペナルティを書き換えている
 \prebreakpenalty`，=10000
 \prebreakpenalty`．=10000
