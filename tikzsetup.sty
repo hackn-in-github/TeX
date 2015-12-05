@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/04/2015 Ver.0.097]%
+\ProvidesPackage{tikzsetup}[12/05/2015 Ver.0.098]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -492,35 +492,41 @@
 % #1 オプション引数
 % option:ovalmag=楕円の比率,size=数字のサイズ,thickness=線の太さ
 % #2 数字
-\define@key{Cmaru}{ovalmag}{\def\@OvalMag{#1}}%
-\define@key{Cmaru}{size}{\def\@NoSize{#1}}%
-\define@key{Cmaru}{thickness}{\def\@Thick{#1}}%
-\def\Cmaru{\@ifnextchar[{\@Cmaru}{\@Cmaru[]}}
-\def\@Cmaru[#1]#2{%
- \bgroup
-  \def\@OvalMag{1}%
-  \def\@NoSize{}%
-  \def\@Thick{.5pt}%
-  \setkeys{Cmaru}{#1}%
-  \leavevmode\setbox0=\hbox{あ}%
-  \Mul{\@OvalMag}{1400}\XYsize%
-  \Mul{\XYsize}{.6}\harfXYsize%
-  \Div{\XYsize}{2}\CENTER%
-  \dp0=2.5\dp0%
-  \lower\@OvalMag\dp0%
-   \hbox{%
-    \unitlength.001zw%
-    \begin{picture}%
-     (\XYsize,\XYsize)%
-     \allinethickness{\@Thick}%
-     \put(\CENTER,\CENTER){\makebox(0,0){\ellipse{\harfXYsize}{\XYsize}}}%
-     \put(\CENTER,\CENTER){\makebox(0,0){{\@NoSize#2}}}%
-    \end{picture}%
-    }%
- \egroup
+%\define@key{Cmaru}{ovalmag}{\def\@OvalMag{#1}}%
+%\define@key{Cmaru}{size}{\def\@NoSize{#1}}%
+%\define@key{Cmaru}{thickness}{\def\@Thick{#1}}%
+%\def\Cmaru{\@ifnextchar[{\@Cmaru}{\@Cmaru[]}}
+%\def\@Cmaru[#1]#2{%
+% \bgroup
+%  \def\@OvalMag{1}%
+%  \def\@NoSize{}%
+%  \def\@Thick{.5pt}%
+%  \setkeys{Cmaru}{#1}%
+%  \leavevmode\setbox0=\hbox{あ}%
+%  \Mul{\@OvalMag}{1400}\XYsize%
+%  \Mul{\XYsize}{.6}\harfXYsize%
+%  \Div{\XYsize}{2}\CENTER%
+%  \dp0=2.5\dp0%
+%  \lower\@OvalMag\dp0%
+%   \hbox{%
+%    \unitlength.001zw%
+%    \begin{picture}%
+%     (\XYsize,\XYsize)%
+%     \allinethickness{\@Thick}%
+%     \put(\CENTER,\CENTER){\makebox(0,0){\ellipse{\harfXYsize}{\XYsize}}}%
+%     \put(\CENTER,\CENTER){\makebox(0,0){{\@NoSize#2}}}%
+%    \end{picture}%
+%    }%
+% \egroup
+%}%
+%%2012/7/31変更
+%\let\Cmaru=\EMnagamaru
+% 12/5/2015変更
+\NewDocumentCommand\Cmaru{D<>{}O{}m}{%
+ \tikz[baseline=(@O@.base),#1]{%
+  \node[text=white,draw,inner sep=.75pt,ellipse,minimum width=1.4ex,minimum height=1.35em,#2](@O@){1}%
+   node at(@O@.center){#3};}%
 }%
-%2012/7/31変更
-\let\Cmaru=\EMnagamaru
 %%三角枠
 % \triframe<#1>[#2]#3
 % #1 枠の大きさを #1 倍する
@@ -5366,6 +5372,33 @@
  }%
 }%
 \def\endFramebox{\end{mdframed}}%
+%% TitleBox環境
+%% \begin{TitleBox}<#1>(#2)[#3]{#4}{#5}
+%% \end{TitleBox}
+%% #1:#4のnodeに対するTikZオプション
+%% #2:#5のnodeに対するTikZオプション
+%% #3:枠に関するTikZオプション
+%% #4:左上のタイトル
+%% #5:右下のタイトル(省略可)
+\NewDocumentEnvironment{TitleBox}{D<>{}D(){}O{}mm}{%
+ \def\@temp{#5}%
+ \ifx\@temp\@empty
+  \mdframed[%
+   innertopmargin=3mm,%
+   singleextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},#3%
+  ]%
+ \else
+  \mdframed[%
+   innertopmargin=3mm,innerbottommargin=3mm,%
+   singleextra={%
+    \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
+    \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
+   },#3%
+  ]%
+ \fi
+}{%
+ \endmdframed
+}%
 %% 相似記号
 \def\soujitype{s}%
 \def\souji{%
@@ -6258,15 +6291,11 @@
 }%
 \NewDocumentCommand\PutMarkAnswer{m}{%
  \immediate\closeout\MarkAnswerWrite
- \pgfmathparse{width("#1")}%
- \@tempdima=\pgfmathresult pt\relax
- \@tempdima=.5\@tempdima\relax
- \advance\@tempdima by4mm\relax
  \begin{mdframed}%
   [roundcorner=7.5pt,middlelinewidth=1pt,%
    innertopmargin=3mm,innerbottommargin=3mm,%
-   singleextra={\node[fill=white]at(P|-O)[xshift=-\@tempdima]{#1};%
-                \node[font=\bfseries,fill=white]at(P-|O)[xshift=8mm]{解　答};}]
+   singleextra={\node[fill=white]at(P|-O)[w=2.5mm]{#1};%
+                \node[font=\bfseries,fill=white]at(P-|O)[e=2.5mm]{解　答};}]
   \input{\jobname.ans}%
  \end{mdframed}
  \CenterWritefalse
