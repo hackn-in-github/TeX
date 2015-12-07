@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/05/2015 Ver.0.098]%
+\ProvidesPackage{tikzsetup}[12/07/2015 Ver.0.099]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6287,7 +6287,9 @@
  \resetcounter{equation}%
  \resetcounter{figure}%
  \resetcounter{table}%
- \immediate\openout\MarkAnswerWrite\jobname.ans
+ \IfBooleanF{#1}{% 12/07/2015 アスタリスクによる判定を追加
+  \immediate\openout\MarkAnswerWrite\jobname.ans
+ }%
 }%
 \NewDocumentCommand\PutMarkAnswer{m}{%
  \immediate\closeout\MarkAnswerWrite
