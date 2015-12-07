@@ -1077,8 +1077,8 @@
 \def\MojiShitei#1{\def\CenterMoji{#1}}%
 \MojiShitei\アイウ% 中の文字の種類
 \newwrite\center@nswer%
-\def\StartCenter{\setcounter{CenterCTR}{\TempCenterCTR}\CenterWritetrue}%
-\def\StopCenter{\edef\TempCenterCTR{\theCenterCTR}\CenterWritefalse}%
+%\def\StartCenter{\setcounter{CenterCTR}{\TempCenterCTR}\CenterWritetrue}%
+%\def\StopCenter{\edef\TempCenterCTR{\theCenterCTR}\CenterWritefalse}%
 %\MarkReset
 \newif\ifMarkReset
 \MarkResettrue
@@ -6306,13 +6306,17 @@
 \tikzset{MarkCompactNode/.style={font=\mdseries},MarkCompactLine/.style={thin},%
          MarkCompactDash/.style={dash pattern=on1.5pt off1.5pt}}%
 \tikzset{RefMarkNode/.style={font=\mdseries},RefMarkLine/.style={thin}}%
+% 数式環境でのカウンターの制御 12/07/2015
+\def\StartCenter{\setcounter{MarkEnd}{\TempMarkEnd}\CenterWritetrue}%
+\def\StopCenter{\edef\TempMarkEnd{\theMarkEnd}\CenterWritefalse}%
 \NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{%
  \IfBooleanT{#1}{\scriptsize\zw=1zw\relax}%
  \setcounter{MarkFirst}{\numexpr\c@MarkEnd+1}%
  \def\@Mark@Strings{}%
  \def\@Mark@Array{"x"}%
  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
-  \global\advance\c@MarkEnd by\@ne\relax
+  \stepcounter{MarkEnd}%
+%  \global\advance\c@MarkEnd by\@ne\relax
   \edef\@Mark@Strings{\@Mark@Strings\アイウ{MarkEnd}}%
   \edef\@Mark@Array{\@Mark@Array,"\アイウ{MarkEnd}"}%
  }%
