@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/07/2015 Ver.0.099]%
+\ProvidesPackage{tikzsetup}[12/09/2015 Ver.0.0991]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6327,6 +6327,7 @@
     $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$%
    }%
   \fi
+\ifCenterWrite% 12/09/2015 追加
   \IfValueT{#2}{%
    \@ifundefined{Hy@Message}{%
     \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}}}%
@@ -6358,6 +6359,7 @@
     }%
    }%
   }%
+\fi
  \fi
  \leavevmode
  \hbox{%
