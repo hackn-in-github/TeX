@@ -6309,14 +6309,13 @@
 % 数式環境でのカウンターの制御 12/07/2015
 \def\StartCenter{\setcounter{MarkEnd}{\TempMarkEnd}\CenterWritetrue}%
 \def\StopCenter{\edef\TempMarkEnd{\theMarkEnd}\CenterWritefalse}%
-\NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{%
+\NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{% 12/09/2015 auxへの書き出し部分を修正
  \IfBooleanT{#1}{\scriptsize\zw=1zw\relax}%
  \setcounter{MarkFirst}{\numexpr\c@MarkEnd+1}%
  \def\@Mark@Strings{}%
  \def\@Mark@Array{"x"}%
  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
   \stepcounter{MarkEnd}%
-%  \global\advance\c@MarkEnd by\@ne\relax
   \edef\@Mark@Strings{\@Mark@Strings\アイウ{MarkEnd}}%
   \edef\@Mark@Array{\@Mark@Array,"\アイウ{MarkEnd}"}%
  }%
@@ -6324,42 +6323,40 @@
  \ifmeasuring@\else
   \ifCenterWrite
    \immediate\write\MarkAnswerWrite{%
-    $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$%
+    $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$\string\hspace{\string\CenterSkip}
+   }%
+   \IfValueT{#2}{%
+    \@ifundefined{Hy@Message}{%
+     \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}}}%
+    }{%
+     \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}{}{}{}}}%
+    }%
+   }%
+   \IfValueT{#3}{%
+    \def\@Mark@RefName@Array{"x"}%
+    \@for\member:=#3\do{%
+     \edef\@Mark@RefName@Array{\@Mark@RefName@Array,"\member"}%
+    }%
+    \expandafter\def\expandafter\@Mark@RefName@Array\expandafter{\expandafter{\@Mark@RefName@Array}}%
+    \@ifundefined{Hy@Message}{%
+     \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+      \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
+      \let\@refname\pgfmathresult
+      \pgfmathparse{array(\@Mark@Array,\C)}%
+      \let\@refstring\pgfmathresult
+      \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}}}%
+     }%
+    }{%
+     \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+      \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
+      \let\@refname\pgfmathresult
+      \pgfmathparse{array(\@Mark@Array,\C)}%
+      \let\@refstring\pgfmathresult
+      \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}{}{}{}}}%
+     }%
+    }%
    }%
   \fi
-\ifCenterWrite% 12/09/2015 追加
-  \IfValueT{#2}{%
-   \@ifundefined{Hy@Message}{%
-    \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}}}%
-   }{%
-    \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}{}{}{}}}%
-   }%
-  }%
-  \IfValueT{#3}{%
-   \def\@Mark@RefName@Array{"x"}%
-   \@for\member:=#3\do{%
-    \edef\@Mark@RefName@Array{\@Mark@RefName@Array,"\member"}%
-   }%
-   \expandafter\def\expandafter\@Mark@RefName@Array\expandafter{\expandafter{\@Mark@RefName@Array}}%
-   \@ifundefined{Hy@Message}{%
-    \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
-     \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
-     \let\@refname\pgfmathresult
-     \pgfmathparse{array(\@Mark@Array,\C)}%
-     \let\@refstring\pgfmathresult
-     \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}}}%
-    }%
-   }{%
-    \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
-     \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
-     \let\@refname\pgfmathresult
-     \pgfmathparse{array(\@Mark@Array,\C)}%
-     \let\@refstring\pgfmathresult
-     \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}{}{}{}}}%
-    }%
-   }%
-  }%
-\fi
  \fi
  \leavevmode
  \hbox{%
