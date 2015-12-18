@@ -6309,6 +6309,8 @@
 % 数式環境でのカウンターの制御 12/07/2015
 \def\StartCenter{\setcounter{MarkEnd}{\TempMarkEnd}\CenterWritetrue}%
 \def\StopCenter{\edef\TempMarkEnd{\theMarkEnd}\CenterWritefalse}%
+\def\MarkBoxChar#1{\let\MarkBoxMoji=#1\relax}% 12/18/2015 新設
+\MarkBoxChar{\アイウ}%
 \NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{% 12/09/2015 auxへの書き出し部分を修正
  \IfBooleanT{#1}{\scriptsize\zw=1zw\relax}%
  \setcounter{MarkFirst}{\numexpr\c@MarkEnd+1}%
@@ -6316,8 +6318,8 @@
  \def\@Mark@Array{"x"}%
  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
   \stepcounter{MarkEnd}%
-  \edef\@Mark@Strings{\@Mark@Strings\アイウ{MarkEnd}}%
-  \edef\@Mark@Array{\@Mark@Array,"\アイウ{MarkEnd}"}%
+  \edef\@Mark@Strings{\@Mark@Strings\MarkBoxMoji{MarkEnd}}%
+  \edef\@Mark@Array{\@Mark@Array,"\MarkBoxMoji{MarkEnd}"}%
  }%
  \expandafter\def\expandafter\@Mark@Array\expandafter{\expandafter{\@Mark@Array}}%
  \ifmeasuring@\else
