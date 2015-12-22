@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/09/2015 Ver.0.0991]%
+\ProvidesPackage{tikzsetup}[12/22/2015 Ver.0.0992]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -4739,26 +4739,16 @@
 \def\Naishin#1#2{%
  \@Naishin#1@{#2}%
 }%
-\def\@Naishin#1,#2,#3@#4{%
- \path let \p0=($(#1)-(#2)$),\p1=($(#2)-(#3)$),\p2=($(#3)-(#1)$) in node
-  {%
-   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-   \xdef\@MT@N@AB{\pgfmathresult}%
-   \pgfmathparse{sqrt(pow(\x1/28.45274,2)+pow(\y1/28.45274,2))}%
-   \xdef\@MT@N@BC{\pgfmathresult}%
-   \pgfmathparse{sqrt(pow(\x2/28.45274,2)+pow(\y2/28.45274,2))}%
-   \xdef\@MT@N@CA{\pgfmathresult}%
-  };%
- \coordinate(@MT@N@U@AB)at($1/\@MT@N@AB*(#1)-1/\@MT@N@AB*(#2)$);
- \coordinate(@MT@N@U@BC)at($1/\@MT@N@BC*(#2)-1/\@MT@N@BC*(#3)$);
- \coordinate(@MT@N@U@CA)at($1/\@MT@N@CA*(#3)-1/\@MT@N@CA*(#1)$);
- \VVIntersection{#1}{$(@MT@N@U@AB)-(@MT@N@U@CA)$}%
-                {#2}{$(@MT@N@U@AB)-(@MT@N@U@BC)$}{#4}%
- \path let \p0=($(#1)!(#4)!(#2)-(#4)$) in node
-  {%
-   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-   \xdef\NR{\pgfmathresult}%
-  };%
+\def\@Naishin#1,#2,#3@#4{% 12/22/2015 座標の計算ではなく内分点を用いて求めることにする
+ \Veclen{$(#1)-(#2)$}\@AB
+ \Veclen{$(#2)-(#3)$}\@BC
+ \Veclen{$(#3)-(#1)$}\@CA
+ \SetPoint*{@B($(#3)!{\@BC/(\@BC+\@AB)}!(#1)$);%
+	    @C($(#1)!{\@CA/(\@CA+\@BC)}!(#2)$)}%
+ \path[name path=@B@B](B)--(@B);%
+ \path[name path=@C@C](C)--(@C);%
+ \path[name intersections={of=@B@B and @C@C,by={#4}}];%
+ \Veclen{$(@B)-(#4)$}\NR
 }%
 %% \Boushin{#1}{#2}%
 %% #1:三角形の3点をカンマ(,)区切りで指定
