@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/22/2015 Ver.0.0992]%
+\ProvidesPackage{tikzsetup}[12/23/2015 Ver.0.0993]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -4732,100 +4732,88 @@
    \xdef\GR{\pgfmathresult}%
   };%
 }%
-%% \Naishin{#1}{#2}%
-%% #1:三角形の3点をカンマ(,)区切りで指定
-%% #2:内心の名前
-%% \NRに内接円の半径を格納
-\def\Naishin#1#2{%
- \@Naishin#1@{#2}%
+%% \Naishin<#1>{#2}{#3}%
+%% #1:オリジナルオプション
+%%  NRname:内接円の半径のコマンド名を指定[NR](ex. NRname=Vr)
+%% #2:三角形の3点をカンマ(,)区切りで指定
+%% #3:内心の名前
+%% デフォルトで\NRに内接円の半径を格納
+\define@key{Naishin}{NRname}{\def\@NRname@{#1}}%
+\def\Naishin{\@ifnextchar<{\@Naishin}{\@Naishin<>}}%
+\def\@Naishin<#1>#2#3{%
+ \def\@NRname@{NR}%
+ \setkeys{Naishin}{#1}%
+ \@@Naishin#2@{#3}%
 }%
-\def\@Naishin#1,#2,#3@#4{% 12/22/2015 座標の計算ではなく内分点を用いて求めることにする
- \Veclen{$(#1)-(#2)$}\@AB
- \Veclen{$(#2)-(#3)$}\@BC
- \Veclen{$(#3)-(#1)$}\@CA
- \SetPoint*{@B($(#3)!{\@BC/(\@BC+\@AB)}!(#1)$);%
-	    @C($(#1)!{\@CA/(\@CA+\@BC)}!(#2)$)}%
- \path[name path=@B@B](B)--(@B);%
- \path[name path=@C@C](C)--(@C);%
- \path[name intersections={of=@B@B and @C@C,by={#4}}];%
- \Veclen{$(@B)-(#4)$}\NR
+\def\@@Naishin#1,#2,#3@#4{% 12/22/2015 座標の計算ではなく内分点を用いて求めることにする
+%                           12/23/2015 計算が間違っていたので修正
+ \Veclen{$(#1)-(#2)$}\@N@AB
+ \Veclen{$(#2)-(#3)$}\@N@BC
+ \Veclen{$(#3)-(#1)$}\@N@CA
+ \SetPoint*{@N@B($(#3)!{\@N@BC/(\@N@BC+\@N@AB)}!(#1)$);%
+	    @N@C($(#1)!{\@N@CA/(\@N@CA+\@N@BC)}!(#2)$)}%
+ \path[name path=@N@B@B](B)--(@N@B);%
+ \path[name path=@N@C@C](C)--(@N@C);%
+ \path[name intersections={of=@N@B@B and @N@C@C,by={#4}}];%
+ \Veclen{$(#3)!(#4)!(#1)-(#4)$}\@N@VR@
+ \expandafter\let\csname \@NRname@\endcsname=\@N@VR@
 }%
-%% \Boushin{#1}{#2}%
-%% #1:三角形の3点をカンマ(,)区切りで指定
-%% #2:傍心の名前
-%% \BRに傍接円の半径を格納
-\def\Boushin#1#2{%
- \@Boushin#1@{#2}%
+%% \Boushin<#1>{#2}{#3}% 12/23/2015 mytikzpicture環境のみから
+%%                                  すべてのtikzpicture環境で使用可に
+%% #1:オリジナルオプション
+%%  BRname:傍接円の半径のコマンド名を指定[BR](ex. BRname=Vr)
+%% #2:三角形の3点をカンマ(,)区切りで指定
+%%  A,B,Cと指定すると角Bの対辺に接する傍接円を求める
+%% #3:傍心の名前
+%% デフォルトで\BRに傍接円の半径を格納
+\define@key{Boushin}{BRname}{\def\@BRname@{#1}}%
+\def\Boushin{\@ifnextchar<{\@Boushin}{\@Boushin<>}}%
+\def\@Boushin<#1>#2#3{%
+ \def\@BRname@{BR}%
+ \setkeys{Boushin}{#1}%
+ \@@Boushin#2@{#3}%
 }%
-\def\@Boushin#1,#2,#3@#4{%
- \path let \p0=($(#1)-(#2)$),\p1=($(#2)-(#3)$),\p2=($(#3)-(#1)$) in node
-  {%
-   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-   \xdef\@MT@N@AB{\pgfmathresult}%
-   \pgfmathparse{sqrt(pow(\x1/28.45274,2)+pow(\y1/28.45274,2))}%
-   \xdef\@MT@N@BC{\pgfmathresult}%
-   \pgfmathparse{sqrt(pow(\x2/28.45274,2)+pow(\y2/28.45274,2))}%
-   \xdef\@MT@N@CA{\pgfmathresult}%
-  };%
- \coordinate(@MT@N@U@AB)at($1/\@MT@N@AB*(#1)-1/\@MT@N@AB*(#2)$);
- \coordinate(@MT@N@U@BC)at($1/\@MT@N@BC*(#2)-1/\@MT@N@BC*(#3)$);
- \coordinate(@MT@N@U@CA)at($1/\@MT@N@CA*(#3)-1/\@MT@N@CA*(#1)$);
- \VVIntersection{#1}{$(@MT@N@U@AB)+(@MT@N@U@CA)$}%
-                {#3}{$(@MT@N@U@BC)+(@MT@N@U@CA)$}{#4}%
- \path let \p0=($(#1)!(#4)!(#3)-(#4)$) in node
-  {%
-   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-   \xdef\BR{\pgfmathresult}%
-  };%
+\def\@@Boushin#1,#2,#3@#4{%
+ \Veclen{$(#1)-(#2)$}\@B@AB
+ \Veclen{$(#2)-(#3)$}\@B@BC
+ \Veclen{$(#3)-(#1)$}\@B@CA
+ \SetPoint*{@B@P($(#1)!{\@B@AB/(\@B@AB+\@B@BC)}!(#3)$)}%
+ \path let \p0=($(@B@P)-(#2)$), \p1=($(#3)-(#2)$) in node {%
+  \GetMathparse{atan2(\y0,\x0)-atan2(\y1,\x1)}\@B@RESULT
+  \global\let\@B@ANGLE=\@B@RESULT
+ };%
+ \GetMathparse{(1/2)*(\@B@AB+\@B@BC+\@B@CA)*sqrt((\@B@CA^2-(\@B@AB-\@B@BC)^2)/((\@B@AB+\@B@BC)^2-\@B@CA^2))}\@BR@
+ \SetPoint*{@B@Q($(#2)!{(1/(2*\@B@BC)*(\@B@AB+\@B@BC+\@B@CA))}!(#3)$)}%
+ \ifdim\@B@ANGLE pt>0pt\relax
+  \coordinate(#4)at($(#2)!{(1/(2*\@B@BC))*(\@B@AB+\@B@BC+\@B@CA)}!(#3)!\@BR@ cm!-90:(#2)$);%
+ \else
+  \coordinate(#4)at($(#2)!{(1/(2*\@B@BC))*(\@B@AB+\@B@BC+\@B@CA)}!(#3)!\@BR@ cm!90:(#2)$);%
+ \fi
+ \expandafter\let\csname\@BRname@\endcsname=\@BR@
 }%
-%% \Cancel obsolete \teisei \Teisei コマンドを新設
-%\define@key{MTCancel}{s}[true]{\def\@MTT@dir{0}}%
-%\define@key{MTCancel}{b}[true]{\def\@MTT@dir{1}}%
-%\define@key{MTCancel}{x}[true]{\def\@MTT@dir{2}}%
-%\define@key{MTCancel}{h}[true]{\def\@MTT@dir{3}}%
-%\define@key{MTCancel}{v}[true]{\def\@MTT@dir{4}}%
-%\def\Cancel{\@ifnextchar<{\@Cancel}{\@Cancel<>}}%
-%\def\@Cancel<#1>{\@ifnextchar[{\@@Cancel<#1>}{\@@Cancel<#1>[]}}%
-%\def\@@Cancel<#1>[#2]#3{%
-% \bgroup
-%  \def\@MTT@dir{0}%
-%  \setkeys{MTCancel}{#1}%
-%  \setbox0=\hbox{\ensuremath{#3}}%
-%  \tikz[baseline=(X.base),outer sep=0pt]{%
-%   \ifcase\@MTT@dir
-%    %s(default)
-%    \coordinate(@MTT@SP)at($.5*(-\wd0,-\ht0-\dp0)$);
-%    \coordinate(@MTT@EP)at($.5*(\wd0,\ht0+\dp0)$);
-%   \or
-%    %b
-%    \coordinate(@MTT@SP)at($.5*(-\wd0,\ht0+\dp0)$);
-%    \coordinate(@MTT@EP)at($.5*(\wd0,-\ht0-\dp0)$);
-%   \or
-%    %x
-%    \coordinate(@MTT@SP)at($.5*(-\wd0,-\ht0-\dp0)$);
-%    \coordinate(@MTT@EP)at($.5*(\wd0,\ht0+\dp0)$);
-%    \coordinate(@MTT@SP1)at($.5*(-\wd0,\ht0+\dp0)$);
-%    \coordinate(@MTT@EP1)at($.5*(\wd0,-\ht0-\dp0)$);
-%   \or
-%    %h
-%    \coordinate(@MTT@SP)at($.5*(-\wd0,0)$);
-%    \coordinate(@MTT@EP)at($.5*(\wd0,0)$);
-%   \or
-%    %v
-%    \coordinate(@MTT@SP)at($.5*(0,-\ht0-\dp0)$);
-%    \coordinate(@MTT@EP)at($.5*(0,\ht0+\dp0)$);
-%   \else
-%    %s
-%    \coordinate(@MTT@SP)at($.5*(-\wd0,-\ht0-\dp0)$);
-%    \coordinate(@MTT@EP)at($.5*(\wd0,\ht0+\dp0)$);
-%   \fi
-%   \node[inner sep=0pt](X){\ensuremath{#3}};
-%   \draw[#2](@MTT@SP)--(@MTT@EP);
-%   \ifnum\@MTT@dir=\tw@
-%    \draw[#2](@MTT@SP1)--(@MTT@EP1);
-%   \fi
-%  }%
-% \egroup
+%\def\Boushin#1#2{%
+% \@Boushin#1@{#2}%
+%}%
+%\def\@Boushin#1,#2,#3@#4{%
+% \path let \p0=($(#1)-(#2)$),\p1=($(#2)-(#3)$),\p2=($(#3)-(#1)$) in node
+%  {%
+%   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
+%   \xdef\@MT@N@AB{\pgfmathresult}%
+%   \pgfmathparse{sqrt(pow(\x1/28.45274,2)+pow(\y1/28.45274,2))}%
+%   \xdef\@MT@N@BC{\pgfmathresult}%
+%   \pgfmathparse{sqrt(pow(\x2/28.45274,2)+pow(\y2/28.45274,2))}%
+%   \xdef\@MT@N@CA{\pgfmathresult}%
+%  };%
+% \coordinate(@MT@N@U@AB)at($1/\@MT@N@AB*(#1)-1/\@MT@N@AB*(#2)$);
+% \coordinate(@MT@N@U@BC)at($1/\@MT@N@BC*(#2)-1/\@MT@N@BC*(#3)$);
+% \coordinate(@MT@N@U@CA)at($1/\@MT@N@CA*(#3)-1/\@MT@N@CA*(#1)$);
+% \VVIntersection{#1}{$(@MT@N@U@AB)+(@MT@N@U@CA)$}%
+%                {#3}{$(@MT@N@U@BC)+(@MT@N@U@CA)$}{#4}%
+% \path let \p0=($(#1)!(#4)!(#3)-(#4)$) in node
+%  {%
+%   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
+%   \xdef\BR{\pgfmathresult}%
+%  };%
 %}%
 %% \CCIntersections<#1>[#2]{#3}{#4}{#5}{#6}{#7}%
 %% #1:固有オプション
