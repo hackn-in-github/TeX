@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/23/2015 Ver.0.0993]%
+\ProvidesPackage{tikzsetup}[12/24/2015 Ver.0.0994]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -4708,15 +4708,77 @@
 \def\@Juushin#1,#2,#3@#4{%
  \coordinate(#4)at($1/3*(#1)+1/3*(#2)+1/3*(#3)$);
 }%
-%% \Suishin{#1}{#2}%
-%% #1:三角形の3点をカンマ(,)区切りで指定
-%% #2:垂心の名前
-\def\Suishin#1#2{%
- \@Suishin#1@{#2}%
+%% \Suishin<#1>{#2}{#3}% 12/24/2015 tikzpicture環境でも使用可に
+%% #1:オリジナルオプション
+%%  show points:[true]指定すると垂心を求める際に使った座標を表示する
+%% #2:三角形の3点をカンマ(,)区切りで指定(ex. \Suishin{A,B,C}{S})
+%% #3:垂心の名前
+\define@key{Suishin}{show points}[true]{\def\@Suishin@Show@Ast{}}%
+\def\Suishin{\@ifnextchar<{\@Suishin}{\@Suishin<>}}%
+\def\@Suishin<#1>#2#3{%
+ \def\@Suishin@Show@Ast{*}%
+ \setkeys{Suishin}{#1}%
+ \@@Suishin#2@{#3}%
 }%
-\def\@Suishin#1,#2,#3@#4{%
- \NNIntersection{#1}{$(#2)-(#3)$}{#2}{$(#3)-(#1)$}{#4}%
+\def\@@Suishin#1,#2,#3@#4{%
+ \expandafter\SetPoint\@Suishin@Show@Ast{@S@A($(#2)!(#1)!(#3)$);@S@B($(#1)!(#2)!(#3)$)}%
+ \Veclen{$(#2)-(#3)$}\@S@a
+ \Veclen{$(#3)-(#1)$}\@S@b
+ \Veclen{$(#1)-(#2)$}\@S@c
+ \Veclen{$(#2)-(@S@A)$}\@S@s
+ \Veclen{$(#3)-(@S@A)$}\@S@t
+ \Veclen{$(#3)-(@S@B)$}\@S@x
+ \Veclen{$(#1)-(@S@B)$}\@S@y
+ \pgfmathless{\@S@b^2+\@S@c^2-\@S@a^2}{0}%
+ \let\@S@A@RESULT=\pgfmathresult
+ \pgfmathless{\@S@a^2+\@S@c^2-\@S@b^2}{0}%
+ \let\@S@B@RESULT=\pgfmathresult
+ \pgfmathless{\@S@a^2+\@S@b^2-\@S@c^2}{0}%
+ \let\@S@C@RESULT=\pgfmathresult
+ \expandafter\SetPoint\@Suishin@Show@Ast{@S@A($(#2)!(#1)!(#3)$);@S@B($(#1)!(#2)!(#3)$);@S@C($(#1)!(#3)!(#2)$)}
+ \ifthenelse{\@S@A@RESULT=\z@\and\@S@B@RESULT=\z@\and\@S@C@RESULT=\z@}{%
+  \path[name path=@S@AA](#1)--(@S@A);
+  \path[name path=@S@BB](#2)--(@S@B);
+  \path[name intersections={of=@S@AA and @S@BB,by=#4}];
+ }{%
+  \ifnum\@S@A@RESULT=\@ne\relax
+   \expandafter\SetPoint\@Suishin@Show@Ast{@C1($(#3)!2!(#1)$);@S@C1($(#2)!(@C1)!(#1)$)}%
+   \path[name path=@S@BB](#2)--(@S@B);
+   \path[name path=@S@CC](@C1)--(@S@C1);
+   \path[name intersections={of=@S@AA and @S@CC,by=@S1}];
+   \Veclen{$(#3)-(@C1)$}\@S@Bunshi
+   \Veclen{$(@S@B)-(@B1)$}\@S@Bunbo
+   \expandafter\SetPoint\@Suishin@Show@Ast{#4($(@S1)!{\@S@Bunshi/\@S@Bunbo}!(@S@B)$)}%
+  \fi
+  \ifnum\@S@B@RESULT=\@ne\relax
+   \expandafter\SetPoint\@Suishin@Show@Ast{@A1($(#1)!2!(#2)$);@S@A1($(#3)!(@A1)!(#2)$)}%
+   \path[name path=@S@CC](#3)--(@S@C);
+   \path[name path=@S@AA](@A1)--(@S@A1);
+   \path[name intersections={of=@S@CC and @S@AA,by=@S1}];
+   \Veclen{$(#1)-(@A1)$}\@S@Bunshi
+   \Veclen{$(@S@C)-(@A1)$}\@S@Bunbo
+   \expandafter\SetPoint\@Suishin@Show@Ast{#4($(@S1)!{\@S@Bunshi/\@S@Bunbo}!(@S@C)$)}%
+  \fi
+  \ifnum\@S@C@RESULT=\@ne\relax
+   \expandafter\SetPoint\@Suishin@Show@Ast{@B1($(#2)!2!(#3)$);@S@B1($(#1)!(@B1)!(#3)$)}%
+   \path[name path=@S@AA](#1)--(@S@A);
+   \path[name path=@S@BB](@B1)--(@S@B1);
+   \path[name intersections={of=@S@AA and @S@BB,by=@S1}];
+   \Veclen{$(#2)-(@B1)$}\@S@Bunshi
+   \Veclen{$(@S@A)-(@B1)$}\@S@Bunbo
+   \expandafter\SetPoint\@Suishin@Show@Ast{#4($(@S1)!{\@S@Bunshi/\@S@Bunbo}!(@S@A)$)}%
+  \fi
+ }%
 }%
+%%% \Suishin{#1}{#2}%
+%%% #1:三角形の3点をカンマ(,)区切りで指定
+%%% #2:垂心の名前
+%\def\Suishin#1#2{%
+% \@Suishin#1@{#2}%
+%}%
+%\def\@Suishin#1,#2,#3@#4{%
+% \NNIntersection{#1}{$(#2)-(#3)$}{#2}{$(#3)-(#1)$}{#4}%
+%}%
 %% \Gaishin{#1}{#2}%
 %% #1:三角形の3点をカンマ(,)区切りで指定
 %% #2:外心の名前
