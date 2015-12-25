@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/24/2015 Ver.0.0994]%
+\ProvidesPackage{tikzsetup}[12/25/2015 Ver.0.0995]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -4710,63 +4710,46 @@
 }%
 %% \Suishin<#1>{#2}{#3}% 12/24/2015 tikzpicture環境でも使用可に
 %% #1:オリジナルオプション
-%%  show points:[true]指定すると垂心を求める際に使った座標を表示する
 %% #2:三角形の3点をカンマ(,)区切りで指定(ex. \Suishin{A,B,C}{S})
 %% #3:垂心の名前
-\define@key{Suishin}{show points}[true]{\def\@Suishin@Show@Ast{}}%
-\def\Suishin{\@ifnextchar<{\@Suishin}{\@Suishin<>}}%
-\def\@Suishin<#1>#2#3{%
- \def\@Suishin@Show@Ast{*}%
- \setkeys{Suishin}{#1}%
- \@@Suishin#2@{#3}%
+\NewDocumentCommand\Suishin{D<>{}mm}{% 12/25/2015 修正
+ \@Suishin#2@{#3}%
 }%
-\def\@@Suishin#1,#2,#3@#4{%
- \expandafter\SetPoint\@Suishin@Show@Ast{@S@A($(#2)!(#1)!(#3)$);@S@B($(#1)!(#2)!(#3)$)}%
- \Veclen{$(#2)-(#3)$}\@S@a
- \Veclen{$(#3)-(#1)$}\@S@b
- \Veclen{$(#1)-(#2)$}\@S@c
- \Veclen{$(#2)-(@S@A)$}\@S@s
- \Veclen{$(#3)-(@S@A)$}\@S@t
- \Veclen{$(#3)-(@S@B)$}\@S@x
- \Veclen{$(#1)-(@S@B)$}\@S@y
+\def\@Suishin#1,#2,#3@#4{%
+ \expandafter\SetPoint\@Suishin@Show@Ast{%
+  @S@A($(#2)!(#1)!(#3)$);@S@B($(#3)!(#2)!(#1)$);@S@C($(#1)!(#3)!(#2)$)%
+ }%
+ \Veclen{$(#3)-(#2)$}\@S@a
+ \Veclen{$(#1)-(#3)$}\@S@b
+ \Veclen{$(#2)-(#1)$}\@S@c
  \pgfmathless{\@S@b^2+\@S@c^2-\@S@a^2}{0}%
- \let\@S@A@RESULT=\pgfmathresult
- \pgfmathless{\@S@a^2+\@S@c^2-\@S@b^2}{0}%
- \let\@S@B@RESULT=\pgfmathresult
+ \let\@S@A@Result=\pgfmathresult
+ \pgfmathless{\@S@c^2+\@S@a^2-\@S@b^2}{0}%
+ \let\@S@B@Result=\pgfmathresult
  \pgfmathless{\@S@a^2+\@S@b^2-\@S@c^2}{0}%
- \let\@S@C@RESULT=\pgfmathresult
- \expandafter\SetPoint\@Suishin@Show@Ast{@S@A($(#2)!(#1)!(#3)$);@S@B($(#1)!(#2)!(#3)$);@S@C($(#1)!(#3)!(#2)$)}
- \ifthenelse{\@S@A@RESULT=\z@\and\@S@B@RESULT=\z@\and\@S@C@RESULT=\z@}{%
+ \let\@S@C@Result=\pgfmathresult
+ \Veclen{$(#1)-(@S@A)$}\@S@D@a
+ \Veclen{$(#2)-(@S@B)$}\@S@D@b
+ \Veclen{$(#3)-(@S@C)$}\@S@D@c
+ \ifthenelse{\@S@A@Result=\z@\and\@S@B@Result=\z@\and\@S@C@Result=\z@}{%
   \path[name path=@S@AA](#1)--(@S@A);
   \path[name path=@S@BB](#2)--(@S@B);
   \path[name intersections={of=@S@AA and @S@BB,by=#4}];
  }{%
-  \ifnum\@S@A@RESULT=\@ne\relax
-   \expandafter\SetPoint\@Suishin@Show@Ast{@C1($(#3)!2!(#1)$);@S@C1($(#2)!(@C1)!(#1)$)}%
-   \path[name path=@S@BB](#2)--(@S@B);
-   \path[name path=@S@CC](@C1)--(@S@C1);
-   \path[name intersections={of=@S@AA and @S@CC,by=@S1}];
-   \Veclen{$(#3)-(@C1)$}\@S@Bunshi
-   \Veclen{$(@S@B)-(@B1)$}\@S@Bunbo
-   \expandafter\SetPoint\@Suishin@Show@Ast{#4($(@S1)!{\@S@Bunshi/\@S@Bunbo}!(@S@B)$)}%
+  \ifnum\@S@A@Result=\@ne\relax
+   \GetMathparse{(\@S@D@a*(\@S@b^2-\@S@D@c^2)+%
+	sqrt(\@S@D@c^2*(\@S@b^2-\@S@D@a^2)*(\@S@b^2-\@S@D@c^2)))/(\@S@D@a*(\@S@D@c^2-\@S@D@a^2))}\@S@D
+  \SetPoint{#4($(#1)!{-\@S@D}!(@S@A)$)}%
   \fi
-  \ifnum\@S@B@RESULT=\@ne\relax
-   \expandafter\SetPoint\@Suishin@Show@Ast{@A1($(#1)!2!(#2)$);@S@A1($(#3)!(@A1)!(#2)$)}%
-   \path[name path=@S@CC](#3)--(@S@C);
-   \path[name path=@S@AA](@A1)--(@S@A1);
-   \path[name intersections={of=@S@CC and @S@AA,by=@S1}];
-   \Veclen{$(#1)-(@A1)$}\@S@Bunshi
-   \Veclen{$(@S@C)-(@A1)$}\@S@Bunbo
-   \expandafter\SetPoint\@Suishin@Show@Ast{#4($(@S1)!{\@S@Bunshi/\@S@Bunbo}!(@S@C)$)}%
+  \ifnum\@S@B@Result=\@ne\relax
+   \GetMathparse{(\@S@D@b*(\@S@c^2-\@S@D@a^2)+%
+	sqrt(\@S@D@a^2*(\@S@c^2-\@S@D@b^2)*(\@S@c^2-\@S@D@a^2)))/(\@S@D@b*(\@S@D@a^2-\@S@D@b^2))}\@S@D
+  \SetPoint{#4($(#2)!{-\@S@D}!(@S@B)$)}%
   \fi
-  \ifnum\@S@C@RESULT=\@ne\relax
-   \expandafter\SetPoint\@Suishin@Show@Ast{@B1($(#2)!2!(#3)$);@S@B1($(#1)!(@B1)!(#3)$)}%
-   \path[name path=@S@AA](#1)--(@S@A);
-   \path[name path=@S@BB](@B1)--(@S@B1);
-   \path[name intersections={of=@S@AA and @S@BB,by=@S1}];
-   \Veclen{$(#2)-(@B1)$}\@S@Bunshi
-   \Veclen{$(@S@A)-(@B1)$}\@S@Bunbo
-   \expandafter\SetPoint\@Suishin@Show@Ast{#4($(@S1)!{\@S@Bunshi/\@S@Bunbo}!(@S@A)$)}%
+  \ifnum\@S@C@Result=\@ne\relax
+   \GetMathparse{(\@S@D@c*(\@S@a^2-\@S@D@b^2)+%
+	sqrt(\@S@D@b^2*(\@S@a^2-\@S@D@c^2)*(\@S@a^2-\@S@D@b^2)))/(\@S@D@c*(\@S@D@b^2-\@S@D@c^2))}\@S@D
+  \SetPoint*{#4($(#3)!{-\@S@D}!(@S@C)$)}%
   \fi
  }%
 }%
@@ -4779,36 +4762,64 @@
 %\def\@Suishin#1,#2,#3@#4{%
 % \NNIntersection{#1}{$(#2)-(#3)$}{#2}{$(#3)-(#1)$}{#4}%
 %}%
-%% \Gaishin{#1}{#2}%
-%% #1:三角形の3点をカンマ(,)区切りで指定
-%% #2:外心の名前
-%% \GRに外接円の半径を格納
-\def\Gaishin#1#2{%
- \@Gaishin#1@{#2}%
+%% \Gaishin<#1>{#2}{#3}%
+%% #1:オリジナルオプション
+%%  radius name:外接円の半径のコマンド名を指定[GR](ex. radius name=Vr)
+%%  show points:[true]指定すると外心を求めるときに使った点が表示される
+%% #2:三角形の3点をカンマ(,)区切りで指定
+%% #3:外心の名前
+%% デフォルトで\GRに外接円の半径を格納
+\define@key{Gaishin}{radius name}{\def\@R@Name@{#1}}%
+\define@key{Gaishin}{show points}[true]{\def\@G@Ast{}}%
+\NewDocumentCommand\Gaishin{D<>{}mm}{%
+ \def\@R@Name@{GR}%
+ \def\@G@Ast{*}%
+ \setkeys{Gaishin}{#1}%
+ \@Gaishin#2@{#3}%
 }%
 \def\@Gaishin#1,#2,#3@#4{%
- \NNIntersection{$(#1)!1/2!(#2)$}{$(#1)-(#2)$}{$(#1)!1/2!(#3)$}{$(#1)-(#3)$}{#4}%
- \path let \p0=($(#4)-(#1)$) in node
-  {%
-   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-   \xdef\GR{\pgfmathresult}%
-  };%
+ \Veclen{$(#1)-(#2)$}\@G@c
+ \Veclen{$(#2)-(#3)$}\@G@a
+ \Veclen{$(#3)-(#1)$}\@G@b
+ \GetMathparse{(\@G@b^2+\@G@c^2-\@G@a^2)/(2*\@G@b*\@G@c)}\@G@Cos@A
+ \GetMathparse{sqrt(1-(\@G@Cos@A)^2)}\@G@Sin@A
+ \GetMathparse{\@G@a/(2*\@G@Sin@A)}\@GR@
+ \GetMathparse{sqrt(\@GR@^2-(\@G@a/2)^2)}\@G@D
+ \expandafter\SetPoint\@G@Ast{@G@M($1/2*(#2)+1/2*(#3)$)}%
+ \Veclen{$(@G@M)!\@G@D cm!90:(#3)-(#1)$}\@@GR@
+ \GetMathparse{int(100*(\@@GR@-\@GR@))}\@G@W
+ \ifnum\@G@W=\z@\relax% 差の絶対値が.001未満 場合によっては \@G@W<3 などと修正が必要かも
+  \expandafter\SetPoint\@G@Ast{#4($(@G@M)!\@G@D cm!90:(#3)$)}%
+ \else
+  \expandafter\SetPoint\@G@Ast{#4($(@G@M)!\@G@D cm!-90:(#3)$)}%
+ \fi
+ \expandafter\let\csname\@R@Name@\endcsname=\@GR@
 }%
+%\def\Gaishin#1#2{%
+% \@Gaishin#1@{#2}%
+%}%
+%\def\@Gaishin#1,#2,#3@#4{%
+% \NNIntersection{$(#1)!1/2!(#2)$}{$(#1)-(#2)$}{$(#1)!1/2!(#3)$}{$(#1)-(#3)$}{#4}%
+% \path let \p0=($(#4)-(#1)$) in node
+%  {%
+%   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
+%   \xdef\GR{\pgfmathresult}%
+%  };%
+%}%
 %% \Naishin<#1>{#2}{#3}%
 %% #1:オリジナルオプション
-%%  NRname:内接円の半径のコマンド名を指定[NR](ex. NRname=Vr)
+%%  radius name:内接円の半径のコマンド名を指定[NR](ex. radius name=Vr)
 %% #2:三角形の3点をカンマ(,)区切りで指定
 %% #3:内心の名前
 %% デフォルトで\NRに内接円の半径を格納
-\define@key{Naishin}{NRname}{\def\@NRname@{#1}}%
-\def\Naishin{\@ifnextchar<{\@Naishin}{\@Naishin<>}}%
-\def\@Naishin<#1>#2#3{%
- \def\@NRname@{NR}%
+\define@key{Naishin}{radius name}{\def\@R@Name@{#1}}%
+\NewDocumentCommand\Naishin{D<>{}mm}{%
+ \def\@R@Name@{NR}%
  \setkeys{Naishin}{#1}%
  \@@Naishin#2@{#3}%
 }%
-\def\@@Naishin#1,#2,#3@#4{% 12/22/2015 座標の計算ではなく内分点を用いて求めることにする
-%                           12/23/2015 計算が間違っていたので修正
+\def\@Naishin#1,#2,#3@#4{% 12/22/2015 座標の計算ではなく内分点を用いて求めることにする
+%                          12/23/2015 計算が間違っていたので修正
  \Veclen{$(#1)-(#2)$}\@N@AB
  \Veclen{$(#2)-(#3)$}\@N@BC
  \Veclen{$(#3)-(#1)$}\@N@CA
@@ -4818,40 +4829,37 @@
  \path[name path=@N@C@C](C)--(@N@C);%
  \path[name intersections={of=@N@B@B and @N@C@C,by={#4}}];%
  \Veclen{$(#3)!(#4)!(#1)-(#4)$}\@N@VR@
- \expandafter\let\csname \@NRname@\endcsname=\@N@VR@
+ \expandafter\let\csname \@R@Name@\endcsname=\@N@VR@
 }%
 %% \Boushin<#1>{#2}{#3}% 12/23/2015 mytikzpicture環境のみから
 %%                                  すべてのtikzpicture環境で使用可に
 %% #1:オリジナルオプション
-%%  BRname:傍接円の半径のコマンド名を指定[BR](ex. BRname=Vr)
+%%  radius name:傍接円の半径のコマンド名を指定[BR](ex. radius name=Vr)
 %% #2:三角形の3点をカンマ(,)区切りで指定
 %%  A,B,Cと指定すると角Bの対辺に接する傍接円を求める
 %% #3:傍心の名前
 %% デフォルトで\BRに傍接円の半径を格納
-\define@key{Boushin}{BRname}{\def\@BRname@{#1}}%
-\def\Boushin{\@ifnextchar<{\@Boushin}{\@Boushin<>}}%
-\def\@Boushin<#1>#2#3{%
- \def\@BRname@{BR}%
+\define@key{Boushin}{radius name}{\def\@R@Name@{#1}}%
+\NewDocumentCommand\Boushin{D<>{}mm}{%
+ \def\@R@Name@{BR}%
  \setkeys{Boushin}{#1}%
- \@@Boushin#2@{#3}%
+ \@Boushin#2@{#3}%
 }%
-\def\@@Boushin#1,#2,#3@#4{%
- \Veclen{$(#1)-(#2)$}\@B@AB
- \Veclen{$(#2)-(#3)$}\@B@BC
- \Veclen{$(#3)-(#1)$}\@B@CA
- \SetPoint*{@B@P($(#1)!{\@B@AB/(\@B@AB+\@B@BC)}!(#3)$)}%
- \path let \p0=($(@B@P)-(#2)$), \p1=($(#3)-(#2)$) in node {%
-  \GetMathparse{atan2(\y0,\x0)-atan2(\y1,\x1)}\@B@RESULT
-  \global\let\@B@ANGLE=\@B@RESULT
- };%
- \GetMathparse{(1/2)*(\@B@AB+\@B@BC+\@B@CA)*sqrt((\@B@CA^2-(\@B@AB-\@B@BC)^2)/((\@B@AB+\@B@BC)^2-\@B@CA^2))}\@BR@
- \SetPoint*{@B@Q($(#2)!{(1/(2*\@B@BC)*(\@B@AB+\@B@BC+\@B@CA))}!(#3)$)}%
- \ifdim\@B@ANGLE pt>0pt\relax
-  \coordinate(#4)at($(#2)!{(1/(2*\@B@BC))*(\@B@AB+\@B@BC+\@B@CA)}!(#3)!\@BR@ cm!-90:(#2)$);%
+\def\@Boushin#1,#2,#3@#4{%
+ \Veclen{$(#1)-(#2)$}\@B@c
+ \Veclen{$(#2)-(#3)$}\@B@a
+ \Veclen{$(#3)-(#1)$}\@B@b
+ \GetMathparse{(\@B@c^2+\@B@a^2-\@B@b^2)/(2*\@B@c*\@B@a)}\@B@Cos@B
+ \GetMathparse{(1/2)*(\@B@a+\@B@b+\@B@c)*sqrt(2/(\@B@Cos@B+1)-1)}\@BR@
+ \SetPoint{@B@H($(#2)!{(\@B@a+\@B@b+\@B@c)/(2*\@B@a)}!(#3)$)}%
+ \Veclen{$(@B@H)!\@BR@ cm!90:(#2)-(#1)$}\@B@L@F
+ \Veclen{$(@B@H)!\@BR@ cm!-90:(#2)-(#1)$}\@B@L@S
+ \ifdim\@B@L@F pt<\@B@L@S pt\relax
+  \SetPoint{#4($(@B@H)!\@BR@ cm!90:(#2)$)}%
  \else
-  \coordinate(#4)at($(#2)!{(1/(2*\@B@BC))*(\@B@AB+\@B@BC+\@B@CA)}!(#3)!\@BR@ cm!90:(#2)$);%
+  \SetPoint{#4($(@B@H)!\@BR@ cm!-90:(#2)$)}%
  \fi
- \expandafter\let\csname\@BRname@\endcsname=\@BR@
+ \expandafter\let\csname\@R@Name@\endcsname=\@BR@
 }%
 %\def\Boushin#1#2{%
 % \@Boushin#1@{#2}%
