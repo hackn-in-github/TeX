@@ -1,5 +1,5 @@
-	%Setup
-\ProvidesPackage{tikzsetup}[12/25/2015 Ver.0.0995]%
+%Setup
+\ProvidesPackage{tikzsetup}[12/26/2015 Ver.0.0996]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -1071,11 +1071,11 @@
 \def\@Kot@e|#1|#2|{\@ifnextchar<{\@@Kot@e{#1}{#2}}{\@@Kot@e{#1}{#2}<答>}}%
 \def\@@Kot@e#1#2<#3>{\penalty-20\hbox{}\Dotfill#1#3#2}%-9999から-20に2013/5/17
 % センター問題の箱および相互参照，解答出力用の設定
-\def\ModeShitei#1{\def\CenterMode{#1}}%
-\ModeShitei\bfseries% 中の文字の種類
-\def\refModeShitei{\mcfamily}%
-\def\MojiShitei#1{\def\CenterMoji{#1}}%
-\MojiShitei\アイウ% 中の文字の種類
+%\def\ModeShitei#1{\def\CenterMode{#1}}%
+%\ModeShitei\bfseries% 中の文字の種類
+%\def\refModeShitei{\mcfamily}%
+%\def\MojiShitei#1{\def\CenterMoji{#1}}%
+%\MojiShitei\アイウ% 中の文字の種類
 \newwrite\center@nswer%
 %\def\StartCenter{\setcounter{CenterCTR}{\TempCenterCTR}\CenterWritetrue}%
 %\def\StopCenter{\edef\TempCenterCTR{\theCenterCTR}\CenterWritefalse}%
@@ -1095,244 +1095,244 @@
   \immediate\openout\center@nswer\jobname\@MarkResetNo.ans\relax
  \fi
 }%
-%\Mark
-\DeclareRobustCommand\Mark{\@ifstar{\MarkSpcfalse\@Mark}{\@Mark}}%
-\def\@Mark{\@ifnextchar[{\@@Mark}{\@@Mark[\@empty]}}%
-\def\@@Mark[#1]{\@ifnextchar[{\@@@Mark[#1]}{\@@@Mark[#1][\@empty]}}
-\def\@@@Mark[#1][#2]#3{%
- \leavevmode
- \def\@MarkList{}%
- \c@TEMPCTR=0\relax
- \@tfor\member:=#3\do{%
-  \global\advance\c@TEMPCTR by\@ne\relax
-  \global\advance\c@CenterCTR by\@ne\relax
-  \edef\@MarkList{\@MarkList\CenterMoji{CenterCTR}}%
-  \expandafter\edef\csname Mark@each@\romannumeral\theTEMPCTR\endcsname{\CenterMoji{CenterCTR}}%
- }%
- \def\@MarkRefStrings{#1}%
- \def\@TrueEmpty{\@empty}%
- \ifx\@MarkRefStrings\@TrueEmpty
- \else
-  \@ifundefined{Hy@Message}%
-   {%
-    \immediate\write\@auxout{\string\newlabel{mark:#1}{{\@MarkList}{\thepage}}}%
-   }{%
-    \immediate\write\@auxout{\string\newlabel{mark:#1}{{\@MarkList}{\thepage}{}{}{}}}%
-   }%
-%  {%
-%   \let\@currentlabel=\@MarkList
-%   \@currentlabel\label{mark:#1}%
-%  }%
- \fi
- \def\@Mark@eachRefStrings{#2}%
- \ifx\@TrueEmpty\@Mark@eachRefStrings
- \else
-  \c@tempcnta=\z@\relax
-  \expandafter\@tfor\expandafter\@member\expandafter:\expandafter=\@MarkList\do{%
-   \advance\c@tempcnta by\@ne\relax
-   \expandafter\edef\csname @Mark@part@\romannumeral\c@tempcnta\endcsname{\@member}%
-  }%
-  \c@tempcnta=\z@\relax
-  \@for\@member:=#2\do{%
-   \advance\c@tempcnta by\@ne\relax
-   \@ifundefined{Hy@Message}%
-   {%
-    \immediate\write\@auxout{\string\newlabel{mark:\@member}{{\csname @Mark@part@\romannumeral\c@tempcnta\endcsname}{\thepage}}}%
-   }{%
-    \immediate\write\@auxout{\string\newlabel{mark:\@member}{{\csname @Mark@part@\romannumeral\c@tempcnta\endcsname}{\thepage}{}{}{}}}%
-   }%
-%   {%
-%    \expandafter\let\expandafter\@currentlabel\expandafter=\csname Mark@each@\romannumeral\the\c@tempcnta\endcsname
-%    \label{mark:\@member}%
-%   }%
-  }%
- \fi
-% #1 が1文字以上の場合 \jobname*.ans に
-% アイ = 12 などと書き込む
- \ifnum\c@TEMPCTR>0\relax
-% \MarkReset* が発行されているときは \jobname*.ans に書き込まない
-  \ifMarkReset
-% \mathpallete 時に \jobname*.ans に書き込まない
-  \ifCenterWrite
-\ifmeasuring@\else
-   \immediate\write\center@nswer{%
-    \string
-    \hbox{%
-     $\string
-      \boldsymbol{%
-       \string\mbox{\string\CenterMode\space\@MarkList}=%
-% #1 がコントロールシーケンスのときの対策
-       \string#3%
-      }%
-     $%
-    }%
-    \string\hskip\string\AnswerSkip%
-   }%
-\fi
-  \fi
-  \fi
-  \ifnum\c@TEMPCTR>3\relax
-   \MarkKeepWidthfalse
-  \fi
- \fi
- \@@@@Mark{#3}%
-}%
-\def\@@@@Mark#1{%
+%%\Mark
+%\DeclareRobustCommand\Mark{\@ifstar{\MarkSpcfalse\@Mark}{\@Mark}}%
+%\def\@Mark{\@ifnextchar[{\@@Mark}{\@@Mark[\@empty]}}%
+%\def\@@Mark[#1]{\@ifnextchar[{\@@@Mark[#1]}{\@@@Mark[#1][\@empty]}}
+%\def\@@@Mark[#1][#2]#3{%
 % \leavevmode
- \bgroup
- \setbox0=\hbox{あ}%
- \advance\CenterBoxWidth by.5zw\relax
- \dimen0=\dp0\relax
- \setbox1=\hbox{\@MarkList}%
- \ifMarkSpc
-  \advance\dimen0 by\CenterSpc\relax
- \fi
- \advance\dimen0 by\CenterLine\relax
- \hskip\CenterSkip
- \lower\dimen0\hbox{\vrule width\CenterLine
-                 \vbox{\hrule height\CenterLine
-		       \ifMarkSpc
-		        \kern\CenterSpc
-		       \fi
-		       \hbox
-		        \ifdim\wd1>\CenterBoxWidth\relax\else\ifMarkKeepWidth\ifMarkSpc to\CenterBoxWidth\fi\fi\fi
-		            {%
-			     \ifMarkSpc
-			      \kern\CenterSpc
-			     \fi
-		             \hss
-			     \def\@TempMarkList{}%
-			     \ifx\@TempMarkList\@MarkList
-			      \vphantom{あ}%
-			     \else
-			      \ifMarkSpc
-			      \else
-			       \scriptsize
-			      \fi
-			      \CenterMode\@MarkList
-			     \fi
-			     \hss%
-			     \ifMarkSpc
-			      \kern\CenterSpc
-			     \fi
-                             }%
-		       \ifMarkSpc
-		        \kern\CenterSpc
-		       \fi
-		       \hrule height\CenterLine}%
-		 \vrule width\CenterLine}%
- \hskip\CenterSkip
- \egroup
- \MarkKeepWidthtrue
- \MarkSpctrue
-}%
-%\refMark
-\def\refMark{\@ifstar{\MarkSpcfalse\MarkKeepWidthfalse\@refMark}{\@refMark}}%
-\def\@refMark#1{%
- \@ifundefined{r@mark:#1}{
-  \def\@MarkList{\textcolor{red}{??}}%
-  \@@@@Mark{}%
- }%
- {%
-  {%
-   \let\@xp@=\expandafter
-   \@xp@\edef\@xp@\@temp\@xp@{\csname r@mark:#1\endcsname}%
-   \c@tempcnta=\z@\relax
-   \@xp@\@tfor\@xp@\member\@xp@:\@xp@=\@temp\do{%
-    \advance\c@tempcnta by\@ne\relax
-    \@xp@\let\csname @temp@\romannumeral\c@tempcnta\endcsname=\member
-   }%
-   \let\@MarkList=\@temp@i
-   \c@tempcnta=\z@\relax
-   \@xp@\@tfor\@xp@\member\@xp@:\@xp@=\@temp@i\do{%
-    \advance\c@tempcnta by\@ne\relax
-   }%
-   \ifnum\c@tempcnta>3\relax
-    \MarkKeepWidthfalse
-   \fi
-   \CenterLine=\refCenterLine\relax
-   \ModeShitei\refModeShitei
-   \@@@@Mark{}%
-  }%
- }%
- \MarkSpctrue
- \MarkKeepWidthtrue
-}%
+% \def\@MarkList{}%
+% \c@TEMPCTR=0\relax
+% \@tfor\member:=#3\do{%
+%  \global\advance\c@TEMPCTR by\@ne\relax
+%  \global\advance\c@CenterCTR by\@ne\relax
+%  \edef\@MarkList{\@MarkList\CenterMoji{CenterCTR}}%
+%  \expandafter\edef\csname Mark@each@\romannumeral\theTEMPCTR\endcsname{\CenterMoji{CenterCTR}}%
+% }%
+% \def\@MarkRefStrings{#1}%
+% \def\@TrueEmpty{\@empty}%
+% \ifx\@MarkRefStrings\@TrueEmpty
+% \else
+%  \@ifundefined{Hy@Message}%
+%   {%
+%    \immediate\write\@auxout{\string\newlabel{mark:#1}{{\@MarkList}{\thepage}}}%
+%   }{%
+%    \immediate\write\@auxout{\string\newlabel{mark:#1}{{\@MarkList}{\thepage}{}{}{}}}%
+%   }%
+%%  {%
+%%   \let\@currentlabel=\@MarkList
+%%   \@currentlabel\label{mark:#1}%
+%%  }%
+% \fi
+% \def\@Mark@eachRefStrings{#2}%
+% \ifx\@TrueEmpty\@Mark@eachRefStrings
+% \else
+%  \c@tempcnta=\z@\relax
+%  \expandafter\@tfor\expandafter\@member\expandafter:\expandafter=\@MarkList\do{%
+%   \advance\c@tempcnta by\@ne\relax
+%   \expandafter\edef\csname @Mark@part@\romannumeral\c@tempcnta\endcsname{\@member}%
+%  }%
+%  \c@tempcnta=\z@\relax
+%  \@for\@member:=#2\do{%
+%   \advance\c@tempcnta by\@ne\relax
+%   \@ifundefined{Hy@Message}%
+%   {%
+%    \immediate\write\@auxout{\string\newlabel{mark:\@member}{{\csname @Mark@part@\romannumeral\c@tempcnta\endcsname}{\thepage}}}%
+%   }{%
+%    \immediate\write\@auxout{\string\newlabel{mark:\@member}{{\csname @Mark@part@\romannumeral\c@tempcnta\endcsname}{\thepage}{}{}{}}}%
+%   }%
+%%   {%
+%%    \expandafter\let\expandafter\@currentlabel\expandafter=\csname Mark@each@\romannumeral\the\c@tempcnta\endcsname
+%%    \label{mark:\@member}%
+%%   }%
+%  }%
+% \fi
+%% #1 が1文字以上の場合 \jobname*.ans に
+%% アイ = 12 などと書き込む
+% \ifnum\c@TEMPCTR>0\relax
+%% \MarkReset* が発行されているときは \jobname*.ans に書き込まない
+%  \ifMarkReset
+%% \mathpallete 時に \jobname*.ans に書き込まない
+%  \ifCenterWrite
+%\ifmeasuring@\else
+%   \immediate\write\center@nswer{%
+%    \string
+%    \hbox{%
+%     $\string
+%      \boldsymbol{%
+%       \string\mbox{\string\CenterMode\space\@MarkList}=%
+%% #1 がコントロールシーケンスのときの対策
+%       \string#3%
+%      }%
+%     $%
+%    }%
+%    \string\hskip\string\AnswerSkip%
+%   }%
+%\fi
+%  \fi
+%  \fi
+%  \ifnum\c@TEMPCTR>3\relax
+%   \MarkKeepWidthfalse
+%  \fi
+% \fi
+% \@@@@Mark{#3}%
+%}%
+%\def\@@@@Mark#1{%
+%% \leavevmode
+% \bgroup
+% \setbox0=\hbox{あ}%
+% \advance\CenterBoxWidth by.5zw\relax
+% \dimen0=\dp0\relax
+% \setbox1=\hbox{\@MarkList}%
+% \ifMarkSpc
+%  \advance\dimen0 by\CenterSpc\relax
+% \fi
+% \advance\dimen0 by\CenterLine\relax
+% \hskip\CenterSkip
+% \lower\dimen0\hbox{\vrule width\CenterLine
+%                 \vbox{\hrule height\CenterLine
+%		       \ifMarkSpc
+%		        \kern\CenterSpc
+%		       \fi
+%		       \hbox
+%		        \ifdim\wd1>\CenterBoxWidth\relax\else\ifMarkKeepWidth\ifMarkSpc to\CenterBoxWidth\fi\fi\fi
+%		            {%
+%			     \ifMarkSpc
+%			      \kern\CenterSpc
+%			     \fi
+%		             \hss
+%			     \def\@TempMarkList{}%
+%			     \ifx\@TempMarkList\@MarkList
+%			      \vphantom{あ}%
+%			     \else
+%			      \ifMarkSpc
+%			      \else
+%			       \scriptsize
+%			      \fi
+%			      \CenterMode\@MarkList
+%			     \fi
+%			     \hss%
+%			     \ifMarkSpc
+%			      \kern\CenterSpc
+%			     \fi
+%                             }%
+%		       \ifMarkSpc
+%		        \kern\CenterSpc
+%		       \fi
+%		       \hrule height\CenterLine}%
+%		 \vrule width\CenterLine}%
+% \hskip\CenterSkip
+% \egroup
+% \MarkKeepWidthtrue
+% \MarkSpctrue
+%}%
+%%\refMark
+%\def\refMark{\@ifstar{\MarkSpcfalse\MarkKeepWidthfalse\@refMark}{\@refMark}}%
+%\def\@refMark#1{%
+% \@ifundefined{r@mark:#1}{
+%  \def\@MarkList{\textcolor{red}{??}}%
+%  \@@@@Mark{}%
+% }%
+% {%
+%  {%
+%   \let\@xp@=\expandafter
+%   \@xp@\edef\@xp@\@temp\@xp@{\csname r@mark:#1\endcsname}%
+%   \c@tempcnta=\z@\relax
+%   \@xp@\@tfor\@xp@\member\@xp@:\@xp@=\@temp\do{%
+%    \advance\c@tempcnta by\@ne\relax
+%    \@xp@\let\csname @temp@\romannumeral\c@tempcnta\endcsname=\member
+%   }%
+%   \let\@MarkList=\@temp@i
+%   \c@tempcnta=\z@\relax
+%   \@xp@\@tfor\@xp@\member\@xp@:\@xp@=\@temp@i\do{%
+%    \advance\c@tempcnta by\@ne\relax
+%   }%
+%   \ifnum\c@tempcnta>3\relax
+%    \MarkKeepWidthfalse
+%   \fi
+%   \CenterLine=\refCenterLine\relax
+%   \ModeShitei\refModeShitei
+%   \@@@@Mark{}%
+%  }%
+% }%
+% \MarkSpctrue
+% \MarkKeepWidthtrue
+%}%
 %\MarkAnswer
-\newif\ifMarkAnswer
-\MarkAnswertrue
-%\MarkAnswerfalse
-\def\MarkAnswer#1{%
- \ifMarkReset
-  \immediate\closeout\center@nswer
- \fi
- \ifx#1\@empty
-  \begin{itembox}[l]{解答}%
-   \noindent\leavevmode\input{\jobname\@MarkResetNo.ans}%
-  \end{itembox}%
- \else
-  \ifMarkAnswer
-   \begin{itemtbbox}<l>[r]{解答}{#1}%
-    \noindent\leavevmode\input{\jobname\@MarkResetNo.ans}%
-   \end{itemtbbox}%
-  \else
-   \begin{itembox}[l]{解答}%
-    \noindent\leavevmode\input{\jobname\@MarkResetNo.ans}%
-   \end{itembox}%
-  \fi
- \fi
-}%
-%%%%% 嘘つきマーク
-\def\FakeMark{\@ifstar{\MarkSpcfalse\MarkKeepWidthfalse\@FakeMark}{\@FakeMark}}%
-\def\@FakeMark#1{%
- \bgroup
- \edef\@FakeMarkList{#1}%
- \setbox0=\hbox{あ}%
- \advance\CenterBoxWidth by.5zw\relax
- \dimen0=\dp0\relax
- \setbox1=\hbox{\@FakeMarkList}%
- \ifMarkSpc
-  \advance\dimen0 by\CenterSpc\relax
- \fi
- \advance\dimen0 by\CenterLine\relax
- \hskip\CenterSkip
- \lower\dimen0\hbox{\vrule width\CenterLine
-                 \vbox{\hrule height\CenterLine
-		       \ifMarkSpc
-		        \kern\CenterSpc
-		       \fi
-		       \hbox
-		        \ifdim\wd1>\CenterBoxWidth\relax\else\ifMarkKeepWidth\ifMarkSpc to\CenterBoxWidth\fi\fi\fi
-		            {%
-			     \ifMarkSpc
-			      \kern\CenterSpc
-			     \fi
-		             \hss
-			     \def\@TempMarkList{}%
-			     \ifx\@TempMarkList\@FakeMarkList
-			      \vphantom{あ}%
-			     \else
-			      \ifMarkSpc
-			      \else
-			       \scriptsize
-			      \fi
-			      \CenterMode\@FakeMarkList
-			     \fi
-			     \hss%
-			     \ifMarkSpc
-			      \kern\CenterSpc
-			     \fi
-                             }%
-		       \ifMarkSpc
-		        \kern\CenterSpc
-		       \fi
-		       \hrule height\CenterLine}%
-		 \vrule width\CenterLine}%
- \hskip\CenterSkip
- \egroup
- \MarkSpctrue
- \MarkKeepWidthtrue
-}%
+%\newif\ifMarkAnswer
+%\MarkAnswertrue
+%%\MarkAnswerfalse
+%\def\MarkAnswer#1{%
+% \ifMarkReset
+%  \immediate\closeout\center@nswer
+% \fi
+% \ifx#1\@empty
+%  \begin{itembox}[l]{解答}%
+%   \noindent\leavevmode\input{\jobname\@MarkResetNo.ans}%
+%  \end{itembox}%
+% \else
+%  \ifMarkAnswer
+%   \begin{itemtbbox}<l>[r]{解答}{#1}%
+%    \noindent\leavevmode\input{\jobname\@MarkResetNo.ans}%
+%   \end{itemtbbox}%
+%  \else
+%   \begin{itembox}[l]{解答}%
+%    \noindent\leavevmode\input{\jobname\@MarkResetNo.ans}%
+%   \end{itembox}%
+%  \fi
+% \fi
+%}%
+%%%%%% 嘘つきマーク
+%\def\FakeMark{\@ifstar{\MarkSpcfalse\MarkKeepWidthfalse\@FakeMark}{\@FakeMark}}%
+%\def\@FakeMark#1{%
+% \bgroup
+% \edef\@FakeMarkList{#1}%
+% \setbox0=\hbox{あ}%
+% \advance\CenterBoxWidth by.5zw\relax
+% \dimen0=\dp0\relax
+% \setbox1=\hbox{\@FakeMarkList}%
+% \ifMarkSpc
+%  \advance\dimen0 by\CenterSpc\relax
+% \fi
+% \advance\dimen0 by\CenterLine\relax
+% \hskip\CenterSkip
+% \lower\dimen0\hbox{\vrule width\CenterLine
+%                 \vbox{\hrule height\CenterLine
+%		       \ifMarkSpc
+%		        \kern\CenterSpc
+%		       \fi
+%		       \hbox
+%		        \ifdim\wd1>\CenterBoxWidth\relax\else\ifMarkKeepWidth\ifMarkSpc to\CenterBoxWidth\fi\fi\fi
+%		            {%
+%			     \ifMarkSpc
+%			      \kern\CenterSpc
+%			     \fi
+%		             \hss
+%			     \def\@TempMarkList{}%
+%			     \ifx\@TempMarkList\@FakeMarkList
+%			      \vphantom{あ}%
+%			     \else
+%			      \ifMarkSpc
+%			      \else
+%			       \scriptsize
+%			      \fi
+%			      \CenterMode\@FakeMarkList
+%			     \fi
+%			     \hss%
+%			     \ifMarkSpc
+%			      \kern\CenterSpc
+%			     \fi
+%                             }%
+%		       \ifMarkSpc
+%		        \kern\CenterSpc
+%		       \fi
+%		       \hrule height\CenterLine}%
+%		 \vrule width\CenterLine}%
+% \hskip\CenterSkip
+% \egroup
+% \MarkSpctrue
+% \MarkKeepWidthtrue
+%}%
 %% \SaitanKeiro\O{NEWS} 20150614 削除
 %任意のベクトルに垂直なベクトルを求める 20150614 削除
 % フラクタル図形(二分木)を作成 20150614 削除
@@ -1430,14 +1430,14 @@
 }%
 %単位円を描く 20150614 削除
 %\makebox(#1,#2){#3}   
-%\Makebox[#1](#2,#3){#4}
-%#1 : \unitlength          1pt
-%   \makebox    
-\def\Makebox{\@ifnextchar[{\@Makebox}{\@Makebox[1pt]}}%
-\def\@Makebox[#1](#2,#3)#4{%
- \unitlength#1\relax%
- \makebox(#2,#3){#4}%
-}%
+%%\Makebox[#1](#2,#3){#4}
+%%#1 : \unitlength          1pt
+%%   \makebox    
+%\def\Makebox{\@ifnextchar[{\@Makebox}{\@Makebox[1pt]}}%
+%\def\@Makebox[#1](#2,#3)#4{%
+% \unitlength#1\relax%
+% \makebox(#2,#3){#4}%
+%}%
 %組立除法の鈎
 \newif\ifkumitateboxleft
 \kumitateboxlefttrue
@@ -2547,95 +2547,95 @@
   \path let \p1=#1,\n1={veclen(\x1,\y1)} in node {\xdef#2{\n1}};
  \egroup
 }%
-%% \mytikzjuushin#1#2
-%% #1:三角形の3点
-%% #2:重心の名前
-\def\mytikzjuushin#1#2{%
- \bgroup
-  \let\@xp=\expandafter
-  \mytikzsetcoordinate{@MTJSA}{#1}%
-  \mytikzsetcoordinate{@MTJSB}{\@MTJSApost}%
-  \mytikzsetcoordinate{@MTJSC}{\@MTJSBpost}%
-  \path[name path=@MTJSpathAM](@MTJSA)--($(@MTJSB)!.5!(@MTJSC)$);
-  \path[name path=@MTJSpathBN](@MTJSB)--($(@MTJSC)!.5!(@MTJSA)$);
-  \mytikzmakeintersections{@MTJSpathAM}{@MTJSpathBN}{@MTJSP}%
-  \coordinate(#2)at(@MTJSP-1);
- \egroup
-}%
-%% \mytikzsuishin#1#2
-\def\mytikzsuishin#1#2{%
- \bgroup
-  \let\@xp=\expandafter
-  \mytikzsetcoordinate{@MTSSA}{#1}%
-  \mytikzsetcoordinate{@MTSSB}{\@MTSSApost}%
-  \mytikzsetcoordinate{@MTSSC}{\@MTSSBpost}%
-  \coordinate(@MTSSHA)at($(@MTSSB)!(@MTSSA)!(@MTSSC)$);
-  \coordinate(@MTSSHB)at($(@MTSSA)!(@MTSSB)!(@MTSSC)$);
-  \mytikzPandP{(@MTSSA)(@MTSSHA)}{(@MTSSB)(@MTSSHB)}{#2}%
- \egroup
-}%
-%% \mytikzgaishin#1#2
-%% #1:三角形の3点
-%% #2:外心の名前
-%%  \GRに外接円の半径が格納される
-\def\mytikzgaishin#1#2{%
- \bgroup
-  \let\@xp=\expandafter
-  \mytikzsetcoordinate{@A}{#1}%
-  \mytikzsetcoordinate{@B}{\@Apost}%
-  \mytikzsetcoordinate{@C}{\@Bpost}%
-  \path[name path=@MTGSI] ($(@A)!.5!(@B)!10!-90:(@B)$)--($(@A)!.5!(@B)!10!90:(@B)$);
-  \path[name path=@MTGSII] ($(@B)!.5!(@C)!10!-90:(@C)$)--($(@B)!.5!(@C)!10!90:(@C)$);
-  \path[name intersections={of=@MTGSI and @MTGSII,by={#2}}];
-  \mytikzveclen{($(@A)-(#2)$)}\GR
- \egroup
-}%
-%% \mytikznaishin#1#2
-%% #1:三角形の3点
-%% #2:内心の名前
-%%  \NRに内接円の半径が格納される
-\def\mytikznaishin#1#2{%
- \bgroup
-  \let\@xp=\expandafter
-  \mytikzsetcoordinate{@MTNSA}{#1}%
-  \mytikzsetcoordinate{@MTNSB}{\@MTNSApost}%
-  \mytikzsetcoordinate{@MTNSC}{\@MTNSBpost}%
-  \mytikzveclen{($(@MTNSA)-(@MTNSB)$)}\@MTNSAB
-  \mytikzveclen{($(@MTNSB)-(@MTNSC)$)}\@MTNSBC
-  \mytikzveclen{($(@MTNSC)-(@MTNSA)$)}\@MTNSCA
-  \pgfmathparse{\@MTNSAB/(\@MTNSAB+\@MTNSCA)}%
-  \let\@MTNSBP=\pgfmathresult
-  \coordinate(@MTNSP)at($(@MTNSB)!\@MTNSBP!(@MTNSC)$);
-%  \fill[blue](@MTNSP)circle[radius=2pt];
-  \pgfmathparse{\@MTNSBC/(\@MTNSBC+\@MTNSAB)}%
-  \let\@MTNSCQ=\pgfmathresult
-  \coordinate(@MTNSQ)at($(@MTNSC)!\@MTNSCQ!(@MTNSA)$);
-%  \fill[yellow](@MTNSQ)circle[radius=2pt];
-  \path[name path=@MTNSpathAN](@MTNSA)--(@MTNSP);
-  \path[name path=@MTNSpathBN](@MTNSB)--(@MTNSQ);
-  \mytikzmakeintersections{@MTNSpathAN}{@MTNSpathBN}{@MTNSP}%
-  \coordinate(#2)at(@MTNSP-1);
-  \mytikzveclen{($(@MTNSP-1)-($(@MTNSA)!(@MTNSP-1)!(@MTNSB)$)$)}\NR
- \egroup
-}%
-%% \mytikzboushin#1#2
-%% #1:三角形の3点(角#1の内部に傍心を作る)
-%% #2:傍心の名前
-%%  \BR=傍心円の半径
-\def\mytikzboushin#1#2{%
- \bgroup
-  \let\@xp=\expandafter
-  \mytikzsetcoordinate{@MTBSA}{#1}%
-  \mytikzsetcoordinate{@MTBSB}{\@MTBSApost}%
-  \mytikzsetcoordinate{@MTBSC}{\@MTBSBpost}%
-  \mytikznaishin{#1}{@MTBSIP}%
-  \coordinate(@MTBSD)at($(@MTBSC)!1cm!180:(@MTBSB)$);
-  \mytikznaishin{(@MTBSA)(@MTBSC)(@MTBSD)}{@MTBSIQ}%
-  \mytikzPandP{(@MTBSB)(@MTBSIP)}{(@MTBSC)(@MTBSIQ)}{#2}%
-  \coordinate(@MTBSN)at($(@MTBSA)!(#2)!(@MTBSC)$);
-  \mytikzveclen{($(#2)-(@MTBSN)$)}\BR
- \egroup
-}%
+%%% \mytikzjuushin#1#2
+%%% #1:三角形の3点
+%%% #2:重心の名前
+%\def\mytikzjuushin#1#2{%
+% \bgroup
+%  \let\@xp=\expandafter
+%  \mytikzsetcoordinate{@MTJSA}{#1}%
+%  \mytikzsetcoordinate{@MTJSB}{\@MTJSApost}%
+%  \mytikzsetcoordinate{@MTJSC}{\@MTJSBpost}%
+%  \path[name path=@MTJSpathAM](@MTJSA)--($(@MTJSB)!.5!(@MTJSC)$);
+%  \path[name path=@MTJSpathBN](@MTJSB)--($(@MTJSC)!.5!(@MTJSA)$);
+%  \mytikzmakeintersections{@MTJSpathAM}{@MTJSpathBN}{@MTJSP}%
+%  \coordinate(#2)at(@MTJSP-1);
+% \egroup
+%}%
+%%% \mytikzsuishin#1#2
+%\def\mytikzsuishin#1#2{%
+% \bgroup
+%  \let\@xp=\expandafter
+%  \mytikzsetcoordinate{@MTSSA}{#1}%
+%  \mytikzsetcoordinate{@MTSSB}{\@MTSSApost}%
+%  \mytikzsetcoordinate{@MTSSC}{\@MTSSBpost}%
+%  \coordinate(@MTSSHA)at($(@MTSSB)!(@MTSSA)!(@MTSSC)$);
+%  \coordinate(@MTSSHB)at($(@MTSSA)!(@MTSSB)!(@MTSSC)$);
+%  \mytikzPandP{(@MTSSA)(@MTSSHA)}{(@MTSSB)(@MTSSHB)}{#2}%
+% \egroup
+%}%
+%%% \mytikzgaishin#1#2
+%%% #1:三角形の3点
+%%% #2:外心の名前
+%%%  \GRに外接円の半径が格納される
+%\def\mytikzgaishin#1#2{%
+% \bgroup
+%  \let\@xp=\expandafter
+%  \mytikzsetcoordinate{@A}{#1}%
+%  \mytikzsetcoordinate{@B}{\@Apost}%
+%  \mytikzsetcoordinate{@C}{\@Bpost}%
+%  \path[name path=@MTGSI] ($(@A)!.5!(@B)!10!-90:(@B)$)--($(@A)!.5!(@B)!10!90:(@B)$);
+%  \path[name path=@MTGSII] ($(@B)!.5!(@C)!10!-90:(@C)$)--($(@B)!.5!(@C)!10!90:(@C)$);
+%  \path[name intersections={of=@MTGSI and @MTGSII,by={#2}}];
+%  \mytikzveclen{($(@A)-(#2)$)}\GR
+% \egroup
+%}%
+%%% \mytikznaishin#1#2
+%%% #1:三角形の3点
+%%% #2:内心の名前
+%%%  \NRに内接円の半径が格納される
+%\def\mytikznaishin#1#2{%
+% \bgroup
+%  \let\@xp=\expandafter
+%  \mytikzsetcoordinate{@MTNSA}{#1}%
+%  \mytikzsetcoordinate{@MTNSB}{\@MTNSApost}%
+%  \mytikzsetcoordinate{@MTNSC}{\@MTNSBpost}%
+%  \mytikzveclen{($(@MTNSA)-(@MTNSB)$)}\@MTNSAB
+%  \mytikzveclen{($(@MTNSB)-(@MTNSC)$)}\@MTNSBC
+%  \mytikzveclen{($(@MTNSC)-(@MTNSA)$)}\@MTNSCA
+%  \pgfmathparse{\@MTNSAB/(\@MTNSAB+\@MTNSCA)}%
+%  \let\@MTNSBP=\pgfmathresult
+%  \coordinate(@MTNSP)at($(@MTNSB)!\@MTNSBP!(@MTNSC)$);
+%%  \fill[blue](@MTNSP)circle[radius=2pt];
+%  \pgfmathparse{\@MTNSBC/(\@MTNSBC+\@MTNSAB)}%
+%  \let\@MTNSCQ=\pgfmathresult
+%  \coordinate(@MTNSQ)at($(@MTNSC)!\@MTNSCQ!(@MTNSA)$);
+%%  \fill[yellow](@MTNSQ)circle[radius=2pt];
+%  \path[name path=@MTNSpathAN](@MTNSA)--(@MTNSP);
+%  \path[name path=@MTNSpathBN](@MTNSB)--(@MTNSQ);
+%  \mytikzmakeintersections{@MTNSpathAN}{@MTNSpathBN}{@MTNSP}%
+%  \coordinate(#2)at(@MTNSP-1);
+%  \mytikzveclen{($(@MTNSP-1)-($(@MTNSA)!(@MTNSP-1)!(@MTNSB)$)$)}\NR
+% \egroup
+%}%
+%%% \mytikzboushin#1#2
+%%% #1:三角形の3点(角#1の内部に傍心を作る)
+%%% #2:傍心の名前
+%%%  \BR=傍心円の半径
+%\def\mytikzboushin#1#2{%
+% \bgroup
+%  \let\@xp=\expandafter
+%  \mytikzsetcoordinate{@MTBSA}{#1}%
+%  \mytikzsetcoordinate{@MTBSB}{\@MTBSApost}%
+%  \mytikzsetcoordinate{@MTBSC}{\@MTBSBpost}%
+%  \mytikznaishin{#1}{@MTBSIP}%
+%  \coordinate(@MTBSD)at($(@MTBSC)!1cm!180:(@MTBSB)$);
+%  \mytikznaishin{(@MTBSA)(@MTBSC)(@MTBSD)}{@MTBSIQ}%
+%  \mytikzPandP{(@MTBSB)(@MTBSIP)}{(@MTBSC)(@MTBSIQ)}{#2}%
+%  \coordinate(@MTBSN)at($(@MTBSA)!(#2)!(@MTBSC)$);
+%  \mytikzveclen{($(#2)-(@MTBSN)$)}\BR
+% \egroup
+%}%
 %% \mytikzPandP#1#2#3
 %% 2点で指定された直線#1と2点で指定された直線#2の交点を#3とする
 \def\mytikzPandP#1#2#3{%
@@ -3935,166 +3935,166 @@
 %% #4:y座標を表す式
 %% #5:この関数のパスの名前(交点を求めるときに使える)
 \let\Function=\mytikzfunction
-%% \Vline<#1>[#2]{#3}{#4}{#5}%
-%% V(ector)line
-%% ex:\Vline{A}{1,2}{line1}%
-%% #1:固有オプション
-%%   leftP:左端点の名前を指定(leftP)
-%%   rightP:右端点の名前を指定(rightP)
-%%   noline:直線を描画しない
-%%   half:点#3を始点とする半直線にする
-%% #2:TikZオプション
-%% #3:通過点
-%% #4:方向ベクトル
-%% #5:パスの名前
-\define@key{MTVline}{rightP}{\def\@MTV@rightP{#1}}%
-\define@key{MTVline}{leftP}{\def\@MTV@leftP{#1}}%
-\define@key{MTVline}{noline}[true]{\mytikzoutlinefalse}%
-\define@key{MTVline}{half}[true]{\def\@MTV@half{1}}%
-\def\Vline{\@ifnextchar<{\@Vline}{\@Vline<>}}%
-\def\@Vline<#1>{\@ifnextchar[{\@@Vline<#1>}{\@@Vline<#1>[]}}%
-\def\@@Vline<#1>[#2]#3#4#5{%
- \bgroup
-  \mytikzoutlinetrue
-  \def\@MTV@leftP{leftP}%
-  \def\@MTV@rightP{rightP}%
-\def\@MTV@half{0}%
-  \setkeys{MTVline}{#1}%
-  \path let \p0=($(trueRT)-(trueLB)$),\p1=(#4) in node
-   {%
-    \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-    \xdef\@MTV@MAXlength{\pgfmathresult}%
-    \pgfmathparse{sqrt(pow(\x1/28.45274,2)+pow(\y1/28.45274,2))}%
-    \xdef\@MTV@veclen{\pgfmathresult}%
-   };%
-  \coordinate(@UV)at($1/\@MTV@veclen*(#4)$);
-\ifnum\@MTV@half=\@ne
-\path[name path=@MTV@line](#3)--($(#3)+\@MTV@MAXlength*(@UV)$);
-\else
-  \path[name path=@MTV@line]($(#3)-\@MTV@MAXlength*(@UV)$)--($(#3)+\@MTV@MAXlength*(@UV)$);
-\fi
-  \path[name path=@MTV@frame](\xmin,\ymin)rectangle(\xmax,\ymax);
-  \path[name intersections={of=@MTV@line and @MTV@frame,name=@MTV@X,total=\t}]node{\xdef\@MTV@MAX{\t}};
-% 直線が描画領域の対角線となる場合の対処
-  \ifnum\@MTV@MAX=4\relax
-   \coordinate(@X@-1)at(@MTV@X-2);
-   \coordinate(@X@-2)at(@MTV@X-4);
-  \else
-\ifnum\@MTV@half=\@ne
-\coordinate(@X@-1)at(#3);
-\coordinate(@X@-2)at(@MTV@X-1);
-\else
-   \coordinate(@X@-1)at(@MTV@X-1);
-   \coordinate(@X@-2)at(@MTV@X-2);
-\fi
-  \fi
-  \path let \p0=(@X@-1),\p1=(@X@-2) in node
-   {%
-    \pgfkeys{/pgf/number format/.cd,fixed,precision=2}%
-    \pgfmathparse{\x0/28.45274}%
-    \pgfmathroundto{\pgfmathresult}%
-    \xdef\@MTV@AX{\pgfmathresult}%
-    \pgfmathparse{\y0/28.45274}%
-    \pgfmathroundto{\pgfmathresult}%
-    \xdef\@MTV@AY{\pgfmathresult}%
-    \pgfmathparse{\x1/28.45274}%
-    \pgfmathroundto{\pgfmathresult}%
-    \xdef\@MTV@BX{\pgfmathresult}%
-    \pgfmathparse{\y1/28.45274}%
-    \pgfmathroundto{\pgfmathresult}%
-    \xdef\@MTV@BY{\pgfmathresult}%
-   };%
-  \ifdim\@MTV@AX pt=\@MTV@BX pt\relax
-   \ifdim\@MTV@AY pt<\@MTV@BY pt\relax
-    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-1);
-    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-2);
-   \else
-    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-2);
-    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-1);
-   \fi
-  \else
-   \ifdim\@MTV@AX pt<\@MTV@BX pt\relax
-    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-1);
-    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-2);
-   \else
-    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-2);
-    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-1);
-   \fi
-  \fi
-  \ifmytikzoutline
-   \draw[#2](@X@-1)--(@X@-2);
-  \fi
-%  \path[name path=#5](@X@-1)--(@X@-2);
- \egroup
- \path[name path=#5](@X@-1)--(@X@-2);
-}%
-%% \Pline<#1>[#2]{#3}{#4}%
-%% P(ector)line
-%% ex:\Pline{A,B}{line1}%
-%% #1:固有オプション
-%%   leftP:左端点の名前を指定(leftP)
-%%   rightP:右端点の名前を指定(rightP)
-%%   noline:直線を描画しない
-%%   half:点#3の1番目の点を始点とする半直線にする
-%% #2:TikZオプション
-%% #3:2つの通過点をカンマ区切りで指定
-%% #4:パスの名前
-\def\Pline{\@ifnextchar<{\@Pline}{\@Pline<>}}%
-\def\@Pline<#1>{\@ifnextchar[{\@@Pline<#1>}{\@@Pline<#1>[]}}%
-\def\@@Pline<#1>[#2]#3#4{%
- \@@@Pline<#1>[#2]#3@{#4}%
-}%
-\def\@@@Pline<#1>[#2]#3,#4@#5{%
- \Vline<#1>[#2]{#3}{$(#4)-(#3)$}{#5}%
-}%
-%% \Sline<#1>[#2]#3#4#5
-%% S(lope)line:1点と傾き指定
-%% #1:オプション1
-%%   leftP:左端点の名前を指定(leftP)
-%%   rightP:右端点の名前を指定(rightP)
-%%   noline:直線を描画しない
-%%   half:点#3を始点とする半直線にする
-%% #2:TikZオプション
-%% #3:直線を通る1点を指定
-%% #4:この直線の傾きを指定
-%% #5:パスの名前
-\def\Sline{\@ifnextchar<{\@Sline}{\@Sline<>}}%
-\def\@Sline<#1>{\@ifnextchar[{\@@Sline<#1>}{\@@Sline<#1>[]}}%
-\def\@@Sline<#1>[#2]#3#4#5{%
- \Vline<#1>[#2]{#3}{1,{#4}}{#5}%
-}%
-%% \Aline<#1>[#2]#3#4#5
-%% A(ngle)line:1点と角度指定
-%% #1:オプション1
-%%   leftP:左端点の名前を指定(leftP)
-%%   rightP:右端点の名前を指定(rightP)
-%%   noline:直線を描画しない
-%%   half:点#3を始点とする半直線にする
-%% #2:TikZオプション
-%% #3:直線を通る1点を指定
-%% #4:x軸とのなす角度を指定(60分法)
-%% #5:パスの名前
-\def\Aline{\@ifnextchar<{\@Aline}{\@Aline<>}}%
-\def\@Aline<#1>{\@ifnextchar[{\@@Aline<#1>}{\@@Aline<#1>[]}}%
-\def\@@Aline<#1>[#2]#3#4#5{%
- \Vline<#1>[#2]{#3}{{cos(#4)},{sin(#4)}}{#5}%
-}%
-%% \Nline:1点と法線ベクトル指定
-%% N(ormalVector)line
-%% #1:オプション1
-%%   leftP:左端点の名前を指定(leftP)
-%%   rightP:右端点の名前を指定(rightP)
-%%   noline:直線を描画しない
-%%   half:点#3を始点とする半直線にする[方向ベクトルは指定した法線ベクトルを-90度回転させたもの]
-%% #2:TikZオプション
-%% #3:直線を通る1点を指定
-%% #4:法線ベクトルの成分を指定
-%% #5:パスの名前
-\def\Nline{\@ifnextchar<{\@Nline}{\@Nline<>}}%
-\def\@Nline<#1>{\@ifnextchar[{\@@Nline<#1>}{\@@Nline<#1>[]}}%
-\def\@@Nline<#1>[#2]#3#4#5{%
- \Vline<#1>[#2]{#3}{$(O)!1!-90:(#4)$}{#5}%
-}%
+%%% \Vline<#1>[#2]{#3}{#4}{#5}%
+%%% V(ector)line
+%%% ex:\Vline{A}{1,2}{line1}%
+%%% #1:固有オプション
+%%%   leftP:左端点の名前を指定(leftP)
+%%%   rightP:右端点の名前を指定(rightP)
+%%%   noline:直線を描画しない
+%%%   half:点#3を始点とする半直線にする
+%%% #2:TikZオプション
+%%% #3:通過点
+%%% #4:方向ベクトル
+%%% #5:パスの名前
+%\define@key{MTVline}{rightP}{\def\@MTV@rightP{#1}}%
+%\define@key{MTVline}{leftP}{\def\@MTV@leftP{#1}}%
+%\define@key{MTVline}{noline}[true]{\mytikzoutlinefalse}%
+%\define@key{MTVline}{half}[true]{\def\@MTV@half{1}}%
+%\def\Vline{\@ifnextchar<{\@Vline}{\@Vline<>}}%
+%\def\@Vline<#1>{\@ifnextchar[{\@@Vline<#1>}{\@@Vline<#1>[]}}%
+%\def\@@Vline<#1>[#2]#3#4#5{%
+% \bgroup
+%  \mytikzoutlinetrue
+%  \def\@MTV@leftP{leftP}%
+%  \def\@MTV@rightP{rightP}%
+%\def\@MTV@half{0}%
+%  \setkeys{MTVline}{#1}%
+%  \path let \p0=($(trueRT)-(trueLB)$),\p1=(#4) in node
+%   {%
+%    \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
+%    \xdef\@MTV@MAXlength{\pgfmathresult}%
+%    \pgfmathparse{sqrt(pow(\x1/28.45274,2)+pow(\y1/28.45274,2))}%
+%    \xdef\@MTV@veclen{\pgfmathresult}%
+%   };%
+%  \coordinate(@UV)at($1/\@MTV@veclen*(#4)$);
+%\ifnum\@MTV@half=\@ne
+%\path[name path=@MTV@line](#3)--($(#3)+\@MTV@MAXlength*(@UV)$);
+%\else
+%  \path[name path=@MTV@line]($(#3)-\@MTV@MAXlength*(@UV)$)--($(#3)+\@MTV@MAXlength*(@UV)$);
+%\fi
+%  \path[name path=@MTV@frame](\xmin,\ymin)rectangle(\xmax,\ymax);
+%  \path[name intersections={of=@MTV@line and @MTV@frame,name=@MTV@X,total=\t}]node{\xdef\@MTV@MAX{\t}};
+%% 直線が描画領域の対角線となる場合の対処
+%  \ifnum\@MTV@MAX=4\relax
+%   \coordinate(@X@-1)at(@MTV@X-2);
+%   \coordinate(@X@-2)at(@MTV@X-4);
+%  \else
+%\ifnum\@MTV@half=\@ne
+%\coordinate(@X@-1)at(#3);
+%\coordinate(@X@-2)at(@MTV@X-1);
+%\else
+%   \coordinate(@X@-1)at(@MTV@X-1);
+%   \coordinate(@X@-2)at(@MTV@X-2);
+%\fi
+%  \fi
+%  \path let \p0=(@X@-1),\p1=(@X@-2) in node
+%   {%
+%    \pgfkeys{/pgf/number format/.cd,fixed,precision=2}%
+%    \pgfmathparse{\x0/28.45274}%
+%    \pgfmathroundto{\pgfmathresult}%
+%    \xdef\@MTV@AX{\pgfmathresult}%
+%    \pgfmathparse{\y0/28.45274}%
+%    \pgfmathroundto{\pgfmathresult}%
+%    \xdef\@MTV@AY{\pgfmathresult}%
+%    \pgfmathparse{\x1/28.45274}%
+%    \pgfmathroundto{\pgfmathresult}%
+%    \xdef\@MTV@BX{\pgfmathresult}%
+%    \pgfmathparse{\y1/28.45274}%
+%    \pgfmathroundto{\pgfmathresult}%
+%    \xdef\@MTV@BY{\pgfmathresult}%
+%   };%
+%  \ifdim\@MTV@AX pt=\@MTV@BX pt\relax
+%   \ifdim\@MTV@AY pt<\@MTV@BY pt\relax
+%    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-1);
+%    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-2);
+%   \else
+%    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-2);
+%    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-1);
+%   \fi
+%  \else
+%   \ifdim\@MTV@AX pt<\@MTV@BX pt\relax
+%    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-1);
+%    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-2);
+%   \else
+%    \expandafter\coordinate\expandafter(\@MTV@leftP)at(@X@-2);
+%    \expandafter\coordinate\expandafter(\@MTV@rightP)at(@X@-1);
+%   \fi
+%  \fi
+%  \ifmytikzoutline
+%   \draw[#2](@X@-1)--(@X@-2);
+%  \fi
+%%  \path[name path=#5](@X@-1)--(@X@-2);
+% \egroup
+% \path[name path=#5](@X@-1)--(@X@-2);
+%}%
+%%% \Pline<#1>[#2]{#3}{#4}%
+%%% P(ector)line
+%%% ex:\Pline{A,B}{line1}%
+%%% #1:固有オプション
+%%%   leftP:左端点の名前を指定(leftP)
+%%%   rightP:右端点の名前を指定(rightP)
+%%%   noline:直線を描画しない
+%%%   half:点#3の1番目の点を始点とする半直線にする
+%%% #2:TikZオプション
+%%% #3:2つの通過点をカンマ区切りで指定
+%%% #4:パスの名前
+%\def\Pline{\@ifnextchar<{\@Pline}{\@Pline<>}}%
+%\def\@Pline<#1>{\@ifnextchar[{\@@Pline<#1>}{\@@Pline<#1>[]}}%
+%\def\@@Pline<#1>[#2]#3#4{%
+% \@@@Pline<#1>[#2]#3@{#4}%
+%}%
+%\def\@@@Pline<#1>[#2]#3,#4@#5{%
+% \Vline<#1>[#2]{#3}{$(#4)-(#3)$}{#5}%
+%}%
+%%% \Sline<#1>[#2]#3#4#5
+%%% S(lope)line:1点と傾き指定
+%%% #1:オプション1
+%%%   leftP:左端点の名前を指定(leftP)
+%%%   rightP:右端点の名前を指定(rightP)
+%%%   noline:直線を描画しない
+%%%   half:点#3を始点とする半直線にする
+%%% #2:TikZオプション
+%%% #3:直線を通る1点を指定
+%%% #4:この直線の傾きを指定
+%%% #5:パスの名前
+%\def\Sline{\@ifnextchar<{\@Sline}{\@Sline<>}}%
+%\def\@Sline<#1>{\@ifnextchar[{\@@Sline<#1>}{\@@Sline<#1>[]}}%
+%\def\@@Sline<#1>[#2]#3#4#5{%
+% \Vline<#1>[#2]{#3}{1,{#4}}{#5}%
+%}%
+%%% \Aline<#1>[#2]#3#4#5
+%%% A(ngle)line:1点と角度指定
+%%% #1:オプション1
+%%%   leftP:左端点の名前を指定(leftP)
+%%%   rightP:右端点の名前を指定(rightP)
+%%%   noline:直線を描画しない
+%%%   half:点#3を始点とする半直線にする
+%%% #2:TikZオプション
+%%% #3:直線を通る1点を指定
+%%% #4:x軸とのなす角度を指定(60分法)
+%%% #5:パスの名前
+%\def\Aline{\@ifnextchar<{\@Aline}{\@Aline<>}}%
+%\def\@Aline<#1>{\@ifnextchar[{\@@Aline<#1>}{\@@Aline<#1>[]}}%
+%\def\@@Aline<#1>[#2]#3#4#5{%
+% \Vline<#1>[#2]{#3}{{cos(#4)},{sin(#4)}}{#5}%
+%}%
+%%% \Nline:1点と法線ベクトル指定
+%%% N(ormalVector)line
+%%% #1:オプション1
+%%%   leftP:左端点の名前を指定(leftP)
+%%%   rightP:右端点の名前を指定(rightP)
+%%%   noline:直線を描画しない
+%%%   half:点#3を始点とする半直線にする[方向ベクトルは指定した法線ベクトルを-90度回転させたもの]
+%%% #2:TikZオプション
+%%% #3:直線を通る1点を指定
+%%% #4:法線ベクトルの成分を指定
+%%% #5:パスの名前
+%\def\Nline{\@ifnextchar<{\@Nline}{\@Nline<>}}%
+%\def\@Nline<#1>{\@ifnextchar[{\@@Nline<#1>}{\@@Nline<#1>[]}}%
+%\def\@@Nline<#1>[#2]#3#4#5{%
+% \Vline<#1>[#2]{#3}{$(O)!1!-90:(#4)$}{#5}%
+%}%
 %V(ector),P(oint),S(lope),A(angle),N(ormal Vector)
 %% \VVIntersection<#1>[#2]{#3}{#4}{#5}{#6}{#7}%
 %% ex:\VVIntersection
@@ -6532,7 +6532,8 @@
  }%
 }%
 \let\Mark=\MarkBox
-\let\refMark=\RefMarkBox
+%\let\refMark=\RefMarkBox
+\let\refMark=\RefMark
 \let\MarkReset=\MarkBoxReset
 \let\MarkAnswer=\PutMarkAnswer
 %%何ものかがペナルティを書き換えている
