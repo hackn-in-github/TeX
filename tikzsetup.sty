@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/26/2015 Ver.0.0996]%
+\ProvidesPackage{tikzsetup}[12/31/2015 Ver.0.0997]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -5387,6 +5387,7 @@
  \setkeys{Attention}{#1}%
  \mdframed[%
 	style=AttentionStyle,%
+	firstextra={\node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
 	singleextra={\node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
 	#3]%
 }{%
@@ -5440,7 +5441,9 @@
  \ifx\@temp\@empty
   \mdframed[%
    innertopmargin=3mm,%
-   singleextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},#3%
+   singleextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},%
+   firstextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},%
+   #3%
   ]%
  \else
   \mdframed[%
@@ -5448,7 +5451,12 @@
    singleextra={%
     \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
     \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
-   },#3%
+   },%
+   firstextra={%
+    \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
+    \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
+   },%
+   #3%
   ]%
  \fi
 }{%
@@ -6369,7 +6377,10 @@
  \begin{mdframed}%
   [style=PutMarkAnswerStyle,#2,%
    singleextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
-                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};}]
+                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};},%
+   firstextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
+                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};},%
+  ]
   \input{\jobname.ans}%
  \end{mdframed}
  \CenterWritefalse
