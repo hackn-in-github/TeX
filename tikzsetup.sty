@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/31/2015 Ver.0.0997]%
+\ProvidesPackage{tikzsetup}[12/31/2015 Ver.0.0998]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -5382,13 +5382,24 @@
 \define@key{Attention}{title distance}{\def\@Attention@title@distance{#1}}%
 \def\SetAttentionTitleDistance#1{\def\@Attention@title@distance@default{#1}}%
 \SetAttentionTitleDistance{5mm}%
+\newbox\AttentionTitleBox
 \NewDocumentEnvironment{Attention}{D<>{}D(){}O{}}{% 12/04/2015 singleextraを使い簡略化
  \let\@Attention@title@distance=\@Attention@title@distance@default\relax
  \setkeys{Attention}{#1}%
+\setbox\AttentionTitleBox=\hbox{\tikz\node[AttentionTitle]{Attention};}%
  \mdframed[%
+	skipabove=.75\zh,%
 	style=AttentionStyle,%
-	firstextra={\node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
-	singleextra={\node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
+	firstextra={%
+%	 \node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};%
+\node at(P-|O)[e=\@Attention@title@distance]{\hbox{\vbox to0pt{\vss\box\AttentionTitleBox\vss}}};%
+	 \draw[red!25,-{Stealth},very thick]($(P|-O)+(-4mm,1.5mm)$)--($(P|-O)+(-1.5mm,1.5mm)$)%
+	      arc[start angle=90,delta angle=-180,radius=1.5mm]--($(P|-O)+(-4mm,-1.5mm)$);},%
+	secondextra={%
+	 \draw[red!25,-{Stealth},very thick]($(P-|O)+(4mm,1.5mm)$)--($(P-|O)+(1.5mm,1.5mm)$)%
+	      arc[start angle=90,delta angle=180,radius=1.5mm]--($(P-|O)+(4mm,-1.5mm)$);},
+	singleextra={%
+	 \node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
 	#3]%
 }{%
  \endmdframed
