@@ -600,43 +600,43 @@
 \end{flushright}}%
 \def\@@出典#1{}%
 %[year=1997,term=前,university=弘前,faculty=,department=,no=9,matter={体積，最大・最小},level=標準]
-\define@key{Shutten}{year}{\def\@Shu@Year{#1}}%
-\define@key{Shutten}{term}{\def\@Shu@Term{#1}}%
-\define@key{Shutten}{university}{\def\@Shu@University{#1}}%
-\define@key{Shutten}{faculty}{\def\@Shu@Faculty{#1}}%学部
-\define@key{Shutten}{department}{\def\@Shu@Department{#1}}%学科
-\define@key{Shutten}{no}{\def\@Shu@No{#1}}%
-\define@key{Shutten}{matter}{\def\@Shu@Matter{#1}}%
-\define@key{Shutten}{level}{\def\@Shu@Level{#1}}%
-\def\Shutten#1{%
-	\bgroup
-		\let\@Shu@Year\empty
-		\let\@Shu@Term\empty
-		\let\@Shu@University\empty
-		\let\@Shu@Faculty\empty%
-		\let\@Shu@Department\empty
-		\let\@Shu@No\empty
-		\let\@Shu@Matter\empty
-		\let\@Shu@Level\empty
-		\setkeys{Shutten}{#1}%
-		\begin{flushright}
-		 \@Shu@Year\if\@Shu@Year\empty\else 年\fi
-		 \@Shu@Term\if\@Shu@Term\empty\else 期\quad\fi
-		 \@Shu@University\if\@Shu@University\empty\else 大学\fi
-		 \if\@Shu@Faculty\empty\else\quad\fi
-		 \@Shu@Faculty
-		 \if\@Shu@Faculty\empty\else 学部\fi
-		 \@Shu@Department\if\@Shu@Department\empty\else 学科\fi
-		 \@Shu@No
-		 \ifthenelse{\equal{\empty}{\@Shu@Matter}}{\\}{%
-		  \ifthenelse{\equal{\empty}{\@Shu@Level}}{}{\\}%
-		 }
-		 \@Shu@Matter
-		 \ifthenelse{\equal{\empty}{\@Shu@Level}}{}{[\@Shu@Level]}%
-%		 \if\@Shu@Level\empty\else[\@Shu@Level]\fi
-		\end{flushright}
-	\egroup
-	}%
+%\define@key{Shutten}{year}{\def\@Shu@Year{#1}}%
+%\define@key{Shutten}{term}{\def\@Shu@Term{#1}}%
+%\define@key{Shutten}{university}{\def\@Shu@University{#1}}%
+%\define@key{Shutten}{faculty}{\def\@Shu@Faculty{#1}}%学部
+%\define@key{Shutten}{department}{\def\@Shu@Department{#1}}%学科
+%\define@key{Shutten}{no}{\def\@Shu@No{#1}}%
+%\define@key{Shutten}{matter}{\def\@Shu@Matter{#1}}%
+%\define@key{Shutten}{level}{\def\@Shu@Level{#1}}%
+%\def\Shutten#1{%
+%	\bgroup
+%		\let\@Shu@Year\empty
+%		\let\@Shu@Term\empty
+%		\let\@Shu@University\empty
+%		\let\@Shu@Faculty\empty%
+%		\let\@Shu@Department\empty
+%		\let\@Shu@No\empty
+%		\let\@Shu@Matter\empty
+%		\let\@Shu@Level\empty
+%		\setkeys{Shutten}{#1}%
+%		\begin{flushright}
+%		 \@Shu@Year\if\@Shu@Year\empty\else 年\fi
+%		 \@Shu@Term\if\@Shu@Term\empty\else 期\quad\fi
+%		 \@Shu@University\if\@Shu@University\empty\else 大学\fi
+%		 \if\@Shu@Faculty\empty\else\quad\fi
+%		 \@Shu@Faculty
+%		 \if\@Shu@Faculty\empty\else 学部\fi
+%		 \@Shu@Department\if\@Shu@Department\empty\else 学科\fi
+%		 \@Shu@No
+%		 \ifthenelse{\equal{\empty}{\@Shu@Matter}}{\\}{%
+%		  \ifthenelse{\equal{\empty}{\@Shu@Level}}{}{\\}%
+%		 }
+%		 \@Shu@Matter
+%		 \ifthenelse{\equal{\empty}{\@Shu@Level}}{}{[\@Shu@Level]}%
+%%		 \if\@Shu@Level\empty\else[\@Shu@Level]\fi
+%		\end{flushright}
+%	\egroup
+%	}%
 %% 2015/07/21 変更
 %% term=hoge -> hoge期，faculty=hoge -> hoge学部，department=hoge -> hoge学科がデフォルトだが
 %% term=*[hoge]fuga -> fugahoge
@@ -5375,11 +5375,20 @@
 %   {Attention}%
 %}%
 %\def\endAttention{\end{Framebox}}%
+\mdfdefinestyle{AttentionStyle}{%
+	roundcorner=10pt,linewidth=2pt,linecolor=red!30,%
+	backgroundcolor=red!5,innertopmargin=4mm}%
+\tikzset{AttentionTitle/.style={inner sep=5pt,rounded corners=5pt,fill=red!30}}%
+\define@key{Attention}{title distance}{\def\@Attention@title@distance{#1}}%
+\def\SetAttentionTitleDistance#1{\def\@Attention@title@distance@default{#1}}%
+\SetAttentionTitleDistance{5mm}%
 \NewDocumentEnvironment{Attention}{D<>{}D(){}O{}}{% 12/04/2015 singleextraを使い簡略化
+ \let\@Attention@title@distance=\@Attention@title@distance@default\relax
+ \setkeys{Attention}{#1}%
  \mdframed[%
-  singleextra={\node[inner sep=5pt,rounded corners=5pt,fill=red!30,#1]at(P-|O)[xshift=12.5mm]{Attention};},%
-  roundcorner=10pt,linewidth=2pt,linecolor=red!30,backgroundcolor=red!5,innertopmargin=4mm,#3
- ]%
+	style=AttentionStyle,%
+	singleextra={\node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
+	#3]%
 }{%
  \endmdframed
 }%
@@ -6337,13 +6346,30 @@
   \immediate\openout\MarkAnswerWrite\jobname.ans
  }%
 }%
-\NewDocumentCommand\PutMarkAnswer{m}{%
+\define@key{PutMarkAnswer}{title}{\def\@PMA@title{#1}}%
+\define@key{PutMarkAnswer}{title distance}{\def\@PMA@title@distance{#1}}%
+\define@key{PutMarkAnswer}{subtitle distance}{\def\@PMA@title@subdistance{#1}}%
+\define@key{PutMarkAnswer}{title font}{\def\@PMA@title@font{#1}}%
+\def\SetPutMarkAnswerFont#1{\let\@PMA@title@font@defalut=#1\relax}%
+\SetPutMarkAnswerFont{\bfseries}%
+\def\SetPutMarkAnswerTitleDistance#1{\def\@PMA@title@distance@default{#1}}%
+\SetPutMarkAnswerTitleDistance{2.5mm}%
+\def\SetPutMarkAnswerSubtitleDistance#1{\def\@PMA@subtitle@distance@default{#1}}%
+\SetPutMarkAnswerSubtitleDistance{2.5mm}%
+\mdfdefinestyle{PutMarkAnswerStyle}%
+   {roundcorner=7.5pt,middlelinewidth=1pt,%
+    innertopmargin=3mm,innerbottommargin=3mm}%
+\NewDocumentCommand\PutMarkAnswer{D<>{}O{}m}{%
+ \def\@PMA@title{解　答}%
+ \let\@PMA@title@distance=\@PMA@title@distance@default\relax
+ \let\@PMA@subtitle@distance=\@PMA@subtitle@distance@default\relax
+ \let\@PMA@title@font=\@PMA@title@font@defalut\relax
+ \setkeys{PutMarkAnswer}{#1}%
  \immediate\closeout\MarkAnswerWrite
  \begin{mdframed}%
-  [roundcorner=7.5pt,middlelinewidth=1pt,%
-   innertopmargin=3mm,innerbottommargin=3mm,%
-   singleextra={\node[fill=white]at(P|-O)[w=2.5mm]{#1};%
-                \node[font=\bfseries,fill=white]at(P-|O)[e=2.5mm]{解　答};}]
+  [style=PutMarkAnswerStyle,#2,%
+   singleextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
+                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};}]
   \input{\jobname.ans}%
  \end{mdframed}
  \CenterWritefalse
