@@ -5341,7 +5341,7 @@
    \xdef#3{\pgfmathresult}%
   };%
 }%
-%% Attention環境
+%% Attention環境 01/01/2016改ページされた時の不具合などによりtcolorboxに移行
 % 枠の外のマージンを指定
 % skipabove
 % skipbelow
@@ -5364,7 +5364,7 @@
 % color
 % linecolor=black,innrelinecolor=black,middlelinecolor=black
 % outerlinecolor=black,backgroundcolor=white,fontcolor=black
-%\def\Attention{\@ifnextchar<{\@Attention}{\@Attention<>}}%
+%\def\Attention{\@ifnextchar<{\@Attention}{\@Attention<>}}
 %\def\@Attention<#1>{\@ifnextchar({\@@Attention<#1>}{\@@Attention<#1>()}}%
 %\def\@@Attention<#1>(#2){\@ifnextchar[{\@@@Attention<#1>(#2)}{\@@@Attention<#1>(#2)[]}}%
 %\def\@@@Attention<#1>(#2)[#3]{%
@@ -5375,35 +5375,35 @@
 %   {Attention}%
 %}%
 %\def\endAttention{\end{Framebox}}%
-\mdfdefinestyle{AttentionStyle}{%
-	roundcorner=10pt,linewidth=2pt,linecolor=red!30,%
-	backgroundcolor=red!5,innertopmargin=4mm}%
-\tikzset{AttentionTitle/.style={inner sep=5pt,rounded corners=5pt,fill=red!30}}%
-\define@key{Attention}{title distance}{\def\@Attention@title@distance{#1}}%
-\def\SetAttentionTitleDistance#1{\def\@Attention@title@distance@default{#1}}%
-\SetAttentionTitleDistance{5mm}%
-\newbox\AttentionTitleBox
-\NewDocumentEnvironment{Attention}{D<>{}D(){}O{}}{% 12/04/2015 singleextraを使い簡略化
- \let\@Attention@title@distance=\@Attention@title@distance@default\relax
- \setkeys{Attention}{#1}%
-\setbox\AttentionTitleBox=\hbox{\tikz\node[AttentionTitle]{Attention};}%
- \mdframed[%
-	skipabove=.75\zh,%
-	style=AttentionStyle,%
-	firstextra={%
-%	 \node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};%
-\node at(P-|O)[e=\@Attention@title@distance]{\hbox{\vbox to0pt{\vss\box\AttentionTitleBox\vss}}};%
-	 \draw[red!25,-{Stealth},very thick]($(P|-O)+(-4mm,1.5mm)$)--($(P|-O)+(-1.5mm,1.5mm)$)%
-	      arc[start angle=90,delta angle=-180,radius=1.5mm]--($(P|-O)+(-4mm,-1.5mm)$);},%
-	secondextra={%
-	 \draw[red!25,-{Stealth},very thick]($(P-|O)+(4mm,1.5mm)$)--($(P-|O)+(1.5mm,1.5mm)$)%
-	      arc[start angle=90,delta angle=180,radius=1.5mm]--($(P-|O)+(4mm,-1.5mm)$);},
-	singleextra={%
-	 \node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
-	#3]%
-}{%
- \endmdframed
-}%
+%\mdfdefinestyle{AttentionStyle}{%
+%	roundcorner=10pt,linewidth=2pt,linecolor=red!30,%
+%	backgroundcolor=red!5,innertopmargin=4mm}%
+%\tikzset{AttentionTitle/.style={inner sep=5pt,rounded corners=5pt,fill=red!30}}%
+%\define@key{Attention}{title distance}{\def\@Attention@title@distance{#1}}%
+%\def\SetAttentionTitleDistance#1{\def\@Attention@title@distance@default{#1}}%
+%\SetAttentionTitleDistance{5mm}%
+%\newbox\AttentionTitleBox
+%\NewDocumentEnvironment{Attention}{D<>{}D(){}O{}}{% 12/04/2015 singleextraを使い簡略化
+% \let\@Attention@title@distance=\@Attention@title@distance@default\relax
+% \setkeys{Attention}{#1}%
+%\setbox\AttentionTitleBox=\hbox{\tikz\node[AttentionTitle]{Attention};}%
+% \mdframed[%
+%	skipabove=.75\zh,%
+%	style=AttentionStyle,%
+%	firstextra={%
+%%	 \node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};%
+%\node at(P-|O)[e=\@Attention@title@distance]{\hbox{\vbox to0pt{\vss\box\AttentionTitleBox\vss}}};%
+%	 \draw[red!25,-{Stealth},very thick]($(P|-O)+(-4mm,1.5mm)$)--($(P|-O)+(-1.5mm,1.5mm)$)%
+%	      arc[start angle=90,delta angle=-180,radius=1.5mm]--($(P|-O)+(-4mm,-1.5mm)$);},%
+%	secondextra={%
+%	 \draw[red!25,-{Stealth},very thick]($(P-|O)+(4mm,1.5mm)$)--($(P-|O)+(1.5mm,1.5mm)$)%
+%	      arc[start angle=90,delta angle=180,radius=1.5mm]--($(P-|O)+(4mm,-1.5mm)$);},
+%	singleextra={%
+%	 \node[AttentionTitle]at(P-|O)[e=\@Attention@title@distance]{Attention};},%
+%	#3]%
+%}{%
+% \endmdframed
+%}%
 %% Framebox 環境 (枠で囲む，ページで分割可能)
 %% \begin{Framebox}<#1>(#2)[#3]{#4}
 %%  ほげほげふがふが
@@ -6584,6 +6584,41 @@
 \let\refMark=\RefMark
 \let\MarkReset=\MarkBoxReset
 \let\MarkAnswer=\PutMarkAnswer
+\tcbset{AttentionStyle/.style={%
+ breakable,%
+ title=Attention,%
+ colbacktitle=red!30,coltitle=white,%
+ enhanced,attach boxed title to top left={xshift=5mm,yshift*=-\tcboxedtitleheight/2},%
+ colback=red!5,colframe=red!30,coltext=black,%
+ arc=10pt,boxrule=2pt,sharp corners=downhill,%
+ fonttitle=\normalsize,fontupper=\small,fontlower=\small,%
+ before upper={\parindent=1zw},before lower={\parindent=1zw},%
+% overlay first and middle={%
+%  \draw[very thick,-{Stealth},red!20]($(frame.south east)+(-6mm,1.5mm)$)--+(3mm,0)%
+%	arc[start angle=90,delta angle=-180,radius=1.5mm]--+(-3mm,0);%
+% },% middle に描画されないから保留
+% overlay middle and last={%
+%  \draw[very thick,-{Stealth},red!20]($(frame.north west)+(6mm,1.5mm)$)--+(-3mm,0)%
+%	arc[start angle=90,delta angle=180,radius=1.5mm]--+(3mm,0);%
+% },%
+ overlay first={%
+  \draw[very thick,-{Stealth},red!20]($(frame.south east)+(-6mm,1.5mm)$)--+(3mm,0)%
+	arc[start angle=90,delta angle=-180,radius=1.5mm]--+(-3mm,0);%
+ },%
+ overlay middle={%
+  \draw[very thick,-{Stealth},red!20]($(frame.south east)+(-6mm,1.5mm)$)--+(3mm,0)%
+	arc[start angle=90,delta angle=-180,radius=1.5mm]--+(-3mm,0);%
+  \draw[very thick,-{Stealth},red!20]($(frame.north west)+(6mm,1.5mm)$)--+(-3mm,0)%
+	arc[start angle=90,delta angle=180,radius=1.5mm]--+(3mm,0);%
+ },%
+ overlay last={%
+  \draw[very thick,-{Stealth},red!20]($(frame.north west)+(6mm,1.5mm)$)--+(-3mm,0)%
+	arc[start angle=90,delta angle=180,radius=1.5mm]--+(3mm,0);%
+ },%
+}}%
+\NewTColorBox{Attention}{O{}}{%
+ AttentionStyle,#1%
+}%
 %%何ものかがペナルティを書き換えている
 \prebreakpenalty`，=10000
 \prebreakpenalty`．=10000
