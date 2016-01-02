@@ -6569,11 +6569,6 @@
   }%
  }%
 }%
-\let\Mark=\MarkBox
-%\let\refMark=\RefMarkBox
-\let\refMark=\RefMark
-\let\MarkReset=\MarkBoxReset
-\let\MarkAnswer=\PutMarkAnswer
 \tcbset{AttentionStyle/.style={%
  breakable,%
  title=Attention,%
@@ -6652,6 +6647,11 @@
   \input{\jobname.ans}%
  \end{tcolorbox}%
 }%
+\let\Mark=\MarkBox
+%\let\refMark=\RefMarkBox
+\let\refMark=\RefMark
+\let\MarkReset=\MarkBoxReset
+\let\MarkAnswer=\PutMarkAnswer
 %%何ものかがペナルティを書き換えている
 \prebreakpenalty`，=10000
 \prebreakpenalty`．=10000
