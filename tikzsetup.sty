@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[12/31/2015 Ver.0.0998]%
+\ProvidesPackage{tikzsetup}[01/02/2016 Ver.0.0999]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6365,37 +6365,27 @@
   \immediate\openout\MarkAnswerWrite\jobname.ans
  }%
 }%
-\define@key{PutMarkAnswer}{title}{\def\@PMA@title{#1}}%
-\define@key{PutMarkAnswer}{title distance}{\def\@PMA@title@distance{#1}}%
-\define@key{PutMarkAnswer}{subtitle distance}{\def\@PMA@title@subdistance{#1}}%
-\define@key{PutMarkAnswer}{title font}{\def\@PMA@title@font{#1}}%
-\def\SetPutMarkAnswerFont#1{\let\@PMA@title@font@defalut=#1\relax}%
-\SetPutMarkAnswerFont{\bfseries}%
-\def\SetPutMarkAnswerTitleDistance#1{\def\@PMA@title@distance@default{#1}}%
-\SetPutMarkAnswerTitleDistance{2.5mm}%
-\def\SetPutMarkAnswerSubtitleDistance#1{\def\@PMA@subtitle@distance@default{#1}}%
-\SetPutMarkAnswerSubtitleDistance{2.5mm}%
-\mdfdefinestyle{PutMarkAnswerStyle}%
-   {roundcorner=7.5pt,middlelinewidth=1pt,%
-    innertopmargin=3mm,innerbottommargin=3mm}%
-\NewDocumentCommand\PutMarkAnswer{D<>{}O{}m}{%
- \def\@PMA@title{解　答}%
- \let\@PMA@title@distance=\@PMA@title@distance@default\relax
- \let\@PMA@subtitle@distance=\@PMA@subtitle@distance@default\relax
- \let\@PMA@title@font=\@PMA@title@font@defalut\relax
- \setkeys{PutMarkAnswer}{#1}%
- \immediate\closeout\MarkAnswerWrite
- \begin{mdframed}%
-  [style=PutMarkAnswerStyle,#2,%
-   singleextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
-                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};},%
-   firstextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
-                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};},%
-  ]
-  \input{\jobname.ans}%
- \end{mdframed}
- \CenterWritefalse
-}%
+%\mdfdefinestyle{PutMarkAnswerStyle}%
+%   {roundcorner=7.5pt,middlelinewidth=1pt,%
+%    innertopmargin=3mm,innerbottommargin=3mm}%
+%\NewDocumentCommand\PutMarkAnswer{D<>{}O{}m}{%
+% \def\@PMA@title{解　答}%
+% \let\@PMA@title@distance=\@PMA@title@distance@default\relax
+% \let\@PMA@subtitle@distance=\@PMA@subtitle@distance@default\relax
+% \let\@PMA@title@font=\@PMA@title@font@defalut\relax
+% \setkeys{PutMarkAnswer}{#1}%
+% \immediate\closeout\MarkAnswerWrite
+% \begin{mdframed}%
+%  [style=PutMarkAnswerStyle,#2,%
+%   singleextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
+%                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};},%
+%   firstextra={\node[fill=white]at(P|-O)[w=\@PMA@subtitle@distance]{#3};%
+%                \node[font=\@PMA@title@font,fill=white]at(P-|O)[e=\@PMA@title@distance]{\@PMA@title};},%
+%  ]
+%  \input{\jobname.ans}%
+% \end{mdframed}
+% \CenterWritefalse
+%}%
 \tikzset{MarkNode/.style={font=\bfseries},MarkLine/.style={very thick}}%
 \tikzset{MarkCompactNode/.style={font=\mdseries},MarkCompactLine/.style={thin},%
          MarkCompactDash/.style={dash pattern=on1.5pt off1.5pt}}%
@@ -6587,10 +6577,12 @@
 \tcbset{AttentionStyle/.style={%
  breakable,%
  title=Attention,%
- colbacktitle=red!30,coltitle=white,%
+ coltitle=black,%
  enhanced,attach boxed title to top left={xshift=5mm,yshift*=-\tcboxedtitleheight/2},%
+ boxed title style={%
+	colback=red!30,arc=5pt,left=2.5pt,right=2.5pt,boxrule=0pt},%
  colback=red!5,colframe=red!30,coltext=black,%
- arc=10pt,boxrule=2pt,sharp corners=downhill,%
+ arc=20pt,boxrule=2pt,sharp corners=downhill,%
  fonttitle=\normalsize,fontupper=\small,fontlower=\small,%
  before upper={\parindent=1zw},before lower={\parindent=1zw},%
 % overlay first and middle={%
@@ -6618,6 +6610,47 @@
 }}%
 \NewTColorBox{Attention}{O{}}{%
  AttentionStyle,#1%
+}%
+\tcbset{PutMarkAnswerStyle/.style={%
+ enhanced,%
+ breakable,coltitle=black,%
+ boxed title style={%
+	colback=white,left=0pt,right=0pt,boxrule=0pt,colframe=white},%
+ colback=white,colframe=black,coltext=black,%
+ arc=20pt,boxrule=1pt,sharp corners=downhill,%
+ fonttitle=\normalsize,fontupper=\normalsize,fontlower=\normalsize,%
+ before upper={\noindent},before lower={\noindent}%
+}}%
+\define@key{PutMarkAnswer}{title}{\def\@PMA@title{#1}}%
+\define@key{PutMarkAnswer}{title distance}{\def\@PMA@title@distance{#1}}%
+\define@key{PutMarkAnswer}{subtitle distance}{\def\@PMA@title@subdistance{#1}}%
+\define@key{PutMarkAnswer}{title font}{\def\@PMA@title@font{#1}}%
+\def\SetPutMarkAnswerFont#1{\let\@PMA@title@font@defalut=#1\relax}%
+\SetPutMarkAnswerFont{\bfseries}%
+\def\SetPutMarkAnswerTitleDistance#1{\def\@PMA@title@distance@default{#1}}%
+\SetPutMarkAnswerTitleDistance{2.5mm}%
+\def\SetPutMarkAnswerSubtitleDistance#1{\def\@PMA@subtitle@distance@default{#1}}%
+\SetPutMarkAnswerSubtitleDistance{2.5mm}%
+\NewDocumentCommand\PutMarkAnswer{D<>{}O{}m}{%
+ \def\@PMA@title{解　答}%
+ \let\@PMA@title@distance=\@PMA@title@distance@default\relax
+ \let\@PMA@subtitle@distance=\@PMA@subtitle@distance@default\relax
+ \let\@PMA@title@font=\@PMA@title@font@default\relax
+ \setkeys{PutMarkAnswer}{#1}%
+ \immediate\closeout\MarkAnswerWrite
+ \begin{tcolorbox}[%
+  PutMarkAnswerStyle,#2,%
+  attach boxed title to top left={xshift=\@PMA@title@distance,yshift*=-\tcboxedtitleheight/2},%
+  overlay={%
+	\node at([xshift=-\@PMA@subtitle@distance]frame.south east)[w,fill=white]{#3};%
+	},%
+  overlay first={},%
+  overlay last={%
+	\node at([xshift=-\@PMA@subtitle@distance]frame.south east)[w,fill=white]{#3};%
+	},%
+  title=\@PMA@title]%
+  \input{\jobname.ans}%
+ \end{tcolorbox}%
 }%
 %%何ものかがペナルティを書き換えている
 \prebreakpenalty`，=10000
