@@ -4823,8 +4823,8 @@
  \Veclen{$(#3)-(#1)$}\@N@CA
  \SetPoint*{@N@B($(#3)!{\@N@BC/(\@N@BC+\@N@AB)}!(#1)$);%
 	    @N@C($(#1)!{\@N@CA/(\@N@CA+\@N@BC)}!(#2)$)}%
- \path[name path=@N@B@B](B)--(@N@B);%
- \path[name path=@N@C@C](C)--(@N@C);%
+ \path[name path=@N@B@B](#2)--(@N@B);% #2がBになっていたのを修正
+ \path[name path=@N@C@C](#3)--(@N@C);% #3がCになっていたのを修正
  \path[name intersections={of=@N@B@B and @N@C@C,by={#4}}];%
  \Veclen{$(#3)!(#4)!(#1)-(#4)$}\@N@VR@
  \expandafter\let\csname \@R@Name@\endcsname=\@N@VR@
