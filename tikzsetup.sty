@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[01/05/2016 Ver.0.09992]%
+\ProvidesPackage{tikzsetup}[01/05/2016 Ver.0.09993]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6652,14 +6652,16 @@
  quote default/.style={%
 	empty,breakable,%
 	colback=white,%
-	left=4zw,right=4zw,top=1zh,bottom=1zh%
+	left=4zw,right=4zw,%
+	top=0zh,bottom=0zh,before skip=1.5zh,after skip=1.5zh,%
+	interior engine=standard,colback=white,sharp corners=all%
 	},%
  quote/.style={quote default,%
 	overlay={%
-	\fill[red!20,rounded corners=2.5mm]([yshift=-1\zh]frame.north west)rectangle
-	([xshift=5mm,yshift=1\zh]frame.south west);%
-	\node[text=red!70!black,font=\small]
-	at($1/2*([yshift=-1\zh]frame.north west)+1/2*([xshift=5mm,yshift=1\zh]frame.south west)$)
+	\fill[red!20,rounded corners=2.5mm](frame.north west)rectangle%
+	([xshift=5mm]frame.south west);%
+	\node[text=red!70!black,font=\small]%
+	at($1/2*(frame.north west)+1/2*([xshift=5mm]frame.south west)$)%
 	{\hbox{\tate Quotation}};}}%
 }%
 \NewTColorBox{tcbquote}{s O{}}{%
