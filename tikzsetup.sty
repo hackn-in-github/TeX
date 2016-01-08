@@ -6396,98 +6396,107 @@
 \def\MarkBoxChar#1{\let\MarkBoxMoji=#1\relax}% 12/18/2015 新設
 \MarkBoxChar{\アイウ}%
 \NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{% 12/09/2015 auxへの書き出し部分を修正
- \IfBooleanT{#1}{\scriptsize\zw=1zw\relax}%
- \setcounter{MarkFirst}{\numexpr\c@MarkEnd+1}%
- \def\@Mark@Strings{}%
- \def\@Mark@Array{"x"}%
- \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
-  \stepcounter{MarkEnd}%
-  \edef\@Mark@Strings{\@Mark@Strings\MarkBoxMoji{MarkEnd}}%
-  \edef\@Mark@Array{\@Mark@Array,"\MarkBoxMoji{MarkEnd}"}%
- }%
- \expandafter\def\expandafter\@Mark@Array\expandafter{\expandafter{\@Mark@Array}}%
- \ifmeasuring@\else
-  \ifCenterWrite
-   \immediate\write\MarkAnswerWrite{%
-    $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$\string\hspace{\string\CenterSkip}
-   }%
-   \IfValueT{#2}{%
-    \@ifundefined{Hy@Message}{%
-     \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}}}%
-    }{%
-     \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}{}{}{}}}%
-    }%
-   }%
-   \IfValueT{#3}{%
-    \def\@Mark@RefName@Array{"x"}%
-    \@for\member:=#3\do{%
-     \edef\@Mark@RefName@Array{\@Mark@RefName@Array,"\member"}%
-    }%
-    \expandafter\def\expandafter\@Mark@RefName@Array\expandafter{\expandafter{\@Mark@RefName@Array}}%
-    \@ifundefined{Hy@Message}{%
-     \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
-      \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
-      \let\@refname\pgfmathresult
-      \pgfmathparse{array(\@Mark@Array,\C)}%
-      \let\@refstring\pgfmathresult
-      \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}}}%
-     }%
-    }{%
-     \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
-      \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
-      \let\@refname\pgfmathresult
-      \pgfmathparse{array(\@Mark@Array,\C)}%
-      \let\@refstring\pgfmathresult
-      \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}{}{}{}}}%
-     }%
-    }%
-   }%
-  \fi
- \fi
- \leavevmode
- \hbox{%
-  \ifMarkCompactMode
-  \else
-   \kern1pt
-  \fi
-  \IfBooleanT{#1}{\vrule width0pt depth.75zh}%
-  \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
+ \ifthenelse{\equal{#6}{\empty}}%
+ {%
+  \kern1pt\tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
    \node[white](@O@)at(.5,.5){あ};
-   \ifMarkCompactMode
-    \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
-     \pgfmathparse{array(\@Mark@Array,\C)}%
-     \let\@mark@string=\pgfmathresult
-     \node[MarkCompactNode,#4]at(\C-.5,.5){\@mark@string};
-     \ifnum\C=\@ne\relax
-     \else
-      \ifMarkVerticalLine
-       \draw[MarkCompactDash,#5](\C-1,0)--(\C-1,1);
-      \fi
-     \fi
+   \draw[MarkLine,#5](-.25,-.5)rectangle(3.25,1.5);
+  }\kern1pt
+ }%
+ {%
+  \IfBooleanT{#1}{\scriptsize\zw=1zw\relax}%
+  \setcounter{MarkFirst}{\numexpr\c@MarkEnd+1}%
+  \def\@Mark@Strings{}%
+  \def\@Mark@Array{"x"}%
+  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
+   \stepcounter{MarkEnd}%
+   \edef\@Mark@Strings{\@Mark@Strings\MarkBoxMoji{MarkEnd}}%
+   \edef\@Mark@Array{\@Mark@Array,"\MarkBoxMoji{MarkEnd}"}%
+  }%
+  \expandafter\def\expandafter\@Mark@Array\expandafter{\expandafter{\@Mark@Array}}%
+  \ifmeasuring@\else
+   \ifCenterWrite
+    \immediate\write\MarkAnswerWrite{%
+     $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$\string\hspace{\string\CenterSkip}
     }%
-    \draw[MarkCompactLine,#5](0,0)rectangle(\C,1);
-   \else
-    \IfBooleanTF{#1}{%
-     \node[draw,MarkNode,MarkLine,#4](@O@){\@Mark@Strings};
-    }{%
-     \ifnum\numexpr\c@MarkEnd-\c@MarkFirst>\@ne\relax
+    \IfValueT{#2}{%
+     \@ifundefined{Hy@Message}{%
+      \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}}}%
+     }{%
+      \immediate\write\@auxout{\string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}{}{}{}}}%
+     }%
+    }%
+    \IfValueT{#3}{%
+     \def\@Mark@RefName@Array{"x"}%
+     \@for\member:=#3\do{%
+      \edef\@Mark@RefName@Array{\@Mark@RefName@Array,"\member"}%
+     }%
+     \expandafter\def\expandafter\@Mark@RefName@Array\expandafter{\expandafter{\@Mark@RefName@Array}}%
+     \@ifundefined{Hy@Message}{%
       \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+       \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
+       \let\@refname\pgfmathresult
        \pgfmathparse{array(\@Mark@Array,\C)}%
-       \let\@mark@string=\pgfmathresult
-       \node[MarkNode,#4]at(\C-.5,.5){\@mark@string};
+       \let\@refstring\pgfmathresult
+       \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}}}%
       }%
-      \draw[MarkLine,#5](-.25,-.5)rectangle(\C+.25,1.5);
-     \else
-      \node[MarkNode,#4]at(1.5,.5){\@Mark@Strings};
-      \draw[MarkLine,#5](-.25,-.5)rectangle(3.25,1.5);
-     \fi
+     }{%
+      \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+       \pgfmathparse{array(\@Mark@RefName@Array,\C)}%
+       \let\@refname\pgfmathresult
+       \pgfmathparse{array(\@Mark@Array,\C)}%
+       \let\@refstring\pgfmathresult
+       \immediate\write\@auxout{\string\newlabel{mark:\@refname}{{\@refstring}{\thepage}{}{}{}}}%
+      }%
+     }%
     }%
    \fi
-  }%
-  \ifMarkCompactMode
-  \else
-   \kern1pt
   \fi
+  \leavevmode
+  \hbox{%
+   \ifMarkCompactMode
+   \else
+    \kern1pt
+   \fi
+   \IfBooleanT{#1}{\vrule width0pt depth.75zh}%
+   \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
+    \node[white](@O@)at(.5,.5){あ};
+    \ifMarkCompactMode
+     \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+      \pgfmathparse{array(\@Mark@Array,\C)}%
+      \let\@mark@string=\pgfmathresult
+      \node[MarkCompactNode,#4]at(\C-.5,.5){\@mark@string};
+      \ifnum\C=\@ne\relax
+      \else
+       \ifMarkVerticalLine
+        \draw[MarkCompactDash,#5](\C-1,0)--(\C-1,1);
+       \fi
+      \fi
+     }%
+     \draw[MarkCompactLine,#5](0,0)rectangle(\C,1);
+    \else
+     \IfBooleanTF{#1}{%
+      \node[draw,MarkNode,MarkLine,#4](@O@){\@Mark@Strings};
+     }{%
+      \ifnum\numexpr\c@MarkEnd-\c@MarkFirst>\@ne\relax
+       \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+        \pgfmathparse{array(\@Mark@Array,\C)}%
+        \let\@mark@string=\pgfmathresult
+        \node[MarkNode,#4]at(\C-.5,.5){\@mark@string};
+       }%
+       \draw[MarkLine,#5](-.25,-.5)rectangle(\C+.25,1.5);
+      \else
+       \node[MarkNode,#4]at(1.5,.5){\@Mark@Strings};
+       \draw[MarkLine,#5](-.25,-.5)rectangle(3.25,1.5);
+      \fi
+     }%
+    \fi
+   }%
+   \ifMarkCompactMode
+   \else
+    \kern1pt
+   \fi
+  }%
  }%
 }%
 \NewDocumentCommand\RefMark{s D<>{}D(){}m}{%
