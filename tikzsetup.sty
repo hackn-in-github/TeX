@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[01/05/2016 Ver.0.09993]%
+\ProvidesPackage{tikzsetup}[01/11/2016 Ver.0.09994]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -1662,22 +1662,25 @@
 %  \clip(#3-\@MTPleftmargin,#5-\@MTPbelowmargin)rectangle(#4+\@MTPrightmargin,#6+\@MTPabovemargin);
   \@MTPfontsize
   \ifnum\@MTPxyaxis=\@ne\relax%座標軸の描画と縦軸・横軸・原点の記号の配置
+%01/11/2016 記号は描画終了直前に移行
    \draw[->](#3,0)--(#4,0);
-%node[\@MTPxstringpos]{\@MTPxstring};
-   \expandafter\expandafter\expandafter\node\expandafter\space\expandafter a\expandafter t\expandafter(\expandafter
-  X\expandafter M\expandafter A\expandafter X\expandafter)\expandafter[\@MTPxstringpos]{\@MTPxstring};
    \draw[->](0,#5)--(0,#6);
-%node[\@MTPystringpos]{\@MTPystring};
-   \expandafter\expandafter\expandafter\node\expandafter\space\expandafter a\expandafter t\expandafter(\expandafter
-  Y\expandafter M\expandafter A\expandafter X\expandafter)\expandafter[\@MTPystringpos]{\@MTPystring};
-   \expandafter\expandafter\expandafter\node\expandafter\space\expandafter a\expandafter t\expandafter(\expandafter O\expandafter)\expandafter[\@MTPostringpos]{\@MTPostring};
-%   \node at(O)[\@MTPostringpos]{\@MTPostring};
   \fi
   \ifnum\@MTPgrid=\@ne\relax%グリッドの描画
    \draw[help lines,\@MTPgridoption](#3,#5)grid(#4,#6);
   \fi
 }%
 \def\endmytikzpicture{%
+  \ifnum\@MTPxyaxis=\@ne\relax%座標軸の描画と縦軸・横軸・原点の記号の配置
+%node[\@MTPxstringpos]{\@MTPxstring};
+   \expandafter\expandafter\expandafter\node\expandafter\space\expandafter a\expandafter t\expandafter(\expandafter
+  X\expandafter M\expandafter A\expandafter X\expandafter)\expandafter[\@MTPxstringpos]{\@MTPxstring};
+%node[\@MTPystringpos]{\@MTPystring};
+   \expandafter\expandafter\expandafter\node\expandafter\space\expandafter a\expandafter t\expandafter(\expandafter
+  Y\expandafter M\expandafter A\expandafter X\expandafter)\expandafter[\@MTPystringpos]{\@MTPystring};
+   \expandafter\expandafter\expandafter\node\expandafter\space\expandafter a\expandafter t\expandafter(\expandafter O\expandafter)\expandafter[\@MTPostringpos]{\@MTPostring};
+%   \node at(O)[\@MTPostringpos]{\@MTPostring};
+  \fi
  \end{tikzpicture}%
 }%
 %% \mytikzarc<オプション1>[オプション2]{中心}{半径}{開始角}{終了角}
