@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[01/12/2016 Ver.0.09995]%
+\ProvidesPackage{tikzsetup}[01/14/2016 Ver.0.09996]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -6325,7 +6325,8 @@
 %% #6:#7に対するTikZオプション(font等)
 %% #7:訂正後の文字列
 \NewDocumentCommand\Teisei{D<>{}O{}D(){}mO{north east}D(){}m}{%
- \def\@Teisei@style{10}%
+% 01/14/2016 \@Teisei@styleを\@teisei@styeに変更
+ \def\@teisei@style{10}%
  \setkeys{teisei}{#1}%
  \ifmmode
   \def\@Teisei@mmode{1}%
@@ -6335,7 +6336,7 @@
  \begin{tikzpicture}[baseline=(@O@.base)]
   \node(@O@)[inner sep=0pt,outer sep=2pt,#3]{\ifnum\@Teisei@mmode=\@ne\relax$#4$\else#4\fi};
   \node at(@O@.#5)[inner sep=0pt,font=\scriptsize,#6]{\ifnum\@Teisei@mmode=\@ne\relax$#7$\else#7\fi};
-  \ifcase\@Teisei@style
+  \ifcase\@teisei@style
    \draw[black!25,very thin,#2](@O@.south west)--(@O@.north east);
   \or
    \draw[black!25,very thin,#2](@O@.west)--(@O@.east);
