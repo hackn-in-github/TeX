@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[01/14/2016 Ver.0.09996]%
+\ProvidesPackage{tikzsetup}[01/26/2016 Ver.0.09997]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -9,14 +9,21 @@
 \MarkKeepWidthtrue
 \MarkSpctrue
 %\input{pictureplace}%
-\def\PIC{/home/tooru/Work/picture/iijima/}%
-\def\BMP{/home/tooru/Work/picture/iijima/bmp/}%
-\def\EPS{/home/tooru/Work/picture/iijima/eps/}%
+%\def\PIC{/home/tooru/Work/picture/iijima/}% 01/26/2016 削除
+%\def\BMP{/home/tooru/Work/picture/iijima/bmp/}% 01/26/2016 削除
+%\def\EPS{/home/tooru/Work/picture/iijima/eps/}% 01/26/2016 削除
 %\RequirePackage{amsmath}%
-\RequirePackage{array}%
-\RequirePackage{hhline}%
-\RequirePackage{itembbox}%
-\RequirePackage{cases}%
+%\RequirePackage{array}%
+%\RequirePackage{hhline}%
+%\RequirePackage{itembbox}% 01/26/2016 削除
+%\RequirePackage{cases}% 01/26/2016 削除
+\RequirePackage{hyperref,pxjahyper,xparse,plext,amsmath,graphicx,tikz,array,hhline,cases,tikz,tcolorbox}%
+\usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
+	patterns,topaths,through,calc,intersections,%
+	shapes.geometric,shapes.misc,shapes.multipart,chains,angles,quotes,%
+	arrows.meta}
+\tcbuselibrary{breakable,xparse,skins}%
+\RequirePackage[framemethod=tikz]{mdframed}%
 %%%\myPerlLib{my.pl;nCr.pl}%
 \everymath{\displaystyle}%
 % 版面の設定
@@ -3824,7 +3831,7 @@
  \TouhenKigouSub<#1>[#2]{#3,#4}%
  \@ifnextchar/{\@gobble}{\@@@TouhenKigou<#1>[#2]}%
 }%
-%% \Henko<#1>[#2]{#3,#4}{#5}%
+%% \Henko<#1>[#2]{#3,#4}[#5]{#6}%
 %% #1:固有オプション
 %%    fboxsep:文字列の周りのスペース(1pt)
 %%    fontsize:文字列のサイズ(\scriptsize)
@@ -3832,53 +3839,95 @@
 %%    rotate:文字列の回転指定(0:回転させない 1:始点から終点 -1:終点から始点)
 %%    pos:文字列の配置位置(.5)
 %%    background color:文字列の背景色の指定(white)[transparentで塗りつぶしなし]
-%% #2:Tikzオプション
+%% #2:弧に対するTikzオプション
 %% #3,#4:2端点をカンマ区切りで指定
-%% #5:配置文字列の指定
+%% #5:配置文字列#6に関するTikZオプション
+%% #6:配置文字列の指定
 \define@key{MTHenko}{fboxsep}{\def\@MTH@fboxsep{#1}}%
 \define@key{MTHenko}{fontsize}{\def\@MTH@fontsize{#1}}%
 \define@key{MTHenko}{angle}{\def\@MTH@angle{#1}}%
 \define@key{MTHenko}{rotate}{\def\@MTH@rotate{#1}}%
 \define@key{MTHenko}{pos}{\def\@MTH@pos{#1}}%
 \define@key{MTHenko}{background color}{\def\@MTH@BG@color{#1}}%
-\def\Henko{\@ifnextchar<{\@Henko}{\@Henko<>}}%
-\def\@Henko<#1>{\@ifnextchar[{\@@Henko<#1>}{\@@Henko<#1>[]}}%
-\def\@@Henko<#1>[#2]#3#4{%
- \bgroup
-  \def\@MTH@fboxsep{1pt}%
-  \def\@MTH@fontsize{\scriptsize}%
-  \let\@MTH@angle=\@empty%
-  \def\@MTH@rotate{0}%
-  \def\@MTH@pos{.5}%
-  \def\@MTH@BG@color{white}%
-  \def\@MTH@BG@transparent{transparent}%
-  \setkeys{MTHenko}{#1}%
-  \ifx\@MTH@BG@color\@MTH@BG@transparent
-   \let\colorbox=\@gobble
-  \fi
-  \@@@Henko<#1>[#2]#3@{#4}%
- \egroup
+%\def\Henko{\@ifnextchar<{\@Henko}{\@Henko<>}}%
+%\def\@Henko<#1>{\@ifnextchar[{\@@Henko<#1>}{\@@Henko<#1>[]}}%
+%\def\@@Henko<#1>[#2]#3#4{%
+% \bgroup
+%  \def\@MTH@fboxsep{1pt}%
+%  \def\@MTH@fontsize{\scriptsize}%
+%  \let\@MTH@angle=\@empty%
+%  \def\@MTH@rotate{0}%
+%  \def\@MTH@pos{.5}%
+%  \def\@MTH@BG@color{white}%
+%  \def\@MTH@BG@transparent{transparent}%
+%  \setkeys{MTHenko}{#1}%
+%  \ifx\@MTH@BG@color\@MTH@BG@transparent
+%   \let\colorbox=\@gobble
+%  \fi
+%  \@@@Henko<#1>[#2]#3@{#4}%
+% \egroup
+%}%
+%\def\@@@Henko<#1>[#2]#3,#4@#5{%
+% %弧を描いた後に文字列を配置する
+% \ifx\@MTH@angle\@empty
+%  \draw[mydash,#2](#3)to[bend right](#4);
+% \else
+%  \draw[mydash,#2](#3)to[bend right=\@MTH@angle](#4);
+% \fi
+% \ifnum\@MTH@rotate=\z@
+% \else
+%%  \GetAngle{{$(#3)+(1,0)$},{#3},{#4}}\@MTH@rotate@angle
+%  \MathAtan{$(#4)-(#3)$}\@MTH@rotate@angle%\MathAtanは整数値を出力
+%  \@tempcnta=\numexpr90*(\@MTH@rotate-1)+\@MTH@rotate@angle\relax
+%  \edef\@MTH@rotate{\the\@tempcnta}%
+% \fi
+% \ifx\@MTH@angle\@empty
+%  \path[#2](#3)to[bend right]node[rotate=\@MTH@rotate,pos=\@MTH@pos]%
+%   {\fboxsep=\@MTH@fboxsep\colorbox{\@MTH@BG@color}{\@MTH@fontsize#5}}(#4);
+% \else
+%  \path[#2](#3)to[bend right=\@MTH@angle]node[rotate=\@MTH@rotate,pos=\@MTH@pos]%
+%   {\fboxsep=\@MTH@fboxsep\colorbox{\@MTH@BG@color}{\@MTH@fontsize#5}}(#4);
+% \fi
+%}%
+\NewDocumentCommand\Henko{D<>{}O{}mO{}m}{% 01/26/2016 配置文字列の前にオプションを設定
+ \def\@MTH@fboxsep{1pt}%
+ \def\@MTH@fontsize{\scriptsize}%
+ \let\@MTH@angle=\@empty%
+ \def\@MTH@rotate{0}%
+ \def\@MTH@pos{.5}%
+ \def\@MTH@BG@color{white}%
+ \def\@MTH@BG@transparent{transparent}%
+ \setkeys{MTHenko}{#1}%
+ \ifx\@MTH@BG@color\@MTH@BG@transparent
+  \let\colorbox=\@gobble
+ \fi
+ \@Henko[#2](#3)[#4]{#5}%
+% \@@@Henko<#1>[#2]#3@{#4}%
 }%
-\def\@@@Henko<#1>[#2]#3,#4@#5{%
+\def\@Henko{\@ifnextchar[{\@@Henko}{\@@Henko[]}}%
+\def\@@Henko[#1](#2,#3){\@ifnextchar[{\@@@Henko[#1](#2,#3)}{\@@@Henko[#1](#2,#3)[]}}%
+\def\@@@Henko[#1](#2,#3)[#4]#5{%
  %弧を描いた後に文字列を配置する
  \ifx\@MTH@angle\@empty
-  \draw[mydash,#2](#3)to[bend right](#4);
+  \draw[mydash,#1](#2)to[bend right](#3);
  \else
-  \draw[mydash,#2](#3)to[bend right=\@MTH@angle](#4);
+  \draw[mydash,#1](#2)to[bend right=\@MTH@angle](#3);
  \fi
  \ifnum\@MTH@rotate=\z@
  \else
 %  \GetAngle{{$(#3)+(1,0)$},{#3},{#4}}\@MTH@rotate@angle
-  \MathAtan{$(#4)-(#3)$}\@MTH@rotate@angle%\MathAtanは整数値を出力
+  \MathAtan{$(#3)-(#2)$}\@MTH@rotate@angle%\MathAtanは整数値を出力
   \@tempcnta=\numexpr90*(\@MTH@rotate-1)+\@MTH@rotate@angle\relax
   \edef\@MTH@rotate{\the\@tempcnta}%
  \fi
  \ifx\@MTH@angle\@empty
-  \path[#2](#3)to[bend right]node[rotate=\@MTH@rotate,pos=\@MTH@pos]%
-   {\fboxsep=\@MTH@fboxsep\colorbox{\@MTH@BG@color}{\@MTH@fontsize#5}}(#4);
+  \path[#1](#2)to[bend right]node
+   [rotate=\@MTH@rotate,pos=\@MTH@pos,fill=\@MTH@BG@color,font=\@MTH@fontsize,inner sep=\@MTH@fboxsep,#4]%
+   {#5}(#3);
  \else
-  \path[#2](#3)to[bend right=\@MTH@angle]node[rotate=\@MTH@rotate,pos=\@MTH@pos]%
-   {\fboxsep=\@MTH@fboxsep\colorbox{\@MTH@BG@color}{\@MTH@fontsize#5}}(#4);
+  \path[#1](#2)to[bend right=\@MTH@angle]node
+   [rotate=\@MTH@rotate,pos=\@MTH@pos,fill=\@MTH@BG@color,font=\@MTH@fontsize,inner sep=\@MTH@fboxsep,#4]%
+   {#5}(#3);
  \fi
 }%
 %% \RightAngle<#1>[#2]{#3}%
