@@ -5851,7 +5851,7 @@
 % \@ifnextchar/{\@gobble}{\@@@SetAngles[#1]{#2}}%
 %}%
 \define@key{SetAngles}{strings only}[true]{\def\@SA@stringonly{0}}%
-\RenewDocumentCommand\SetAngles{D<>{}O{}mO{}m}{%
+\NewDocumentCommand\SetAngles{D<>{}O{}mO{}m}{%
  \def\@SA@stringonly{1}%
  \setkeys{SetAngles}{#1}%
  \@SetAngles[#2][#4]{#3}#5;/%
