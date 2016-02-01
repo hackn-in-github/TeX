@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[01/26/2016 Ver.0.09997]%
+\ProvidesPackage{tikzsetup}[02/01/2016 Ver.0.09998]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -5831,21 +5831,39 @@
   \node at(\@HakoHige@Number,\@Hako@Total/\@HakoHige@Max){\@Hako@Med@Mark};
  \fi
 }%
-%% \SetAngles<#1>[#2]{#3}{#4}%
+%% \SetAngles<#1>[#2]{#3}[#4]{#5}% 02/01/2016 文字列にもオプションを与えられるようにする
+%%                             それに伴いオプションの位置を変更する
 %% #1:オリジナルオプション(今のところなし)
-%% #2:picのオプション
+%%  strings only:弧を描画しない
+%% #2:テキストに対するオプション
 %% #3:角におくテキスト
-%% #4:「始点,中心,終点」のセットを ; 区切りで記述
-\def\SetAngles{\@ifnextchar<{\@SetAngles}{\@SetAngles<>}}%
-\def\@SetAngles<#1>{%
- \@ifnextchar[{\@@SetAngles}{\@@SetAngles[]}%
+%% #4:picのオプション
+%% #5:「始点,中心,終点」のセットを ; 区切りで記述
+%\def\SetAngles{\@ifnextchar<{\@SetAngles}{\@SetAngles<>}}%
+%\def\@SetAngles<#1>{%
+% \@ifnextchar[{\@@SetAngles}{\@@SetAngles[]}%
+%}%
+%\def\@@SetAngles[#1]#2#3{%
+% \@@@SetAngles[#1]{#2}#3;/%
+%}%
+%\def\@@@SetAngles[#1]#2#3,#4,#5;{%
+% \path(#3)--(#4)--(#5)pic[draw,"#2",#1]{angle=#3--#4--#5};
+% \@ifnextchar/{\@gobble}{\@@@SetAngles[#1]{#2}}%
+%}%
+\define@key{SetAngles}{strings only}[true]{\def\@SA@stringonly{0}}%
+\RenewDocumentCommand\SetAngles{D<>{}O{}mO{}m}{%
+ \def\@SA@stringonly{1}%
+ \setkeys{SetAngles}{#1}%
+ \@SetAngles[#2][#4]{#3}#5;/%
 }%
-\def\@@SetAngles[#1]#2#3{%
- \@@@SetAngles[#1]{#2}#3;/%
-}%
-\def\@@@SetAngles[#1]#2#3,#4,#5;{%
- \path(#3)--(#4)--(#5)pic[draw,"#2",#1]{angle=#3--#4--#5};
- \@ifnextchar/{\@gobble}{\@@@SetAngles[#1]{#2}}%
+\def\@SetAngles[#1][#2]#3#4,#5,#6;{%
+ \ifcase\@SA@stringonly
+  \path(#4)--(#5)--(#6)pic[#2,"#3"'{#1}]{angle=#4--#5--#6};
+ \or
+  \path(#4)--(#5)--(#6)pic[draw,#2,"#3"'{#1}]{angle=#4--#5--#6};
+ \else
+ \fi
+ \@ifnextchar/{\@gobble}{\@SetAngles[#1][#2]{#3}}%
 }%
 %% \Touhenkigou<#1>[#2]{#3}%
 \define@key{Touhenkigou}{pos}{\def\@TK@Pos{#1}}%
