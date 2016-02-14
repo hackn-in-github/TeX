@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[02/01/2016 Ver.0.09998]%
+\ProvidesPackage{tikzsetup}[02/01/2016 Ver.0.09999]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -4948,6 +4948,8 @@
 %% #6:円2の半径
 %% #7:交点1と交点2の名前をカンマ(,)区切りで指定
 %%  ただし，#1でplusまたはminusを指定した場合は1点のみを指定
+%% 02/14/2016 plusおよびminusの判定で角#2が鈍角の場合は逆になるので
+%% 点#2を-90，90回転させていたのを点#4を90，-90回転に変更
 \define@key{CCIntersections}{plus}[true]{\def\@CCI@minus{0}}%
 \define@key{CCIntersections}{minus}[true]{\def\@CCI@plus{0}}%
 \NewDocumentCommand\CCIntersections{D<>{}mmmmm}{%
@@ -4958,13 +4960,13 @@
  \GetMathparse{sqrt((#3)^2-(\@T@)^2)}\@S@
  \SetPoint*{@C@($(#2)!\@T@/\@L@!(#4)$)}%
  \ifthenelse{\@CCI@plus=\@ne\AND\@CCI@minus=\z@}{%
-  \SetPoint*{#6($(@C@)!\@S@ cm!-90:(#2)$)}%
+  \SetPoint*{#6($(@C@)!\@S@ cm!90:(#4)$)}%
  }{}%
  \ifthenelse{\@CCI@plus=\z@\AND\@CCI@minus=\@ne}{%
-  \SetPoint*{#6($(@C@)!\@S@ cm!90:(#2)$)}%
+  \SetPoint*{#6($(@C@)!\@S@ cm!-90:(#4)$)}%
  }{}%
  \ifthenelse{\@CCI@plus=\@ne\AND\@CCI@minus=\@ne}{%
-  \SetPoint*{@X@($(@C@)!\@S@ cm!90:(#2)$);@Y@($(@C@)!\@S@ cm!-90:(#2)$)}%
+  \SetPoint*{@X@($(@C@)!\@S@ cm!90:(#4)$);@Y@($(@C@)!\@S@ cm!-90:(#4)$)}%
   \@CCIntersections#6\@nil
  }{}%
 }%
