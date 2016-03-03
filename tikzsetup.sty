@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[02/24/2016 Ver.0.099991]%
+\ProvidesPackage{tikzsetup}[02/24/2016 Ver.0.099992]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -709,8 +709,12 @@
 \let\oriendtable\endtable
 \def\解説display{\解説true}%
 \def\解説hidden{\解説false}%
-\def\解説{\@ifstar{\if解説\setcounter{equation}{0}\else\expandafter\@解説\fi}{\if解説\setcounter{equation}{0}\else\expandafter\@解説\fi}}
+\def\解説{%
+ \@ifstar{\if解説\resetcounter{equation}\resetcounter{figure}\resetcounter{table}\else\expandafter\@解説\fi}%
+	 {\if解説\resetcounter{equation}\resetcounter{figure}\resetcounter{table}\else\expandafter\@解説\fi}%
+}%
 \long\def\@解説#1\end#2{%
+ \resetcounter{equation}\resetcounter{figure}\resetcounter{table}%
  \def\temp@envname{#2}%
  \def\@env解説{解説}%
  \ifx\temp@envname\@env解説
