@@ -6802,6 +6802,21 @@
 	{quote,#2}%
 	{quote default,#2}%
 }%
+%% \Vec(*)を新規にTikZを利用して作成
+\NewDocumentCommand\SetVecStyle{m}{%
+ \def\@vec@style@{#1}%
+}%
+\SetVecStyle{Stealth[length=3.5pt]}%
+\RenewDocumentCommand\Vec{sm}{%
+ \tikz[baseline=(@X@.base)]{%
+  \IfBooleanTF{#1}{%
+   \node(@X@){$\mathstrut#2$};
+  }{%
+   \node(@X@)[inner xsep=0pt]{$\mathstrut$#2};
+  }%
+  \expandafter\draw\expandafter[\expandafter>\expandafter=\expandafter{\@vec@style@},->](@X@.north west)--(@X@.north east);
+ }%
+}%
 \let\Mark=\MarkBox
 %\let\refMark=\RefMarkBox
 \let\refMark=\RefMark
