@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzsetup}[02/24/2016 Ver.0.099993]%
+\ProvidesPackage{tikzsetup}[04/02/2016 Ver.0.099994]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenum
 \newif\ifdegree
@@ -4889,6 +4889,7 @@
 }%
 %% \Boushin<#1>{#2}{#3}% 12/23/2015 mytikzpicture環境のみから
 %%                                  すべてのtikzpicture環境で使用可に
+%%                       04/02/2016 \SetPointを\SetPoint*に修正
 %% #1:オリジナルオプション
 %%  radius name:傍接円の半径のコマンド名を指定[BR](ex. radius name=Vr)
 %% #2:三角形の3点をカンマ(,)区切りで指定
@@ -4907,13 +4908,13 @@
  \Veclen{$(#3)-(#1)$}\@B@b
  \GetMathparse{(\@B@c^2+\@B@a^2-\@B@b^2)/(2*\@B@c*\@B@a)}\@B@Cos@B
  \GetMathparse{(1/2)*(\@B@a+\@B@b+\@B@c)*sqrt(2/(\@B@Cos@B+1)-1)}\@BR@
- \SetPoint{@B@H($(#2)!{(\@B@a+\@B@b+\@B@c)/(2*\@B@a)}!(#3)$)}%
+ \SetPoint*{@B@H($(#2)!{(\@B@a+\@B@b+\@B@c)/(2*\@B@a)}!(#3)$)}%
  \Veclen{$(@B@H)!\@BR@ cm!90:(#2)-(#1)$}\@B@L@F
  \Veclen{$(@B@H)!\@BR@ cm!-90:(#2)-(#1)$}\@B@L@S
  \ifdim\@B@L@F pt<\@B@L@S pt\relax
-  \SetPoint{#4($(@B@H)!\@BR@ cm!90:(#2)$)}%
+  \SetPoint*{#4($(@B@H)!\@BR@ cm!90:(#2)$)}%
  \else
-  \SetPoint{#4($(@B@H)!\@BR@ cm!-90:(#2)$)}%
+  \SetPoint*{#4($(@B@H)!\@BR@ cm!-90:(#2)$)}%
  \fi
  \expandafter\let\csname\@R@Name@\endcsname=\@BR@
 }%
