@@ -1,0 +1,77 @@
+%#!xelatex -synctex=1 filename
+%#!xelatex --jobname=前期/filename-fig1 filename
+%#!uplatex -shell-escape filename
+%#!uplatex filename
+%#LPR dvipdfmx -p a4 -r 1200 filename
+% #LPR dvips -Ppdf -f filename.dvi | lpr
+%#MAKEINDEX mendex -g -s mystyle.ist filename
+%#!platex -shell-escape filename
+%#!platex filename
+%%% sudo tlmgr update --self --all
+\documentclass[a4j,xelatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
+%\XeTeXgenerateactualtext=1 %PDF ファイルの検索やコピー & ペーストがうまく動作しない場合指定
+\usepackage{metalogo} % \XeLaTeX ロゴのため
+\usepackage{zxjatype}
+\setjamainfont{IPAexMincho}
+\setjasansfont{IPAexGothic}
+\setjamonofont{IPAexGothic}
+%\setjamainfont{TakaoPMincho}
+%\setjasansfont{TakaoPGothic}
+%\setjamonofont{TakaoGothic}
+%\setjamainfont{mikachan-P}
+%\setjasansfont{mikachan-PB}
+%\setjamonofont{mikachan}
+%\setjamainfont{Migu 1P}
+%\setjasansfont{Migu 1P}
+%\setjamonofont{Migu 1M}
+%\setjamainfont{M+ 1p}
+%\setjasansfont{M+ 1p}
+%\setjamonofont{M+ 1m}
+\makeatletter
+\newif\ifpapersize
+\newif\if@jsclass
+\newif\iftombow
+\makeatother
+\newlength{\zh}
+\setlength{\zh}{1\zw}
+%% \ruby対策 %%
+\newlength\kanjiskip
+\newlength\xkanjiskip
+%%%%%%%%%%%%%%
+\usepackage{emath,EMproof,emathMw}
+%---- mathabx使用時に指定
+\let\therefore\relax
+\let\because\relax
+\usepackage{mathabx}%
+%---------------------
+%\usepackage{newtxmath,newtxtext}%
+%\usepackage{mathptmx}%newtxの方がいいかな？
+\let\EMforeach=\foreach
+\MWsep{4pt}%
+\usepackage{tikzxelatexsetup}
+\hypersetup{%
+ bookmarksnumbered=true,%
+ colorlinks=true,%
+ setpagesize=false,%
+ pdftitle={},%
+ pdfauthor={飯島　徹},%
+ pdfsubject={},%
+ pdfkeywords={}%
+}%
+%\title{{\XeLaTeX}で日本語文書}
+%\author{七篠\ 権兵衛}
+% \today の出力はJSクラスと同様に西暦になる
+%(1)二行ならべる
+%(2)ベースライン間の距離が\baselineskipになるようにする
+%(3)上の行の「下端」と下の行の「上端」の間の縦方向の距離を測る
+%(4)(3)で測定した値と\lineskiplimitを比較する
+%(4-1)(3)の値>\lineskipならばそのまま
+%(4-2)そうでなければ，上の行の「下端」と下の行の「上端」の間を\lineskipにする
+\pagestyle{myfoot}%
+\lineskiplimit=1pt\relax
+\lineskip=2pt\relax
+\pgfrealjobname{filename}%
+\SetPath{前期/}%
+%\includeonly{}%
+\begin{document}
+\end{document}
