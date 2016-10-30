@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[10/04/2016 Ver.0.099997]%
+\ProvidesPackage{tikzxelatexsetup}[10/31/2016 Ver.0.099998]%
 %\Zahyoの括弧の調整10/28/2013
 \newbox\mybox
 \newif\ifenum
@@ -94,14 +94,16 @@
 \def\ps@Number{%
  \def\@oddhead{\@HeadNumberHead\hfil}%
  \def\@evenhead{\@oddhead}%
- \def\@oddfoot{\hfil--\enskip\thepage\enskip--\hfil}%
- \def\@evenfoot{\@oddfoot}}%
+% \def\@oddfoot{\hfil--\enskip\thepage\enskip--\hfil}% 20161031 フッタの定義を削除
+% \def\@evenfoot{\@oddfoot}%
+}%
 %
 \def\ps@Numtext{%
  \def\@oddhead{\@HeadNumberHead\hfil}%
  \def\@evenhead{\@oddhead}%
- \def\@oddfoot{\hfil{\large\bf--\enskip\thepage\enskip--}\hfil}%
- \def\@evenfoot{\@oddfoot}}%
+% \def\@oddfoot{\hfil{\large\bf--\enskip\thepage\enskip--}\hfil}% 20161031 フッタの定義を削除
+% \def\@evenfoot{\@oddfoot}%
+}%
 %
 \def\HeadNumber{%
 % \@ifstar{\clearpage\addtocounter{BAN}{1}\setcounter{Ban}{1}\@HeadNumber}%
