@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[10/31/2016 Ver.0.099998]%
+\ProvidesPackage{tikzxelatexsetup}[11/2/2016 Ver.0.099999]%
 %\Zahyoの括弧の調整10/28/2013
 \newbox\mybox
 \newif\ifenum
@@ -6493,13 +6493,15 @@
 \newcounter{MarkEnd}%
 \NewDocumentCommand\MarkBoxReset{s}{%
  \CenterWritetrue
- \resetcounter{MarkFirst}%
- \resetcounter{MarkEnd}%
- \resetcounter{equation}%
- \resetcounter{figure}%
- \resetcounter{table}%
- \IfBooleanF{#1}{% 12/07/2015 アスタリスクによる判定を追加
-  \immediate\openout\MarkAnswerWrite\jobname.ans
+ \immediate\openout\MarkAnswerWrite\jobname.ans
+  \IfBooleanF{#1}{% 12/07/2015 アスタリスクによる判定を追加
+% 2016/11/2 \openout と カウンタのリセットを入れ替える
+%           \MarkBoxReset*でカウンタはそのままで解答出力はリセットされる
+  \resetcounter{MarkFirst}%
+  \resetcounter{MarkEnd}%
+  \resetcounter{equation}%
+  \resetcounter{figure}%
+  \resetcounter{table}%
  }%
 }%
 %\mdfdefinestyle{PutMarkAnswerStyle}%
