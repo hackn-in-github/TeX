@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/4/2016 Ver.0.0999991]%
+\ProvidesPackage{tikzxelatexsetup}[11/16/2016 Ver.0.0999992]%
 %\Zahyoの括弧の調整10/28/2013
 \newcounter{tempeq}%
 \newcounter{temptable}%
@@ -21,11 +21,11 @@
 %\RequirePackage{hhline}%
 %\RequirePackage{itembbox}% 01/26/2016 削除
 %\RequirePackage{cases}% 01/26/2016 削除
-\RequirePackage{hyperref,xparse,amsmath,graphicx,tikz,array,hhline,cases,tikz,tcolorbox}%
+\RequirePackage{hyperref,xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox}%
 \usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
 	patterns,topaths,through,calc,intersections,%
 	shapes.geometric,shapes.misc,shapes.multipart,chains,angles,quotes,%
-	arrows.meta,bending}
+	arrows.meta,bending,math}% 2016/11/16 math を追加
 \tcbuselibrary{breakable,xparse,skins}%
 \RequirePackage[framemethod=tikz]{mdframed}%
 %%%\myPerlLib{my.pl;nCr.pl}%
@@ -3561,37 +3561,59 @@
  \expandafter\@GetAngle#1@#2%
 }%
 \def\@GetAngle#1,#2,#3@#4{%
- \coordinate(@GA1@)at(#1);%
- \coordinate(@GA2@)at(#2);%
- \coordinate(@GA3@)at(#3);%
- \path let \p0=($(@GA1@)-(@GA2@)$),\p1=($(@GA3@)-(@GA2@)$) in node{%
-% \path let \p0=($(#1)-(#2)$),\p1=($(#3)-(#2)$) in node{%
-  \pgfmathparse{atan2(\y1,\x1)-atan2(\y0,\x0)}%
-  \ifdim\pgfmathresult pt>360pt\relax
-   \pgfmathparse{\pgfmathresult-360}%
-  \fi
-  \ifdim\pgfmathresult pt<0pt\relax
-   \pgfmathparse{\pgfmathresult+360}%
-  \fi
-  \global\let#4=\pgfmathresult
- };%
+ \tikzmath{%
+  real \@x;
+  coordinate \@c;
+  \@c1=($(#1)-(#2)$);
+  \@c2=($(#3)-(#2)$);
+  \@x=atan2(\@cy2,\@cx2)-atan2(\@cy1,\@cx1);
+  if \@x>360 then {\@x=\@x-360;};%
+  if \@x<0 then {\@x=360+\@x;};%
+ }%
+ \let#4\@x%
 }%
+%\def\@GetAngle#1,#2,#3@#4{%
+% \coordinate(@GA1@)at(#1);%
+% \coordinate(@GA2@)at(#2);%
+% \coordinate(@GA3@)at(#3);%
+% \path let \p0=($(@GA1@)-(@GA2@)$),\p1=($(@GA3@)-(@GA2@)$) in node{%
+%% \path let \p0=($(#1)-(#2)$),\p1=($(#3)-(#2)$) in node{%
+%  \pgfmathparse{atan2(\y1,\x1)-atan2(\y0,\x0)}%
+%  \ifdim\pgfmathresult pt>360pt\relax
+%   \pgfmathparse{\pgfmathresult-360}%
+%  \fi
+%  \ifdim\pgfmathresult pt<0pt\relax
+%   \pgfmathparse{\pgfmathresult+360}%
+%  \fi
+%  \global\let#4=\pgfmathresult
+% };%
+%}%
 %% \MathAtan{#1}#2
 %% 原点と点(#1)とのなす角を0から360の範囲で計算したものを#2に格納する
 %% 小数第1位を四捨五入している
 \def\MathAtan#1#2{%
- \path let \p0=(#1) in
-  node{%
-   \pgfmathparse{atan2(\y0,\x0)}%
-   \let\@MT@atan=\pgfmathresult
-   \ifdim\@MT@atan pt<0pt\relax
-    \pgfmathparse{360+\@MT@atan}%
-    \let\@MT@atan=\pgfmathresult
-   \fi
-   \pgfmathroundto{\@MT@atan}%
-   \xdef#2{\pgfmathresult}%
-  };%
+ \tikzmath{%
+  real \@x;
+  coordinate \@c;
+  \@c=(#1);
+  \@x=atan2(\@cy,\@cx);
+  if \@x<0 then {\@x=360+\@x;};
+ }%
+ \let#2\@x
 }%
+%\def\MathAtan#1#2{%
+% \path let \p0=(#1) in
+%  node{%
+%   \pgfmathparse{atan2(\y0,\x0)}%
+%   \let\@MT@atan=\pgfmathresult
+%   \ifdim\@MT@atan pt<0pt\relax
+%    \pgfmathparse{360+\@MT@atan}%
+%    \let\@MT@atan=\pgfmathresult
+%   \fi
+%   \pgfmathroundto{\@MT@atan}%
+%   \xdef#2{\pgfmathresult}%
+%  };%
+%}%
 %% \ASector<#1>[#2]{#3}{#4}%
 %% A(ngle)Sector:開始点と終了点の角度を指定する扇形
 %% ex:\ASector{O}{2}{30,90}%
@@ -3642,11 +3664,19 @@
 \def\@@@PSector#1,#2@<#3>[#4]#5{%
  \GetAngle{{#1},{#5},{#2}}\@PS@DeltaAngle
  \GetAngle{{$(#5)+(1,0)$},{#5},{#1}}\@PS@StartAngle
- \pgfmathparse{\@PS@StartAngle+\@PS@DeltaAngle}%
- \let\@PS@EndAngle=\pgfmathresult
- \path let \p0=($(#5)-(#1)$),\n0={veclen(\x0,\y0)} in node{%
-  \xdef\@PS@Radius{\n0}%
- };%
+% \pgfmathparse{\@PS@StartAngle+\@PS@DeltaAngle}%
+% \let\@PS@EndAngle=\pgfmathresult
+% \path let \p0=($(#5)-(#1)$),\n0={veclen(\x0,\y0)} in node{%
+%  \xdef\@PS@Radius{\n0}%
+% };%
+ \tikzmath{%
+  real \@PS@EndAngle, \@PS@Radius;
+  coordinate \@PS@P, \@E;
+  \@PS@P=($(#5)-(#1)$);
+  \@E=(1,1);
+  \@PS@EndAngle=\@PS@StartAngle+\@PS@DeltaAngle;
+  \@PS@Radius=veclen(\@PS@Px/\@Ex,\@PS@Py/\@Ey);
+ }%
  \ASector<#3>[#4]{#5}{\@PS@Radius}{\@PS@StartAngle,\@PS@EndAngle}%
 }%
 %% \DSector<#1>[#2]{#3}{#4}{#5}%
@@ -3663,9 +3693,17 @@
 \def\@DSector<#1>{\@ifnextchar[{\@@DSector<#1>}{\@@DSector<#1>[]}}%
 \def\@@DSector<#1>[#2]#3#4#5{%
  \GetAngle{{$(#3)+(1,0)$},#3,#4}\@DS@StartAngle
- \pgfmathparse{\@DS@StartAngle+#5}%
- \let\@DS@EndAngle=\pgfmathresult
- \path let \p0=($(#4)-(#3)$),\n0={veclen(\x0,\y0)} in node{\xdef\@DS@Radius{\n0}};%
+ \tikzmath{%
+  real \@DS@EndAngle, \@DS@Radius;
+  coordinate \@DS@P, \@E;
+  \@DS@P=($(#4)-(#3)$);
+  \@E=(1,1);
+  \@DS@EndAngle=\@DS@StartAngle+#5;
+  \@DS@Radius=veclen(\@DS@Px/\@Ex,\@DS@Py/\@Ey);
+ }%
+% \pgfmathparse{\@DS@StartAngle+#5}%
+% \let\@DS@EndAngle=\pgfmathresult
+% \path let \p0=($(#4)-(#3)$),\n0={veclen(\x0,\y0)} in node{\xdef\@DS@Radius{\n0}};%
  \ASector<#1>[#2]{#3}{\@DS@Radius}{\@DS@StartAngle,\@DS@EndAngle}%
 }%
 %% \Bunten<#1>[#2]{#3}{#4}%
@@ -3975,11 +4013,19 @@
 %% \Veclen{#1}#2
 %% ex:\Veclen{A}\hoge
 \def\Veclen#1#2{%
- \path let \p0=(#1) in node
-  {%
-   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
-   \xdef#2{\pgfmathresult}%
-  };%
+ \tikzmath{%
+  coordinate \@P;
+  real \@x;
+  \@P1=(#1);
+  \@P2=(1,1);
+  \@x=veclen(\@Px1/\@Px2,\@Py1/\@Py2);
+ }%
+ \let#2\@x
+% \path let \p0=(#1) in node
+%  {%
+%   \pgfmathparse{sqrt(pow(\x0/28.45274,2)+pow(\y0/28.45274,2))}%
+%   \xdef#2{\pgfmathresult}%
+%  };%
 }%
 %% \VecLen{#1,#2}#3
 %% ex:\VecLen{A,B}\hoge
@@ -4993,13 +5039,21 @@
  }{}%
 }%
 \def\@CCIntersections#1,#2\@nil{%
- \path let \p0=(@X@),\p1=(@Y@) in node{%
-  \pgfmathparse{int(\x0-\x1)}%
-  \global\let\@CCI@DX=\pgfmathresult
-  \pgfmathparse{int(\y0-\y1)}%
-  \global\let\@CCI@DY=\pgfmathresult
- };%
-%\node {\@CCI@DX/\@CCI@DY};
+ \tikzmath{%
+  int \@CCI@DX, \@CCI@DY;
+  coordinate \@P;
+  \@P0=(@X@);
+  \@P1=(@Y@);
+  \@CCI@DX=int(\@Px0-\@Py1);
+  \@CCI@DY=int(\@Py0-\@Py1);
+ }%
+% \path let \p0=(@X@),\p1=(@Y@) in node{%
+%  \pgfmathparse{int(\x0-\x1)}%
+%  \global\let\@CCI@DX=\pgfmathresult
+%  \pgfmathparse{int(\y0-\y1)}%
+%  \global\let\@CCI@DY=\pgfmathresult
+% };%
+%%\node {\@CCI@DX/\@CCI@DY};
  \ifnum\@CCI@DX=\z@\relax
   \ifnum\@CCI@DY<\z@\relax
    \SetPoint*{#1(@X@);#2(@Y@)}%
@@ -5161,17 +5215,28 @@
   \path[name path=@CVI@C](#3)circle[radius=#4];
   \expandafter\Vline\expandafter<\@MTI@noline>[#2]{#5}{#6}{@CVI@L}%
   \path[name intersections={of=@CVI@C and @CVI@L,name=@X@}];
-  \path let \p0=(@X@-1),\p1=(@X@-2) in node
-   {%
-    \pgfmathparse{\x0/28.45274}%
-    \xdef\@CVI@AX{\pgfmathresult}%
-    \pgfmathparse{\y0/28.45274}%
-    \xdef\@CVI@AY{\pgfmathresult}%
-    \pgfmathparse{\x1/28.45274}%
-    \xdef\@CVI@BX{\pgfmathresult}%
-    \pgfmathparse{\y1/28.45274}%
-    \xdef\@CVI@BY{\pgfmathresult}%
-   };%
+  \tikzmath{%
+   coordinate \@P,\@E;
+   real \@CVI@AX,\@CVI@AY,\@CVI@BX,\@CVI@BY;
+   \@P0=(@X@-1);
+   \@P1=(@X@-2);
+   \@E=(1,1);
+   \@CVI@AX=\@Px0/\@Ex;
+   \@CVI@AY=\@Py0/\@Ey;
+   \@CVI@BX=\@Px1/\@Ex;
+   \@CVI@BX=\@Py1/\@Ey;
+  }%
+%  \path let \p0=(@X@-1),\p1=(@X@-2) in node
+%   {%
+%    \pgfmathparse{\x0/28.45274}%
+%    \xdef\@CVI@AX{\pgfmathresult}%
+%    \pgfmathparse{\y0/28.45274}%
+%    \xdef\@CVI@AY{\pgfmathresult}%
+%    \pgfmathparse{\x1/28.45274}%
+%    \xdef\@CVI@BX{\pgfmathresult}%
+%    \pgfmathparse{\y1/28.45274}%
+%    \xdef\@CVI@BY{\pgfmathresult}%
+%   };%
   \ifdim\@CVI@AX pt=\@CVI@BX pt\relax
    \ifdim\@CVI@AY pt<\@CVI@BY pt\relax
     \coordinate(#7)at(@X@-1);
@@ -5453,14 +5518,24 @@
 % #2:#1のx座標を与える制御綴
 % #3:#1のy座標を与える制御綴
 \def\GetCoordinate#1#2#3{%
- \coordinate(@GCC@)at(#1);%
- \path let \p0=(@GCC@) in node
-  {%
-   \pgfmathparse{\x0/28.45274}%
-   \xdef#2{\pgfmathresult}%
-   \pgfmathparse{\y0/28.45274}%
-   \xdef#3{\pgfmathresult}%
-  };%
+ \tikzmath{%
+  coordinate \@P;
+  real \@coor;
+  \@P0=(#1);
+  \@P1=(1,1);
+  \@coor{x}=\@Px0/\@Py1;
+  \@coor{y}=\@Py0/\@Py1;
+  }%
+ \edef#2{\@coor{x}}%
+ \edef#3{\@coor{y}}%
+% \coordinate(@GCC@)at(#1);%
+% \path let \p0=(@GCC@) in node
+%  {%
+%   \pgfmathparse{\x0/28.45274}%
+%   \xdef#2{\pgfmathresult}%
+%   \pgfmathparse{\y0/28.45274}%
+%   \xdef#3{\pgfmathresult}%
+%  };%
 }%
 %% Attention環境 01/01/2016改ページされた時の不具合などによりtcolorboxに移行
 % 枠の外のマージンを指定
