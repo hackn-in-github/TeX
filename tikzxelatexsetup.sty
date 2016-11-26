@@ -6955,9 +6955,8 @@
 \def\@EqualArcsMarks<#1>[#2]#3#4,#5;{%
  \tikzmath{%
   coordinate \@C;
-  real \@ang,\@radius;
-  \@C{F}=(#4);\@C{E}=(#5);\@C{K}=($(#4)-(#3)$);\@C{D}=($(#5)-(#4)$);
-  \@radius=veclen(\@Cx{K},\@Cy{K});
+  real \@ang;
+  \@C{F}=(#4);\@C{E}=(#5);\@C{D}=($(#5)-(#4)$);
   \@ang{Mark}=atan2(\@Cy{D},\@Cx{D})+90;
   \@ang{M}=(atan2(\@Cy{E},\@Cx{E})-atan2(\@Cy{F},\@Cx{F}))/2;
  }%
