@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/16/2016 Ver.0.0999992]%
+\ProvidesPackage{tikzxelatexsetup}[11/27/2016 Ver.0.0999993]%
 %\Zahyoの括弧の調整10/28/2013
 \newcounter{tempeq}%
 \newcounter{temptable}%
@@ -6924,6 +6924,46 @@
  \else
   \vbox{\hbox to\wd\mybox{\hfill\box0\hfill}\box\mybox}%
  \fi
+}%
+\tikzset{
+ pics/eqbar/.style={%
+  foreground code=%
+   {\foreach\N in {1,...,#1}{\draw(-3pt,{((#1-1)/2-(\N-1))*2pt})--+(6pt,0);}%
+   }%
+ },%
+ pics/eqbar/.default={2},%
+}
+\makeatletter
+% \EqualSidesMarks<num>[tikz option]{A,B;C,D;E,F;...}
+\NewDocumentCommand\EqualSidesMarks{D<>{2}O{}m}{%
+ \@EqualSidesMarks<#1>[#2]#3;/%
+}%
+\def\@EqualSidesMarks<#1>[#2]#3,#4;{%
+ \tikzmath{%
+  coordinate \@C;
+  real \@ang;
+  \@C{D}=($(#4)-(#3)$);
+  \@C{M}=($1/2*(#3)+1/2*(#4)$);
+  \@ang=atan2(\@Cy{D},\@Cx{D})+90;
+ }%
+ \pic at(\@C{M})[rotate=\@ang,#2]{eqbar=#1};
+ \@ifnextchar/{\@gobble}{\@EqualSidesMarks<#1>[#2]}%
+}%
+% \EqualArcsMarks<num>[tikz option]{中心}{A,B;C,D;E,F;...}
+\NewDocumentCommand\EqualArcsMarks{D<>{2}O{}mm}{%
+ \@EqualArcsMarks<#1>[#2]{#3}#4;/%
+}%
+\def\@EqualArcsMarks<#1>[#2]#3#4,#5;{%
+ \tikzmath{%
+  coordinate \@C;
+  real \@ang,\@radius;
+  \@C{F}=(#4);\@C{E}=(#5);\@C{K}=($(#4)-(#3)$);\@C{D}=($(#5)-(#4)$);
+  \@radius=veclen(\@Cx{K},\@Cy{K});
+  \@ang{Mark}=atan2(\@Cy{D},\@Cx{D})+90;
+  \@ang{M}=(atan2(\@Cy{E},\@Cx{E})-atan2(\@Cy{F},\@Cx{F}))/2;
+ }%
+ \pic at($(#3)!1!\@ang{M}:(#4)$)[rotate=\@ang{Mark},#2]{eqbar=#1};
+ \@ifnextchar/{\@gobble}{\@EqualArcsMarks<#1>[#2]{#3}}%
 }%
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
