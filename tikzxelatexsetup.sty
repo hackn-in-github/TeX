@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/27/2016 Ver.0.0999993]%
+\ProvidesPackage{tikzxelatexsetup}[11/27/2016 Ver.0.0999994]%
 %\Zahyoの括弧の調整10/28/2013
 \newcounter{tempeq}%
 \newcounter{temptable}%
@@ -6932,7 +6932,7 @@
    }%
  },%
  pics/eqbar/.default={2},%
-}
+}%
 % \EqualSidesMarks<num>[tikz option]{A,B;C,D;E,F;...}
 \NewDocumentCommand\EqualSidesMarks{D<>{2}O{}m}{%
  \@EqualSidesMarks<#1>[#2]#3;/%
@@ -6956,9 +6956,10 @@
  \tikzmath{%
   coordinate \@C;
   real \@ang;
-  \@C{F}=(#4);\@C{E}=(#5);\@C{D}=($(#5)-(#4)$);
+  \@C{D}=($(#5)-(#4)$);
+  \@C{CF}=($(#4)-(#3)$);\@C{CE}=($(#5)-(#3)$);
   \@ang{Mark}=atan2(\@Cy{D},\@Cx{D})+90;
-  \@ang{M}=(atan2(\@Cy{E},\@Cx{E})-atan2(\@Cy{F},\@Cx{F}))/2;
+  \@ang{M}=(atan2(\@Cy{CE},\@Cx{CE})-atan2(\@Cy{CF},\@Cx{CF}))/2;
  }%
  \pic at($(#3)!1!\@ang{M}:(#4)$)[rotate=\@ang{Mark},#2]{eqbar=#1};
  \@ifnextchar/{\@gobble}{\@EqualArcsMarks<#1>[#2]{#3}}%
