@@ -6978,6 +6978,7 @@
   \@ang{Mark}=atan2(\@Cy{D},\@Cx{D})+90;
   \@ang{M}=(atan2(\@Cy{CE},\@Cx{CE})-atan2(\@Cy{CF},\@Cx{CF}))/2;
   if \@ang{M}<0 then{\@ang{M}=\@ang{M}+180;};
+  if \@ang{M}>90 then{\@ang{M}=\@ang{M}-180;};
   if \@EAMflag==1 then{\@ang{M}=\@ang{M}+180;};
  }%
  \pic at($(#3)!1!\@ang{M}:(#4)$)[rotate=\@ang{Mark},#2]{eqbar=#1};
