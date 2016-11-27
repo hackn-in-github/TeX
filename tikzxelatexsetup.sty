@@ -6925,15 +6925,21 @@
   \vbox{\hbox to\wd\mybox{\hfill\box0\hfill}\box\mybox}%
  \fi
 }%
+% \pic at(A)[rotate=60]{eqbar};
+% などと指定する
+% デフォルトでは記号が2本であるがこれを変更する場合eqbar=3などと指定する
 \tikzset{
  pics/eqbar/.style={%
   foreground code=%
-   {\foreach\N in {1,...,#1}{\draw(-3pt,{((#1-1)/2-(\N-1))*2pt})--+(6pt,0);}%
+   {\foreach\@EBN in {1,...,#1}{\draw(-3pt,{((#1-1)/2-(\@EBN-1))*2pt})--+(6pt,0);}%
    }%
  },%
  pics/eqbar/.default={2},%
 }%
 % \EqualSidesMarks<num>[tikz option]{A,B;C,D;E,F;...}
+% デフォルトで記号の数は2個(変更するときは<num>のnumに正の整数値を指定する)
+% 記号の大きさは[tikz option]に線の長さの調節はxscale
+% 線の間隔の調節はyscaleを指定する
 \NewDocumentCommand\EqualSidesMarks{D<>{2}O{}m}{%
  \@EqualSidesMarks<#1>[#2]#3;/%
 }%
@@ -6949,10 +6955,21 @@
  \@ifnextchar/{\@gobble}{\@EqualSidesMarks<#1>[#2]}%
 }%
 % \EqualArcsMarks<num>[tikz option]{中心}{A,B;C,D;E,F;...}
+% デフォルトで記号の数は2個(変更するときは<num>のnumに正の整数値を指定する)
+% 記号の大きさは[tikz option]に線の長さの調節はxscale
+% 線の間隔の調節はyscaleを指定する
+% (恐らく)劣弧に対して等弧記号をつけるようにしているが
+% 優弧に対して付けたい場合または不具合で劣弧に対してついていない場合は
+% 弧を示す2点の先頭に*(アスタリスク)をつける
+% 例えば優弧ABに等弧記号をつける場合は「*A,B」と指定する
 \NewDocumentCommand\EqualArcsMarks{D<>{2}O{}mm}{%
  \@EqualArcsMarks<#1>[#2]{#3}#4;/%
 }%
-\def\@EqualArcsMarks<#1>[#2]#3#4,#5;{%
+\def\@EqualArcsMarks<#1>[#2]#3{%
+ \@ifstar{\def\@EAMflag{1}\@@EqualArcsMarks<#1>[#2]{#3}}%
+         {\def\@EAMflag{0}\@@EqualArcsMarks<#1>[#2]{#3}}%
+}%
+\def\@@EqualArcsMarks<#1>[#2]#3#4,#5;{%
  \tikzmath{%
   coordinate \@C;
   real \@ang;
@@ -6960,6 +6977,8 @@
   \@C{CF}=($(#4)-(#3)$);\@C{CE}=($(#5)-(#3)$);
   \@ang{Mark}=atan2(\@Cy{D},\@Cx{D})+90;
   \@ang{M}=(atan2(\@Cy{CE},\@Cx{CE})-atan2(\@Cy{CF},\@Cx{CF}))/2;
+  if \@ang{M}<0 then{\@ang{M}=\@ang{M}+180;};
+  if \@EAMflag==1 then{\@ang{M}=\@ang{M}+180;};
  }%
  \pic at($(#3)!1!\@ang{M}:(#4)$)[rotate=\@ang{Mark},#2]{eqbar=#1};
  \@ifnextchar/{\@gobble}{\@EqualArcsMarks<#1>[#2]{#3}}%
