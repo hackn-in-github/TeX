@@ -6895,6 +6895,12 @@
 	{quote,#2}%
 	{quote default,#2}%
 }%
+\tcbset{%
+ Framebox/.style={colframe=black,colback=white,arc=0pt}%
+}%
+\NewTColorBox{tcbFramebox}{O{}m}{%
+ IfValueTF={#2}{title={#2},Framebox,#1}{Framebox,#1}%
+}%
 %% \Vec(*)を新規にTikZを利用して作成
 \NewDocumentCommand\SetVecStyle{m}{%
  \def\@vec@style@{#1}%
