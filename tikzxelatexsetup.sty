@@ -1,6 +1,9 @@
 %Setup
 \ProvidesPackage{tikzxelatexsetup}[12/14/2016 Ver.0.0999995]%
 %\Zahyoの括弧の調整10/28/2013
+\newif\ifenumitem
+\DeclareOption{enumitem}{\enumitemtrue}%
+\ProcessOptions\relax
 \newcounter{tempeq}%
 \newcounter{temptable}%
 \newcounter{tempfig}%
@@ -6991,7 +6994,6 @@
  \@ifnextchar/{\@gobble}{\@EqualArcsMarks<#1>[#2]{#3}}%
 }%
 %% enumerate環境をすべてenumitemに移管 12/14/2016
-\RequirePackage[shortlabels,inline]{enumitem}%
 \def\あいう#1{\expandafter\@あいう\csname c@#1\endcsname}%
 \def\@あいう#1{\ifcase#1\or %
 あ\or い\or う\or え\or お\or か\or き\or く\or け\or こ\or%
@@ -7028,6 +7030,8 @@
 E\or F\or G\or H\or I\or J\or K\or L\or M\or N\or O\or P\or Q\or R\or
 S\or T\or U\or V\or W\or X\or Y\or Z\else\@ctrerr\fi}%
 \def\@incircle[#1]#2{\@@cnum{#1{#2}}}%
+\ifenumitem
+\RequirePackage[shortlabels,inline]{enumitem}%
 \AddEnumerateCounter{\あいう}{\@あいう}{あ}%
 \AddEnumerateCounter{\アイウ}{\@アイウ}{ア}%
 \AddEnumerateCounter{\いろは}{\@いろは}{い}%
@@ -7062,6 +7066,9 @@ S\or T\or U\or V\or W\or X\or Y\or Z\else\@ctrerr\fi}%
 \setlist[betaenumerate,3]{label=(\alph*)}%
 \setlist[betaenumerate,4]{label=(\Roman*)}%
 \setlist[betaenumerate,5]{label=(\Alph*)}%
+\else
+\RequirePackage{emathEy}%
+\fi
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
 %\prebreakpenalty`．=10000
