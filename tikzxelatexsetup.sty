@@ -7066,6 +7066,11 @@ S\or T\or U\or V\or W\or X\or Y\or Z\else\@ctrerr\fi}%
 \setlist[betaenumerate,3]{label=(\alph*)}%
 \setlist[betaenumerate,4]{label=(\Roman*)}%
 \setlist[betaenumerate,5]{label=(\Alph*)}%
+\newlist{centerenum}{enumerate}{10}%
+\newlist{centerenum*}{enumerate*}{10}%
+\setlist[centerenum]{label=\protect\InEll{\CenterNumbering*}}%
+\setlist[centerenum*]{label=\protect\InEll{\CenterNumbering*},%before=\\,%
+   afterlabel={\hspace{.75\zw}},itemjoin=\hspace{\betaafterlabel}}%
 \else
 \RequirePackage{emathEy}%
 \fi
