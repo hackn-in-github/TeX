@@ -6993,6 +6993,25 @@
  \pic at($(#3)!1!\@ang{M}:(#4)$)[rotate=\@ang{Mark},#2]{eqbar=#1};
  \@ifnextchar/{\@gobble}{\@EqualArcsMarks<#1>[#2]{#3}}%
 }%
+% \IncludePDF{#1}
+% \PATH#1に#1のdpthファイルが存在したらそれを読み込みその分ベースラインから下げる
+% #1.dpthファイルが存在しなければ#1をただ読みこむだけ
+\newread\pdf@depthfile
+\NewDocumentCommand\GetDepthFileName{m m}{%
+ \@GetDepthFileName{#2}#1
+}%
+\def\@GetDepthFileName#1#2.pdf{\def#1{#2.dpth}}%
+\NewDocumentCommand\IncludePDF{m}{%
+ \GetDepthFileName{\PATH#1}\@PDFDepthFile
+ \IfFileExists{\@PDFDepthFile}{%
+  \immediate\openin\pdf@depthfile=\@PDFDepthFile
+  \read\pdf@depthfile to\@PDFDepth
+  \immediate\closein\pdf@depthfile
+  \raisebox{-\@PDFDepth}{\includegraphics{\PATH#1}}%
+ }{%
+  \includegraphics{\PATH#1}%
+ }%
+}%
 %% enumerate環境をすべてenumitemに移管 12/14/2016
 \def\あいう#1{\expandafter\@あいう\csname c@#1\endcsname}%
 \def\@あいう#1{\ifcase#1\or %
