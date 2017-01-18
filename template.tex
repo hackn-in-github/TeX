@@ -34,13 +34,13 @@
 \newif\ifpapersize
 \newif\if@jsclass
 \newif\iftombow
-\makeatother
-\newlength{\zh}
-\setlength{\zh}{1\zw}
 %% \ruby対策 %%
-\newlength\kanjiskip
-\newlength\xkanjiskip
+\@ifundefined{kanjiskip}{\newlength\kanjiskip}{}%
+\@ifundefined{xkanjiskip}{\newlength\xkanjiskip}{}%
 %%%%%%%%%%%%%%
+\@ifundefined{zh}{\newlength\zh}{}%
+\makeatother
+\setlength{\zh}{1\zw}
 \usepackage{emath,EMproof,emathMw}
 %% edaenumerate環境の上部の間隔設定 edatopsep=-1\zh
 %---- mathabx使用時に指定
