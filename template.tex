@@ -1,3 +1,5 @@
+%#!lualatex -synctex=1 filename
+%#!lualatex --jobname=前期/filename-fig1 filename
 %#!xelatex -synctex=1 filename
 %#!xelatex --jobname=前期/filename-fig1 filename
 %#!uplatex -shell-escape filename
@@ -8,28 +10,62 @@
 %#!platex -shell-escape filename
 %#!platex filename
 %%% sudo tlmgr update --self --all
-\documentclass[a4j,xelatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
+%\documentclass[a4j,xelatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
 %\XeTeXgenerateactualtext=1 %PDF ファイルの検索やコピー & ペーストがうまく動作しない場合指定
+\RequirePackage{luatex85}%\pdfナントカでエラーになったときに必要ってか02/01/2017時点で必要
+\documentclass[a4j,luatex,lualatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
 \usepackage{metalogo} % \XeLaTeX ロゴのため
-\usepackage{zxjatype}
-\setjamainfont[BoldFont=IPAexGothic]{IPAexMincho}
-\setjasansfont{IPAexGothic}
-\setjamonofont{IPAexGothic}
+%% XeLaTeX
+%\usepackage{zxjatype}
+%\setjamainfont[BoldFont=IPAexGothic]{IPAexMincho}
+%\setjasansfont{IPAexGothic}
+%\setmonofont{IPAexGothic}
+%\setjamainfont[BoldFont=MogaMinExB]{MogaMinEx}
+%\setjasansfont{MogaGoEx}
+%\setmonofont{MogaGo}
+%\setjamainfont[BoldFont=YOzNb]{YOzN}
+%\setjasansfont{YOzNb}
+%\setmonofont{YOzNF}
 %\setjamainfont[BoldFont=Ume P Gothic]{Ume P Mincho}
 %\setjasansfont{Ume P Gothic}
-%\setjamonofont{Ume Gothic}
+%\setmonofont{Ume Gothic}
 %\setjamainfont[BoldFont=TakaoPGothic]{TakaoPMincho}
 %\setjasansfont{TakaoPGothic}
-%\setjamonofont{TakaoGothic}
+%\setmonofont{TakaoGothic}
 %\setjamainfont[BoldFont=mikachan-PB]{mikachan-P}
 %\setjasansfont{mikachan-PB}
-%\setjamonofont{mikachan}
+%\setmonofont{mikachan}
 %\setjamainfont{Migu 1P}
 %\setjasansfont{Migu 1P}
-%\setjamonofont{Migu 1M}
+%\setmonofont{Migu 1M}
 %\setjamainfont{M+ 1p}
 %\setjasansfont{M+ 1p}
-%\setjamonofont{M+ 1m}
+%\setmonofont{M+ 1m}
+%% LuaLaTeX-ja こっちの方が綺麗かも…
+%\setmainjfont[BoldFont=IPAexGothic]{IPAexMincho}
+%\setsansjfont{IPAexGothic}
+%\setmonofont{IPAexGothic}
+\setmainjfont[BoldFont=MogaMinExB]{MogaMinEx}
+\setsansjfont{MogaGoEx}
+\setmonofont{MogaGo}
+%\setmainjfont[BoldFont=YOzNb]{YOzN}
+%\setsansjfont{YOzNb}
+%\setmonofont{YOzNF}
+%\setmainjfont[BoldFont=Ume P Gothic]{Ume P Mincho}
+%\setsansjfont{Ume P Gothic}
+%\setmonofont{Ume Gothic}
+%\setmainjfont[BoldFont=TakaoPGothic]{TakaoPMincho}
+%\setsansjfont{TakaoPGothic}
+%\setmonofont{TakaoGothic}
+%\setmainjfont[BoldFont=mikachan-PB]{mikachan-P}
+%\setsansjfont{mikachan-PB}
+%\setmonofont{mikachan}
+%\setmainjfont{Migu 1P}
+%\setsansjfont{Migu 1P}
+%\setmonofont{Migu 1M}
+%\setmainjfont{M+ 1p}
+%\setsansjfont{M+ 1p}
+%\setmonofont{M+ 1m}
 \makeatletter
 \newif\ifpapersize
 \newif\if@jsclass
