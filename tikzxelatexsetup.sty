@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[01/27/2017 Ver.0.0999996]%
+\ProvidesPackage{tikzxelatexsetup}[02/04/2017 Ver.0.0999997]%
 %\Zahyoの括弧の調整10/28/2013
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
@@ -6995,23 +6995,24 @@
  \pic at($(#3)!1!\@ang{M}:(#4)$)[rotate=\@ang{Mark},#2]{eqbar=#1};
  \@ifnextchar/{\@gobble}{\@EqualArcsMarks<#1>[#2]{#3}}%
 }%
-% \IncludePDF{#1}
-% \PATH#1に#1のdpthファイルが存在したらそれを読み込みその分ベースラインから下げる
-% #1.dpthファイルが存在しなければ#1をただ読みこむだけ
+% \IncludePDF[#1]{#2}
+% #1は\includegraphicのオプション
+% \PATH#2に#2のdpthファイルが存在したらそれを読み込みその分ベースラインから下げる
+% #2.dpthファイルが存在しなければ#2をただ読みこむだけ
 \newread\pdf@depthfile
 \NewDocumentCommand\GetDepthFileName{m m}{%
  \@GetDepthFileName{#2}#1
 }%
 \def\@GetDepthFileName#1#2.pdf{\def#1{#2.dpth}}%
-\NewDocumentCommand\IncludePDF{m}{%
- \GetDepthFileName{\PATH#1}\@PDFDepthFile
+\NewDocumentCommand\IncludePDF{O{} m}{%
+ \GetDepthFileName{\PATH#2}\@PDFDepthFile
  \IfFileExists{\@PDFDepthFile}{%
   \immediate\openin\pdf@depthfile=\@PDFDepthFile
   \read\pdf@depthfile to\@PDFDepth
   \immediate\closein\pdf@depthfile
-  \raisebox{-\@PDFDepth}{\includegraphics{\PATH#1}}%
+  \raisebox{-\@PDFDepth}{\includegraphics[#1]{\PATH#2}}%
  }{%
-  \includegraphics{\PATH#1}%
+  \includegraphics[#1]{\PATH#2}%
  }%
 }%
 %% enumerate環境をすべてenumitemに移管 12/14/2016
