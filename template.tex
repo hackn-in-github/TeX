@@ -12,9 +12,11 @@
 %%% sudo tlmgr update --self --all
 %\documentclass[a4j,xelatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
 %\XeTeXgenerateactualtext=1 %PDF ファイルの検索やコピー & ペーストがうまく動作しない場合指定
-\RequirePackage{luatex85}%\pdfナントカでエラーになったときに必要ってか02/01/2017時点で必要
-\documentclass[a4j,luatex,lualatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
-\usepackage{metalogo} % \XeLaTeX ロゴのため
+%\RequirePackage{luatex85}%\pdfナントカでエラーになったときに必要ってか02/01/2017時点で必要
+%hyperrefを新しい物にして不要になる
+\documentclass[a4j,lualatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
+\setpagelayout{margin=20mm}%余白を若干狭く
+\usepackage{metalogo}% \XeLaTeX ロゴのため
 %% XeLaTeX
 %\usepackage{zxjatype}
 %\setjamainfont[BoldFont=IPAexGothic]{IPAexMincho}
