@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[03/11/2017 Ver.0.11]%
+\ProvidesPackage{tikzxelatexsetup}[03/17/2017 Ver.0.111]%
+%\Henkoのnodeにsolidを追加 03/17/2017
 %解説および問題環境でsectionカウンタを回す(hyperref対策)
 %\Henkoをbend leftからcontrolsに仕様変更
 %\Zahyoの括弧の調整10/28/2013
@@ -3057,13 +3058,14 @@
   \@tempcnta=\numexpr90*(\@MTH@rotate-1)+\@MTH@rotate@angle\relax
   \edef\@MTH@ROTATE{\the\@tempcnta}%
  \fi
+%% node のオプションにsolidを追加(drawを指定するとmydashが適用されるため)
  \ifdim\@MTH@pos pt<.5pt\relax
   \draw[mydash,#2](#3)..controls(@HK@P1)and(@HK@P2)..(@HK@M)%
-   node[pos=2*\@MTH@pos,inner sep=.5pt,fill=white,rotate=\@MTH@ROTATE,font=\scriptsize,#5]{#6}%
+   node[solid,pos=2*\@MTH@pos,inner sep=.5pt,fill=white,rotate=\@MTH@ROTATE,font=\scriptsize,#5]{#6}%
    ..controls(@HK@P3)and(@HK@P4)..(#4);
  \else
   \draw[mydash,#2](#3)..controls(@HK@P1)and(@HK@P2)..(@HK@M)..controls(@HK@P3)and(@HK@P4)..(#4)%
-   node[pos=(\@MTH@pos-.5)*2,inner sep=.5pt,fill=white,rotate=\@MTH@ROTATE,font=\scriptsize,#5]{#6};
+   node[solid,pos=(\@MTH@pos-.5)*2,inner sep=.5pt,fill=white,rotate=\@MTH@ROTATE,font=\scriptsize,#5]{#6};
  \fi
 }%
 %% \RightAngle<#1>[#2]{#3}%
