@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[03/17/2017 Ver.0.111]%
+\ProvidesPackage{tikzxelatexsetup}[04/12/2017 Ver.0.1111]%
+% \Cmaru の前後に \kanjiskip が入るようにする
 %\Henkoのnodeにsolidを追加 03/17/2017
 %解説および問題環境でsectionカウンタを回す(hyperref対策)
 %\Henkoをbend leftからcontrolsに仕様変更
@@ -432,15 +433,29 @@
 \def\rnum#1{\expandafter{\romannumeral#1}}%
 % \Rnum{10} : 10をローマ数字の大文字で出力
 \def\Rnum#1{\uppercase\expandafter{\romannumeral#1}}%
-%%長丸センター試験
-% Cmaru<#1>[#2]#3
-% #1 オプション引数
-% option:ovalmag=楕円の比率,size=数字のサイズ,thickness=線の太さ
-% #2 数字
+%%長丸センター試験 04/12/2017 修正 前後に \kanjiskip が入るようにする
+% Cmaru<#1>(#2)[#3]#4
+% #1 : #4のノードのオプション
+% #2 : 楕円の draw に対するオプション
+% #3 : 楕円の circle に対するオプション
+% #4 : 楕円で囲む文字
 \NewDocumentCommand\Cmaru{D<>{}O{}m}{%
  \tikz[baseline=(@O@.base),#1]{%
   \node[text=white,draw,inner sep=.75pt,ellipse,minimum width=1.4ex,minimum height=1.35em,#2](@O@){1}%
    node at(@O@.center){#3};}%
+}%
+\chardef\zenkakuSpace=\jis"2121\relax %"
+\RenewDocumentCommand{\Cmaru}{D<>{}D(){}O{}m}{%
+ \zenkakuSpace
+ \kern-1\zw\relax
+ {%
+  \tikz[baseline=(@O@.base)]{%
+   \node[#1](@O@){#4};
+   \draw[thick,#2](@O@.center)circle[x radius=.425em,y radius=.6em,#3];
+  }%
+ }%
+ \kern-1\zw\relax
+ \zenkakuSpace
 }%
 %%三角枠
 % \triframe<#1>[#2]#3
