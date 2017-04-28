@@ -1,5 +1,6 @@
 %Setup
 \ProvidesPackage{tikzxelatexsetup}[04/12/2017 Ver.0.1111]%
+% siunitx.sty を読み込む & \DegOrRad の再定義 04/29/2017
 % \Cmaru の前後に \kanjiskip が入るようにする
 %\Henkoのnodeにsolidを追加 03/17/2017
 %解説および問題環境でsectionカウンタを回す(hyperref対策)
@@ -19,7 +20,7 @@
 \newif\ifMarkSpc
 \MarkKeepWidthtrue
 \MarkSpctrue
-\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox}%
+\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx}%
 \usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
 	patterns,topaths,through,calc,intersections,%
 	shapes.geometric,shapes.misc,shapes.multipart,chains,angles,quotes,%
@@ -985,7 +986,7 @@
 }%
 %% 60分法と弧度法の切り替え
 %\DegOrRad{60分法(単位なし)} pgf の計算機能へ移行 20150614
-%\degreetrue で60分法
+%\degreetrue で60分法(siunitx.styを用いて\ang{#1}として出力する) 04/29/2017
 %\degreefalse でラジアン表記
 \newif\ifdegree
 \def\DegOrRad#1{%
@@ -994,7 +995,8 @@
  \fi
  \pgfmathparse{int(abs(#1))}%
  \ifdegree
-  \pgfmathresult\deg
+  \ang{#1}% 04/29/2017 修正
+%  \pgfmathresult\deg
  \else
   \pgfmathparse{int(mod(int(abs(#1)),180))}%
   \ifnum\pgfmathresult=\z@\relax
