@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[04/12/2017 Ver.0.1111]%
+\ProvidesPackage{tikzxelatexsetup}[05/27/2017 Ver.0.1112]%
+% 床関数・天井関数の定義 05/27/2017
 % siunitx.sty を読み込む & \DegOrRad の再定義 04/29/2017
 % \Cmaru の前後に \kanjiskip が入るようにする
 %\Henkoのnodeにsolidを追加 03/17/2017
@@ -5758,6 +5759,12 @@
   \includegraphics[#1]{\PATH#2}%
  }%
 }%
+%% 床関数・天井関数の定義
+%% \floorfunc* でガウス記号
+\def\ceilfunc#1{\ensuremath{\left\lceil#1\right\rceil}}%
+\def\floorfunc{\@ifstar{\floor@func}{\@floorfunc}}%
+\def\@floorfunc#1{\ensuremath{\left\lfloor#1\right\rfloor}}%
+\def\floor@func#1{\ensuremath{\left[#1\right]}}%
 %% enumerate環境をすべてenumitemに移管 12/14/2016
 \def\あいう#1{\expandafter\@あいう\csname c@#1\endcsname}%
 \def\@あいう#1{\ifcase#1\or %
