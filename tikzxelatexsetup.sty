@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/27/2017 Ver.0.1112]%
+\ProvidesPackage{tikzxelatexsetup}[06/09/2017 Ver.0.1113]%
+% \HakoHige (縦の箱ひげ図)が非常に使いにくいので \YokoHakoHige (横の箱ひげ図)を新設 06/09/2017
 % 床関数・天井関数の定義 05/27/2017
 % siunitx.sty を読み込む & \DegOrRad の再定義 04/29/2017
 % \Cmaru の前後に \kanjiskip が入るようにする
@@ -4698,6 +4699,105 @@
               --(\@HakoHige@Number,\@HakoHige@Max@Num);
  \ifnum\@Hako@Show@Med=\@ne\relax
   \node at(\@HakoHige@Number,\@Hako@Total/\@HakoHige@Max){\@Hako@Med@Mark};
+ \fi
+}%
+%% \HakoHige が非常に使いにくいので \YokoHakoHige を新設 06/09/2017
+\def\YokoHakoHigeWidth#1{\edef\@YokoHako@Width{#1}}%
+% 0<\@YokoHako@Hige@Width<1
+\def\YokoHakoHigeHigeWidth#1{\edef\@YokoHako@Hige@Width{#1}}%
+\YokoHakoHigeWidth{.5}%
+\YokoHakoHigeHigeWidth{.4}%
+% \YokoHakoHige<#1>[#2](#3){#4}
+% #1:original option
+%  width:箱の横幅
+%  higewidth:ひげの横幅
+%  data:最小値,第1四分位数,第2四分位数,第3四分位数,最大値を順に与えてデータを使わない
+%  showmed:平均値を表示する
+%  medmark:平均値のマークの設定($+$)
+% #2:箱のオプション指定
+% #3:ひげのオプション指定
+% #4:箱ひげを作るためのデータをカンマ区切りで指定
+\define@key{YokoHakoHige}{width}{\def\@YokoHako@Width{#1}}%
+\define@key{YokoHakoHige}{higewidth}{\def\@YokoHako@Hige@Width{#1}}%
+\define@key{YokoHakoHige}{data}{\def\@YokoHako@Data{#1}}%
+\define@key{YokoHakoHige}{showmed}[1]{\def\@YokoHako@Show@Med{#1}}%
+\define@key{YokoHakoHige}{medmark}{\def\@YokoHako@Med@Mark{#1}}%
+\def\YokoHakoHige{\@ifnextchar<{\@YokoHakoHige}{\@YokoHakoHige<>}}%
+\def\@YokoHakoHige<#1>{\@ifnextchar[{\@@YokoHakoHige<#1>}{\@@YokoHakoHige<#1>[]}}%
+\def\@@YokoHakoHige<#1>[#2]{\@ifnextchar({\@@@YokoHakoHige<#1>[#2]}{\@@@YokoHakoHige<#1>[#2]()}}%
+\def\@@@YokoHakoHige<#1>[#2](#3)#4{%
+ \let\@YokoHako@Data=\@empty
+ \def\@YokoHako@Show@Med{0}%
+ \def\@YokoHako@Med@Mark{$+$}%
+ \setkeys{YokoHakoHige}{#1}%
+ \def\@YokoHako@Total{0}%
+ \expandafter\@for\expandafter\@HH@x\expandafter:\expandafter=#4\do{%
+  \GetMathparse{(\@YokoHako@Total)+(\@HH@x)}\@YokoHako@Total
+ }%
+ \@ifundefined{@YokoHakoHige@Number}%
+  {%
+   \def\@YokoHakoHige@Number{1}%
+  }{%
+   \GetMathparse{int(\@YokoHakoHige@Number+1)}\@YokoHakoHige@Number
+  }%
+ \def\@YokoHako@Data@Split##1,##2,##3,##4,##5\@nil{%
+  \def\@YokoHakoHige@Min@Num{##1}%
+  \def\@YokoHakoHige@FQua@Num{##2}%
+  \def\@YokoHakoHige@Mid@Num{##3}%
+  \def\@YokoHakoHige@TQua@Num{##4}%
+  \def\@YokoHakoHige@Max@Num{##5}%
+ }%
+ \ifx\@YokoHako@Data\@empty
+  \Sort{YokoHakoHige}{#4}\@YokoHakoHige@Max\@YokoHakoHige@Array
+  \GetMathparse{(1+\@YokoHakoHige@Max)/2}\@YokoHakoHige@Mid
+  \GetMathparse{(1+\@YokoHakoHige@Mid)/2}\@YokoHakoHige@FQua%1/4
+  \GetMathparse{(\@YokoHakoHige@Mid+\@YokoHakoHige@Max)/2}\@YokoHakoHige@TQua%3/4
+  \GetMathparse{int(\@YokoHakoHige@Mid)}\Int@YokoHakoHige@Mid
+  \GetMathparse{int(\@YokoHakoHige@FQua)}\Int@YokoHakoHige@FQua
+  \GetMathparse{int(\@YokoHakoHige@TQua)}\Int@YokoHakoHige@TQua
+  \ifdim\@YokoHakoHige@Mid pt=\Int@YokoHakoHige@Mid pt\relax
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@Mid}\@YokoHakoHige@Mid@Num
+  \else
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@Mid}\@YokoHako@TempI
+   \GetMathparse{int(\Int@YokoHakoHige@Mid+1)}\Int@YokoHakoHige@Mid
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@Mid}\@YokoHako@TempII
+   \GetMathparse{((\@YokoHako@TempI)+(\@YokoHako@TempII))/2}\@YokoHakoHige@Mid@Num
+  \fi
+  \ifdim\@YokoHakoHige@FQua pt=\Int@YokoHakoHige@FQua pt\relax
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@FQua}\@YokoHakoHige@FQua@Num
+  \else
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@FQua}\@YokoHako@TempI
+   \GetMathparse{int(\Int@YokoHakoHige@FQua+1)}\Int@YokoHakoHige@FQua
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@FQua}\@YokoHako@TempII
+   \GetMathparse{((\@YokoHako@TempI)+(\@YokoHako@TempII))/2}\@YokoHakoHige@FQua@Num
+  \fi
+  \ifdim\@YokoHakoHige@TQua pt=\Int@YokoHakoHige@TQua pt\relax
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@TQua}\@YokoHakoHige@TQua@Num
+  \else
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@TQua}\@YokoHako@TempI
+   \GetMathparse{int(\Int@YokoHakoHige@TQua+1)}\Int@YokoHakoHige@TQua
+   \GetSortNum{YokoHakoHige}{\Int@YokoHakoHige@TQua}\@YokoHako@TempII
+   \GetMathparse{((\@YokoHako@TempI)+(\@YokoHako@TempII))/2}\@YokoHakoHige@TQua@Num
+  \fi
+  \GetSortNum{YokoHakoHige}{1}\@YokoHakoHige@Min@Num
+  \GetSortNum{YokoHakoHige}{\@YokoHakoHige@Max}\@YokoHakoHige@Max@Num
+ \else
+  \expandafter\@YokoHako@Data@Split\@YokoHako@Data\@nil
+ \fi
+ \draw[thick,#2](\@YokoHakoHige@FQua@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Width)%
+       rectangle(\@YokoHakoHige@TQua@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Width)
+                (\@YokoHakoHige@Mid@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Width)%
+              --(\@YokoHakoHige@Mid@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Width);%
+ \draw[thick,#3](\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Hige@Width)%
+              --(\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Hige@Width)%
+                (\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Hige@Width)%
+              --(\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Hige@Width)%
+                (\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number)%
+              --(\@YokoHakoHige@FQua@Num,-\@YokoHakoHige@Number)%
+                (\@YokoHakoHige@TQua@Num,-\@YokoHakoHige@Number)%
+              --(\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number);
+ \ifnum\@YokoHako@Show@Med=\@ne\relax
+  \node at(\@YokoHako@Total/\@YokoHakoHige@Max,-\@YokoHakoHige@Number){\@YokoHako@Med@Mark};
  \fi
 }%
 %% \SetAngles<#1>[#2]{#3}[#4]{#5}% 02/01/2016 文字列にもオプションを与えられるようにする
