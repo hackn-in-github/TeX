@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/09/2017 Ver.0.1114]%
+\ProvidesPackage{tikzxelatexsetup}[06/09/2017 Ver.0.1115]%
+% Attention環境内で\lineskip，\lineskiplimitが初期化されていたので反映されるようにした
 % 増減表の曲がった矢印を定義 07/30/2017
 % \HakoHige (縦の箱ひげ図)が非常に使いにくいので \YokoHakoHige (横の箱ひげ図)を新設 06/09/2017
 % 床関数・天井関数の定義 05/27/2017
@@ -5645,6 +5646,8 @@
   }%
  }%
 }%
+\newdimen\Attentionlineskiplimit
+\newdimen\Attentionlineskip
 \tcbset{AttentionStyle/.style={%
  breakable,%
  title=Attention,%
@@ -5655,7 +5658,10 @@
  colback=red!5,colframe=red!30,coltext=black,%
  arc=20pt,boxrule=2pt,sharp corners=downhill,%
  fonttitle=\normalsize,fontupper=\small,fontlower=\small,%
- before upper={\parindent=1\zw},before lower={\parindent=1\zw},%
+ before upper={\parindent=1\zw\relax\lineskiplimit=\Attentionlineskiplimit\relax
+   \lineskip=\Attentionlineskip\relax},%
+ before lower={\parindent=1\zw\relax\lineskiplimit=\Attentionlineskiplimit\relax
+   \lineskip=\Attentionlineskip\relax},%
 % overlay first and middle={%
 %  \draw[very thick,-{Stealth},red!20]($(frame.south east)+(-6mm,1.5mm)$)--+(3mm,0)%
 %	arc[start angle=90,delta angle=-180,radius=1.5mm]--+(-3mm,0);%
