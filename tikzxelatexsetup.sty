@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/09/2017 Ver.0.1115]%
+\ProvidesPackage{tikzxelatexsetup}[08/20/2017 Ver.0.1116]%
+% \RotationMarkを追加 08/20/2017
 % Attention環境内で\lineskip，\lineskiplimitが初期化されていたので反映されるようにした
 % 増減表の曲がった矢印を定義 07/30/2017
 % \HakoHige (縦の箱ひげ図)が非常に使いにくいので \YokoHakoHige (横の箱ひげ図)を新設 06/09/2017
@@ -5984,6 +5985,35 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
   \tikz[x={(1em,0)},y={(0,1em)},>={Stealth[length=.5em]}]%
    \draw[->](-1,0)arc[start angle=180,delta angle=90,radius=1];%
  }%
+}%
+%% \RotationMark<#1>(#2)[#3]{#4} 2017/08/20 追加
+%% #1 : pics/rotationmark の設定
+%%      start angle : 開始角(10)
+%%      end angle   : 終了角(350)
+%%      x radius    : x軸方向の半径(3.75pt)
+%%      y radius    : y軸方向の半径(7pt)
+%% #2 : pics/rotationmark の \draw のオプション(->)
+%% #3 : \pic のオプション
+%% #4 : 回転記号を置く座標
+\tikzset{%
+ pics/rotationmark/.style={%
+  foreground code={%
+   \draw[->,#1](\@RM@SP)arc[start angle=\@RM@SA,end angle=\@RM@EA,x radius=\@RM@XR,y radius=\@RM@YR];
+ }},%
+ pics/rotationmark/.default={},%
+}%
+\define@key{RotationMark}{start angle}{\def\@RM@SA{#1}}%
+\define@key{RotationMark}{end angle}{\def\@RM@EA{#1}}%
+\define@key{RotationMark}{x radius}{\def\@RM@XR{#1}}%
+\define@key{RotationMark}{y radius}{\def\@RM@YR{#1}}%
+\NewDocumentCommand\RotationMark{D<>{}D(){}O{}m}{%
+ \def\@RM@SA{10}%
+ \def\@RM@EA{350}%
+ \def\@RM@XR{3.75pt}%
+ \def\@RM@YR{7.5pt}%
+ \IfNoValueF{#1}{\setkeys{RotationMark}{#1}}%
+ \def\@RM@SP{{cos(\@RM@SA)*\@RM@XR},{sin(\@RM@SA)*\@RM@YR}}%
+ \pic[#3]at(#4){rotationmark={#2}};
 }%
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000

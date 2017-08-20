@@ -126,7 +126,15 @@
 \Attentionlineskip=\lineskip\relax
 \pgfrealjobname{filename}%
 \SetPath{前期/}%
+%% e-TeX 拡張 %%
+% \ifdefined \else \fi
+% \ifcsname ... \endcsname \else \fi
+% \unless 真偽の反転
+% \numexpr \dimexpr \glueexpr \muexpr 後続の演算を予めしてしまう
+% \middle
+% \unexpanded{#1} #1を展開しないようにする
+%%%%%%%%%%%%%%
+%\listfiles%読み込まれているファイルリストをlogファイルの*File List*以降に表示させる
 %\includeonly{}%
-%\listfiles%読み込まれていファイルリストをlogファイルの*File List*以降に表示させる
 \begin{document}
 \end{document}
