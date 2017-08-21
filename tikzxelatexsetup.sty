@@ -6021,18 +6021,19 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %% (x|y)*scaleの値によらず一定の大きさの(黒|白)丸が描けるから\Maruは不要になる
 %% 黒丸は*付き 白丸は:なし
 %% #1 : 丸の半径
-%% #2 : /tikz/pics/kuromaruおよび/tikz/pics/shiromaruで描かれる円の半径を指定(3pt)
+%% #2 : /tikz/pics/kuromaruおよび/tikz/pics/shiromaruで描かれる円の半径を指定(1.5pt)
 %% #3 : pic のオプション指定(色や倍率などを指定)
 %% #4 : 丸を置く場所をカンマ(,)区切りで複数個指定できる
 \tikzset{%
  /tikz/pics/.cd,%
  kuromaru/.style={%
   foreground code={%
-  \fill(0,0)circle[radius=#1];
+   \fill(0,0)circle[radius=#1];
  }},%
  shiromaru/.style={%
-  foreground code={\fill[white](0,0)circle[radius=#1];
-  \draw(0,0)circle[radius=#1];
+  foreground code={%
+   \fill[white](0,0)circle[radius=#1];
+   \draw(0,0)circle[radius=#1];
  }},%
  kuromaru/.default={1.5pt},%
  shiromaru/.default={1.5pt},%
