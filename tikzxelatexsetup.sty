@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[08/20/2017 Ver.0.1116]%
+\ProvidesPackage{tikzxelatexsetup}[08/21/2017 Ver.0.1117]%
+% \PicMaruを追加 08/21/2017
 % \RotationMarkを追加 08/20/2017
 % Attention環境内で\lineskip，\lineskiplimitが初期化されていたので反映されるようにした
 % 増減表の曲がった矢印を定義 07/30/2017
@@ -5996,11 +5997,12 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %% #3 : \pic のオプション
 %% #4 : 回転記号を置く座標
 \tikzset{%
- pics/rotationmark/.style={%
+ /tikz/pisc/.cd,%
+ rotationmark/.style={%
   foreground code={%
    \draw[->,#1](\@RM@SP)arc[start angle=\@RM@SA,end angle=\@RM@EA,x radius=\@RM@XR,y radius=\@RM@YR];
  }},%
- pics/rotationmark/.default={},%
+ rotationmark/.default={},%
 }%
 \define@key{RotationMark}{start angle}{\def\@RM@SA{#1}}%
 \define@key{RotationMark}{end angle}{\def\@RM@EA{#1}}%
@@ -6014,6 +6016,37 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  \IfNoValueF{#1}{\setkeys{RotationMark}{#1}}%
  \def\@RM@SP{{cos(\@RM@SA)*\@RM@XR},{sin(\@RM@SA)*\@RM@YR}}%
  \pic[#3]at(#4){rotationmark={#2}};
+}%
+%% \PicMaru(*)<#1>[#2]{#3} 08/21/2017
+%% (x|y)*scaleの値によらず一定の大きさの(黒|白)丸が描けるから\Maruは不要になる
+%% 黒丸は*付き 白丸は:なし
+%% #1 : 丸の半径
+%% #2 : /tikz/pics/kuromaruおよび/tikz/pics/shiromaruで描かれる円の半径を指定(3pt)
+%% #3 : pic のオプション指定(色や倍率などを指定)
+%% #4 : 丸を置く場所をカンマ(,)区切りで複数個指定できる
+\tikzset{%
+ /tikz/pics/.cd,%
+ kuromaru/.style={%
+  foreground code={%
+  \fill(0,0)circle[radius=#1];
+ }},%
+ shiromaru/.style={%
+  foreground code={\fill[white](0,0)circle[radius=#1];
+  \draw(0,0)circle[radius=#1];
+ }},%
+ kuromaru/.default={1.5pt},%
+ shiromaru/.default={1.5pt},%
+}%
+\NewDocumentCommand\PicMaru{sD<>{1.5pt}O{}m}{%
+ \IfBooleanTF{#1}{\@PicMaru@B<#2>[#3]#4,;}{\@PicMaru@W<#2>[#3]#4,;}%
+}%
+\def\@PicMaru@B<#1>[#2]#3,{%
+ \pic[#2]at(#3){kuromaru={#1}};%
+ \@ifnextchar;{\@gobble}{\@PicMaru@B<#1>[#2]}%
+}%
+\def\@PicMaru@W<#1>[#2]#3,{%
+ \pic[#2]at(#3){shiromaru={#1}};%
+ \@ifnextchar;{\@gobble}{\@PicMaru@W<#1>[#2]}%
 }%
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
