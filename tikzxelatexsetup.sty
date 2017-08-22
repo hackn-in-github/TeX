@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[08/22/2017 Ver.0.1118]%
+\ProvidesPackage{tikzxelatexsetup}[08/23/2017 Ver.0.1119]%
+% \Vec の定義に \mathstrut を噛ませる
 % \Vec(*)をesvectに任せる 08/22/2017
 % \PicMaruを追加 08/21/2017
 % \RotationMarkを追加 08/20/2017
@@ -5777,7 +5778,7 @@
 }%
 %% \Vec(*)をesvect.styに任せる
 \RenewDocumentCommand\Vec{sm}{%
- \IfBooleanTF{#1}{\vv{#2}}{\vv{\mathrm{#2}}}%
+ \IfBooleanTF{#1}{\vv{\mathstrut#2}}{\vv{\mathrm{\mathstrut#2}}}% 08/23/2017 \mathstrut を追加
 }%
 \let\Mark=\MarkBox
 %\let\refMark=\RefMarkBox
