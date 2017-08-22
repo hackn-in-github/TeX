@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[08/21/2017 Ver.0.1117]%
+\ProvidesPackage{tikzxelatexsetup}[08/22/2017 Ver.0.1118]%
+% \Vec(*)をesvectに任せる 08/22/2017
 % \PicMaruを追加 08/21/2017
 % \RotationMarkを追加 08/20/2017
 % Attention環境内で\lineskip，\lineskiplimitが初期化されていたので反映されるようにした
@@ -26,7 +27,7 @@
 \newif\ifMarkSpc
 \MarkKeepWidthtrue
 \MarkSpctrue
-\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx}%
+\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx,esvect}%
 \usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
 	patterns,topaths,through,calc,intersections,%
 	shapes.geometric,shapes.misc,shapes.multipart,chains,angles,quotes,%
@@ -5773,6 +5774,10 @@
   }%
   \expandafter\draw\expandafter[\expandafter>\expandafter=\expandafter{\@vec@style@},->](@X@.north west)--(@X@.north east);
  }%
+}%
+%% \Vec(*)をesvect.styに任せる
+\RenewDocumentCommand\Vec{sm}{%
+ \IfBooleanTF{#1}{\vv{#2}}{\vv{\mathrm{#2}}}%
 }%
 \let\Mark=\MarkBox
 %\let\refMark=\RefMarkBox
