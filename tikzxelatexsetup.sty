@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[08/23/2017 Ver.0.1119]%
+\ProvidesPackage{tikzxelatexsetup}[08/31/2017 Ver.0.1120]%
+% \SetAngle にオリジナルオプション point を新設
 % \Vec の定義に \mathstrut を噛ませる
 % \Vec(*)をesvectに任せる 08/22/2017
 % \PicMaruを追加 08/21/2017
@@ -4808,8 +4809,10 @@
 }%
 %% \SetAngles<#1>[#2]{#3}[#4]{#5}% 02/01/2016 文字列にもオプションを与えられるようにする
 %%                             それに伴いオプションの位置を変更する
-%% #1:オリジナルオプション(今のところなし)
-%%  strings only:弧を描画しない
+%% #1:オリジナルオプション
+%%    strings only:弧を描画しない
+%%    point       :弧#4#5#6の中点を表す点の前置詞(P)
+%%                 順にP1，P2，...と点を生成する 08/31/2017 に新設
 %% #2:テキストに対するオプション
 %% #3:角におくテキスト
 %% #4:picのオプション
@@ -4826,18 +4829,23 @@
 % \@ifnextchar/{\@gobble}{\@@@SetAngles[#1]{#2}}%
 %}%
 \define@key{SetAngles}{strings only}[true]{\def\@SA@stringonly{0}}%
+\define@key{SetAngles}{point}{\def\@SA@Point{#1}}%
 \NewDocumentCommand\SetAngles{D<>{}O{}mO{}m}{%
  \def\@SA@stringonly{1}%
+ \def\@SA@Point{P}%
  \setkeys{SetAngles}{#1}%
  \@SetAngles[#2][#4]{#3}#5;/%
+ \setcounter{tempcntc}{0}%
 }%
 \def\@SetAngles[#1][#2]#3#4,#5,#6;{%
+ \addtocounter{tempcntc}{1}%
  \ifcase\@SA@stringonly
-  \path(#4)--(#5)--(#6)pic[#2,"#3"'{#1}]{angle=#4--#5--#6};
+  \pic[#2,"#3"'{#1}]{angle=#4--#5--#6};
  \or
-  \path(#4)--(#5)--(#6)pic[draw,#2,"#3"'{#1}]{angle=#4--#5--#6};
+  \pic[draw,#2,"#3"'{#1}]{angle=#4--#5--#6};
  \else
  \fi
+ \pic[inner sep=0pt,outer sep=0pt,"{}",angle eccentricity=1](\@SA@Point\thetempcntc){angle=#4--#5--#6};
  \@ifnextchar/{\@gobble}{\@SetAngles[#1][#2]{#3}}%
 }%
 %% \Touhenkigou<#1>[#2]{#3}%
