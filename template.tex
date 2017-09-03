@@ -119,22 +119,22 @@
 %(4)(3)で測定した値と\lineskiplimitを比較する
 %(4-1)(3)の値>\lineskipならばそのまま
 %(4-2)そうでなければ，上の行の「下端」と下の行の「上端」の間を\lineskipにする
-\pagestyle{myfoot}%
+%\mathord ： 通常の記号、文字
+%\mathop ： 大型演算子
+%\mathbin ： 二項演算子
+%\mathrel ： 関係演算子
+%\mathopen ： 開き括弧類
+%\mathclose ： 閉じ括弧類
+%\mathpunct ： 句読点類
+%\mathalpha ： 数式英字
+\pagestyle{myfoot}              %
 \lineskiplimit=1pt\relax
 \lineskip=2pt\relax
 \Attentionlineskiplimit=\lineskiplimit\relax
 \Attentionlineskip=\lineskip\relax
 \pgfrealjobname{filename}%
 \SetPath{前期/}%
-%% e-TeX 拡張 %%
-% \ifdefined \else \fi
-% \ifcsname ... \endcsname \else \fi
-% \unless 真偽の反転
-% \numexpr \dimexpr \glueexpr \muexpr 後続の演算を予めしてしまう
-% \middle
-% \unexpanded{#1} #1を展開しないようにする
-%%%%%%%%%%%%%%
-%\listfiles%読み込まれているファイルリストをlogファイルの*File List*以降に表示させる
 %\includeonly{}%
+%\listfiles%読み込まれていファイルリストをlogファイルの*File List*以降に表示させる
 \begin{document}
 \end{document}
