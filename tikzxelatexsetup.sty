@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[08/31/2017 Ver.0.1120]%
+\ProvidesPackage{tikzxelatexsetup}[09/03/2017 Ver.0.1121]%
+% \Re，\Imで数式中にRe，Imをローマン体で表記する(\mathop)を噛ませてある
 % \SetAngle にオリジナルオプション point を新設
 % \Vec の定義に \mathstrut を噛ませる
 % \Vec(*)をesvectに任せる 08/22/2017
@@ -6063,6 +6064,9 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  \pic[#2]at(#3){shiromaru={#1}};%
  \@ifnextchar;{\@gobble}{\@PicMaru@W<#1>[#2]}%
 }%
+% 複素数の実部および虚部の表記
+\def\Re{\mathop{\mathrm{Re}}}%
+\def\Im{\mathop{\mathrm{Im}}}%
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
 %\prebreakpenalty`．=10000
