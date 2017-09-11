@@ -113,21 +113,29 @@
 %\title{{\XeLaTeX}で日本語文書}
 %\author{七篠\ 権兵衛}
 % \today の出力はJSクラスと同様に西暦になる
+\pagestyle{myfoot}
+%% \lineskip \lineskiplimit の設定
 %(1)二行ならべる
 %(2)ベースライン間の距離が\baselineskipになるようにする
 %(3)上の行の「下端」と下の行の「上端」の間の縦方向の距離を測る
 %(4)(3)で測定した値と\lineskiplimitを比較する
 %(4-1)(3)の値>\lineskipならばそのまま
 %(4-2)そうでなければ，上の行の「下端」と下の行の「上端」の間を\lineskipにする
-%\mathord ： 通常の記号、文字
-%\mathop ： 大型演算子
-%\mathbin ： 二項演算子
-%\mathrel ： 関係演算子
-%\mathopen ： 開き括弧類
+%\mathord   ： 通常の記号、文字
+%\mathop    ： 大型演算子
+%\mathbin   ： 二項演算子
+%\mathrel   ： 関係演算子
+%\mathopen  ： 開き括弧類
 %\mathclose ： 閉じ括弧類
 %\mathpunct ： 句読点類
 %\mathalpha ： 数式英字
-\pagestyle{myfoot}              %
+%% e-TeX 拡張 %%
+% \ifdefined \else \fi
+% \ifcsname ... \endcsname \else \fi
+% \unless 真偽の反転
+% \numexpr \dimexpr \glueexpr \muexpr 後続の演算を予めしてしまう
+% \middle
+% \unexpanded{#1} #1を展開しないようにする\pagestyle{myfoot}%
 \lineskiplimit=1pt\relax
 \lineskip=2pt\relax
 \Attentionlineskiplimit=\lineskiplimit\relax
