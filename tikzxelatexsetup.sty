@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[09/03/2017 Ver.0.1121]%
+\ProvidesPackage{tikzxelatexsetup}[09/20/2017 Ver.0.1122]%
+% inline の enumerate 環境で afterlabel に \nobreak を噛ませる
 % \Re，\Imで数式中にRe，Imをローマン体で表記する(\mathop)を噛ませてある
 % \SetAngle にオリジナルオプション point を新設
 % \Vec の定義に \mathstrut を噛ませる
@@ -5954,14 +5955,14 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 \setlist[enumerate,4]{label=(\Roman*),ref=\theenumiii(\Roman*)}%
 \setlist[enumerate,5]{label=(\Alph*),ref=\theenumiv(\Alpha*)}%
 \newlist{edaenumerate}{enumerate*}{10}%
-\setlist[edaenumerate]{before=\\,afterlabel={\hspace{.75\zw}},itemjoin=\hspace{\betaafterlabel}}%
+\setlist[edaenumerate]{before=\\,afterlabel={\kern.75\zw\nobreak},itemjoin=\hspace{\betaafterlabel}}%
 \setlist[edaenumerate,1]{label=(\arabic*)}%
 \setlist[edaenumerate,2]{label=(\roman*)}%
 \setlist[edaenumerate,3]{label=(\alph*)}%
 \setlist[edaenumerate,4]{label=(\Roman*)}%
 \setlist[edaenumerate,5]{label=(\Alph*)}%
 \newlist{betaenumerate}{enumerate*}{10}%
-\setlist[betaenumerate]{before=\\,afterlabel={\hspace{.75\zw}},itemjoin=\hspace{\betaafterlabel}}%
+\setlist[betaenumerate]{before=\\,afterlabel={\kern.75\zw\nobreak},itemjoin=\hspace{\betaafterlabel}}%
 \setlist[betaenumerate,1]{label=(\arabic*)}%
 \setlist[betaenumerate,2]{label=(\roman*)}%
 \setlist[betaenumerate,3]{label=(\alph*)}%
@@ -5971,7 +5972,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 \newlist{centerenum*}{enumerate*}{10}%
 \setlist[centerenum]{label=\protect\InEll{\CenterNumbering*}}%
 \setlist[centerenum*]{label=\protect\InEll{\CenterNumbering*},%before=\\,%
-   afterlabel={\hspace{.75\zw}},itemjoin=\hspace{\betaafterlabel}}%
+   afterlabel={\kern.75\zw\nobreak},itemjoin=\hspace{\betaafterlabel}}%
 \else
 \RequirePackage{emathEy}%
 \fi
