@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[09/20/2017 Ver.0.1122]%
+\ProvidesPackage{tikzxelatexsetup}[10/08/2017 Ver.0.1123]%
+% 内側の正三角形の一辺の長さが1のルーローの三角形を \pic at(X){Reuleaux triangle}; で出力させる
 % inline の enumerate 環境で afterlabel に \nobreak を噛ませる
 % \Re，\Imで数式中にRe，Imをローマン体で表記する(\mathop)を噛ませてある
 % \SetAngle にオリジナルオプション point を新設
@@ -6068,6 +6069,16 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 % 複素数の実部および虚部の表記
 \def\Re{\mathop{\mathrm{Re}}}%
 \def\Im{\mathop{\mathrm{Im}}}%
+%% ルーローの三角形
+\tikzset{%
+ pics/Reuleaux triangle/.style={%
+  foreground code={%
+   \draw[#1](0,0)arc[start angle=120,delta angle=60,radius=1]--%
+    (-120:1)arc[start angle=-120,delta angle=60,radius=1]--%
+    (-60:1)arc[start angle=0,delta angle=60,radius=1]--cycle;
+  },%
+ },%
+}%
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
 %\prebreakpenalty`．=10000
