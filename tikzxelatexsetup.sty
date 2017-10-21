@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[10/08/2017 Ver.0.1123]%
+\ProvidesPackage{tikzxelatexsetup}[10/21/2017 Ver.0.1124]%
+% \EuclidDiv を定義 expl3 を使用する
 % 内側の正三角形の一辺の長さが1のルーローの三角形を \pic at(X){Reuleaux triangle}; で出力させる
 % inline の enumerate 環境で afterlabel に \nobreak を噛ませる
 % \Re，\Imで数式中にRe，Imをローマン体で表記する(\mathop)を噛ませてある
@@ -6079,6 +6080,68 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
   },%
  },%
 }%
+\ExplSyntaxOn
+\int_new:N \l_tmp_node_number_int
+\int_new:N \l_tmp_hijosu_int
+\int_new:N \l_tmp_josu_int
+\int_new:N \l_tmp_shou_int
+\int_new:N \l_tmp_seki_int
+\int_new:N \l_tmp_amari_int
+\int_new:N \l_tmp_min_amari_int
+%% ユークリッドの互除法の割り算の筆算の表示
+%% \EuclidDiv[#1]{#2}{#3}%
+%%  #1:オプション
+%%     min amari余りが:ここで指定した値以下になるまで割り算を行う(default:1)
+%%  #2と#3の最大公約数を調べる
+\tikzset{EuclidDiv/.style={outer~xsep=3pt,y={(0,1.2em)}}}
+\keys_define:nn {EuclidDiv}{%
+ min amari .code:n = {\int_set:Nn \l_tmp_min_amari_int {#1}},
+ min amari .default:n = \c_one
+}%
+\NewDocumentCommand \EuclidDiv{omm}{%
+ \group_begin:
+  \int_set:Nn \l_tmp_min_amari_int \c_one
+  \IfValueT{#1}{%
+   \keys_set:nn {EuclidDiv}{#1}
+  }
+  \int_zero:N \l_tmp_node_number_int
+  % node や coordinate は global であるからグルーピングの影響は受けない
+  \int_compare:nNnTF {#2} > {#3}
+   {%
+    \node(余り0)[inner~sep=0pt]{#3};
+    \Original_EuclidDiv:nn {#2}{#3}
+   }{
+    \node(余り0)[inner~sep=0pt]{#2};
+    \Original_EuclidDiv:nn {#3}{#2}
+   }
+%  \Original_EuclidDiv:nn {#2}{#3}
+ \group_end:
+}%
+\cs_new:Npn \Original_EuclidDiv:nn #1#2{%
+ \int_incr:N \l_tmp_node_number_int
+ \int_set:Nn \l_tmp_hijosu_int {#1}
+ \int_set:Nn \l_tmp_josu_int {#2}
+ \int_set:Nn \l_tmp_amari_int {\int_mod:nn {#1}{#2}}
+ \int_set:Nn \l_tmp_seki_int {#1-\l_tmp_amari_int}
+ \int_set:Nn \l_tmp_shou_int {\l_tmp_seki_int/#2}
+ \node(被除数\int_use:N \l_tmp_node_number_int)at(余り\int_eval:n {\l_tmp_node_number_int-1}.east)[inner~xsep=0pt,right]{\int_use:N \l_tmp_hijosu_int};
+ \node at($(余り\int_eval:n {\l_tmp_node_number_int-1}.east)!1/2!(被除数\int_use:N \l_tmp_node_number_int.west)$){)};
+ \tikzmath{
+  coordinate~\C;
+  \C1=(被除数\int_use:N \l_tmp_node_number_int.east);
+  \C2=(被除数\int_use:N \l_tmp_node_number_int.west);
+  \WIDTH=\Cx1-\Cx2;
+ }%
+ \node(商\int_use:N \l_tmp_node_number_int)at($(被除数\int_use:N \l_tmp_node_number_int)+(0,1)$)[text~width=\WIDTH-6pt,inner~xsep=0pt,align=right]{\int_use:N \l_tmp_shou_int};
+ \node(積\int_use:N \l_tmp_node_number_int)at($(被除数\int_use:N \l_tmp_node_number_int)+(0,-1)$)[text~width=\WIDTH-6pt,inner~xsep=0pt,align=right]{\int_use:N \l_tmp_seki_int};
+ \node(余り\int_use:N \l_tmp_node_number_int)at($(積\int_use:N \l_tmp_node_number_int)+(0,-1)$)[text~width=\WIDTH-6pt,inner~xsep=0pt,align=right]{\int_use:N \l_tmp_amari_int};
+ \draw(被除数\int_use:N \l_tmp_node_number_int.north~west)--(被除数\int_use:N \l_tmp_node_number_int.north~east);
+ \draw(余り\int_use:N \l_tmp_node_number_int.north~west)--(余り\int_use:N \l_tmp_node_number_int.north~east);
+ \int_compare:nNnT \l_tmp_amari_int > \l_tmp_min_amari_int
+  {\Original_EuclidDiv:VV \l_tmp_josu_int \l_tmp_amari_int}
+}%
+\cs_generate_variant:Nn \Original_EuclidDiv:nn { VV }
+\ExplSyntaxOff
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
 %\prebreakpenalty`．=10000
