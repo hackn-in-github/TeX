@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[10/21/2017 Ver.0.1124]%
+\ProvidesPackage{tikzxelatexsetup}[11/05/2017 Ver.0.1125]%
+% \eqref を再定義
 % \EuclidDiv を定義 expl3 を使用する
 % 内側の正三角形の一辺の長さが1のルーローの三角形を \pic at(X){Reuleaux triangle}; で出力させる
 % inline の enumerate 環境で afterlabel に \nobreak を噛ませる
@@ -33,7 +34,7 @@
 \newif\ifMarkSpc
 \MarkKeepWidthtrue
 \MarkSpctrue
-\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx,esvect}%
+\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx,esvect,refcount}%
 \usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
 	patterns,topaths,through,calc,intersections,%
 	shapes.geometric,shapes.misc,shapes.multipart,chains,angles,quotes,%
@@ -6079,6 +6080,19 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
     (-60:1)arc[start angle=0,delta angle=60,radius=1]--cycle;
   },%
  },%
+}%
+%% \eqref の再定義
+%% 要 refcount.sty
+\DeclareRobustCommand*\eqref[1]{%
+ \refused{#1}% 通知とか未定義時警告とか
+ \IfRefUndefinedExpandable{#1}{%
+  \textbf{??}% 未定義時の出力
+ }{%else
+  \leavevmode
+  \bgroup
+   \preEqlabel{}\postEqlabel{}\tagform@{\href{\getrefbykeydefault{#1}{anchor}{}}{\getrefnumber{#1}}}%
+  \egroup
+ }%
 }%
 \ExplSyntaxOn
 \int_new:N \l_tmp_node_number_int
