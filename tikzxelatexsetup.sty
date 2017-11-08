@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/05/2017 Ver.0.1125]%
+\ProvidesPackage{tikzxelatexsetup}[11/08/2017 Ver.0.1126]%
+% \MarkBox に代わる \XMark を新設 枠は \node[draw,rectangle] で出力
 % \eqref を再定義
 % \EuclidDiv を定義 expl3 を使用する
 % 内側の正三角形の一辺の長さが1のルーローの三角形を \pic at(X){Reuleaux triangle}; で出力させる
@@ -154,6 +155,36 @@
 \parindent1\zw\relax
 \unitlength1cm\relax
 %
+\def\あいう#1{\expandafter\@あいう\csname c@#1\endcsname}%
+\def\@あいう#1{\ifcase#1\or %
+あ\or い\or う\or え\or お\or か\or き\or く\or け\or こ\or%
+さ\or し\or す\or せ\or そ\or た\or ち\or つ\or て\or と\or%
+な\or に\or ぬ\or ね\or の\or は\or ひ\or ふ\or へ\or ほ\or%
+ま\or み\or む\or め\or も\or や\or ゆ\or よ\or%
+ら\or り\or る\or れ\or ろ\or わ\or ゐ\or ゑ\or を\or ん\else\@ctrerr\fi%
+}%
+\def\アイウ#1{\expandafter\@アイウ\csname c@#1\endcsname}%
+\def\@アイウ#1{\ifcase#1\or %
+ア\or イ\or ウ\or エ\or オ\or カ\or キ\or ク\or ケ\or コ\or%
+サ\or シ\or ス\or セ\or ソ\or タ\or チ\or ツ\or テ\or ト\or%
+ナ\or ニ\or ヌ\or ネ\or ノ\or ハ\or ヒ\or フ\or ヘ\or ホ\or%
+マ\or ミ\or ム\or メ\or モ\or ヤ\or ユ\or ヨ\or%
+ラ\or リ\or ル\or レ\or ロ\or ワ\or ヰ\or ヱ\or ヲ\or ン\else\@ctrerr\fi%
+}%
+\def\いろは#1{\expandafter\@いろは\csname c@#1\endcsname}%
+\def\@いろは#1{\ifcase#1\or %
+い\or ろ\or は\or に\or ほ\or へ\or と\or ち\or り\or ぬ\or る\or を\or%
+わ\or か\or よ\or た\or れ\or そ\or つ\or ね\or な\or ら\or む\or %
+う\or ゐ\or の\or お\or く\or や\or ま\or け\or ふ\or こ\or え\or て\or%
+あ\or さ\or き\or ゆ\or め\or み\or し\or ゑ\or ひ\or も\or せ\or す\or ん\else\@ctrerr\fi%
+}%
+\def\イロハ#1{\expandafter\@イロハ\csname c@#1\endcsname}%
+\def\@イロハ#1{\ifcase#1\or %
+イ\or ロ\or ハ\or ニ\or ホ\or ヘ\or ト\or チ\or リ\or ヌ\or ル\or ヲ\or%
+ワ\or カ\or ヨ\or タ\or レ\or ソ\or ツ\or ネ\or ナ\or ラ\or ム\or%
+ウ\or ヰ\or ノ\or オ\or ク\or ヤ\or マ\or ケ\or フ\or コ\or エ\or テ\or%
+ア\or サ\or キ\or ユ\or メ\or ミ\or シ\or ヱ\or ヒ\or モ\or セ\or ス\or ン\else\@ctrerr\fi%
+}%
 % 原稿ファイルの作成曜日を出力
 \def\曜日{{\count0=\year \count1=\month%
  \ifnum\count1<3\relax%
@@ -4393,31 +4424,31 @@
 %% #2:#4を含む\tikzのオプション
 %% #3:mdframed 環境のオプション
 %% #4:タイトル
-\newbox\FrameboxTitleBox
-\def\Framebox{\@ifnextchar<{\@tikzFramebox}{\@tikzFramebox<>}}%
-\def\@tikzFramebox<#1>{\@ifnextchar({\@@tikzFramebox<#1>}{\@@tikzFramebox<#1>()}}%
-\def\@@tikzFramebox<#1>(#2){\@ifnextchar[{\@@@tikzFramebox<#1>(#2)}{\@@@tikzFramebox<#1>(#2)[]}}%
-\def\@@@tikzFramebox<#1>(#2)[#3]#4{%
- \ifstrempty{#4}{%
-  \begin{mdframed}%
-   [%
-    topline=true,roundcorner=10pt,linewidth=1pt,#3,%
-   ]%
- }{%
-  \setbox\FrameboxTitleBox=\hbox{\tikz[baseline=(current bounding box.east),outer sep=0pt,#2]%
-   \node[anchor=east,rectangle,fill=white,inner xsep=2mm,#1]{#4};}%
-  \@tempdima=\dimexpr-.5\ht\FrameboxTitleBox-.5\dp\FrameboxTitleBox\relax
-  \begin{mdframed}%
-   [%
-    topline=true,roundcorner=10pt,innertopmargin=0pt,linewidth=1pt,%
-    frametitleaboveskip=\@tempdima,
-    frametitle={%
-     \box\FrameboxTitleBox
-    },#3%
-   ]%
- }%
-}%
-\def\endFramebox{\end{mdframed}}%
+%%%\newbox\FrameboxTitleBox
+%%%\def\Framebox{\@ifnextchar<{\@tikzFramebox}{\@tikzFramebox<>}}%
+%%%\def\@tikzFramebox<#1>{\@ifnextchar({\@@tikzFramebox<#1>}{\@@tikzFramebox<#1>()}}%
+%%%\def\@@tikzFramebox<#1>(#2){\@ifnextchar[{\@@@tikzFramebox<#1>(#2)}{\@@@tikzFramebox<#1>(#2)[]}}%
+%%%\def\@@@tikzFramebox<#1>(#2)[#3]#4{%
+%%% \ifstrempty{#4}{%
+%%%  \begin{mdframed}%
+%%%   [%
+%%%    topline=true,roundcorner=10pt,linewidth=1pt,#3,%
+%%%   ]%
+%%% }{%
+%%%  \setbox\FrameboxTitleBox=\hbox{\tikz[baseline=(current bounding box.east),outer sep=0pt,#2]%
+%%%   \node[anchor=east,rectangle,fill=white,inner xsep=2mm,#1]{#4};}%
+%%%  \@tempdima=\dimexpr-.5\ht\FrameboxTitleBox-.5\dp\FrameboxTitleBox\relax
+%%%  \begin{mdframed}%
+%%%   [%
+%%%    topline=true,roundcorner=10pt,innertopmargin=0pt,linewidth=1pt,%
+%%%    frametitleaboveskip=\@tempdima,
+%%%    frametitle={%
+%%%     \box\FrameboxTitleBox
+%%%    },#3%
+%%%   ]%
+%%% }%
+%%%}%
+%%%\def\endFramebox{\end{mdframed}}%
 %% TitleBox環境
 %% \begin{TitleBox}<#1>(#2)[#3]{#4}{#5}
 %% \end{TitleBox}
@@ -4426,32 +4457,32 @@
 %% #3:枠に関するTikZオプション
 %% #4:左上のタイトル
 %% #5:右下のタイトル(省略可)
-\NewDocumentEnvironment{TitleBox}{D<>{}D(){}O{}mm}{%
- \def\@temp{#5}%
- \ifx\@temp\@empty
-  \mdframed[%
-   innertopmargin=3mm,%
-   singleextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},%
-   firstextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},%
-   #3%
-  ]%
- \else
-  \mdframed[%
-   innertopmargin=3mm,innerbottommargin=3mm,%
-   singleextra={%
-    \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
-    \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
-   },%
-   firstextra={%
-    \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
-    \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
-   },%
-   #3%
-  ]%
- \fi
-}{%
- \endmdframed
-}%
+%%%\NewDocumentEnvironment{TitleBox}{D<>{}D(){}O{}mm}{%
+%%% \def\@temp{#5}%
+%%% \ifx\@temp\@empty
+%%%  \mdframed[%
+%%%   innertopmargin=3mm,%
+%%%   singleextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},%
+%%%   firstextra={\node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};},%
+%%%   #3%
+%%%  ]%
+%%% \else
+%%%  \mdframed[%
+%%%   innertopmargin=3mm,innerbottommargin=3mm,%
+%%%   singleextra={%
+%%%    \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
+%%%    \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
+%%%   },%
+%%%   firstextra={%
+%%%    \node[inner sep=2pt,fill=white,#1]at(P-|O)[e=2.5mm]{#4};
+%%%    \node[inner sep=2pt,fill=white,#2]at(P|-O)[w=2.5mm]{#5};
+%%%   },%
+%%%   #3%
+%%%  ]%
+%%% \fi
+%%%}{%
+%%% \endmdframed
+%%%}%
 %% 相似記号
 \def\soujitype{s}%
 \def\souji{%
@@ -5479,7 +5510,7 @@
 \def\StartCenter{\setcounter{MarkEnd}{\TempMarkEnd}\CenterWritetrue}%
 \def\StopCenter{\edef\TempMarkEnd{\theMarkEnd}\CenterWritefalse}%
 \def\MarkBoxChar#1{\let\MarkBoxMoji=#1\relax}% 12/18/2015 新設
-\MarkBoxChar{\アイウ}%
+\MarkBoxChar\アイウ
 \NewDocumentCommand\MarkBox{sooD<>{}D(){}m}{% 12/09/2015 auxへの書き出し部分を修正
  \ifthenelse{\equal{#6}{\empty}}%
  {%
@@ -5584,6 +5615,68 @@
   }%
  }%
 }%
+\let\MarkBoxOld=\MarkBox
+%
+%\Mark(*)[#1][#2]<#3>(#4){#5}%
+\newdimen\MarkXSep
+\newdimen\MarkYSep
+\MarkXSep=2pt % \XMark の inner xsep の値
+\MarkYSep=3pt % \XMark の inner ysep の値
+\tikzset{MarkBoxNode/.style={inner xsep=\MarkXSep,inner ysep=\MarkYSep,draw,rectangle,font=\bfseries,%
+                             very thick,minimum width=3\zw+2*\MarkXSep,align=center},%
+         MarkBoxScriptNode/.style={inner sep=1pt,draw,rectangle,very thick,font=\scriptsize\bfseries}}%
+\NewDocumentCommand\XMark{sooD<>{}D(){}m}{%
+ \ifthenelse{\equal{#6}{\empty}}{%
+  \IfBooleanTF{#1}{%
+   \,\tikz[baseline=(@M@O@.base),#4]\node[MarkBoxScriptNode,#5](@M@O@){\phantom{あ}};\,%
+  }{%
+   \,\tikz[baseline=(@M@O@.base),#4]\node[MarkBoxNode,#5](@M@O@){\phantom{あ}};\,%
+  }%
+ }{%
+  \setcounter{MarkFirst}{\numexpr\c@MarkEnd+\@ne}%
+  \def\@Mark@Strings{}%
+  \def\@Mark@Array{\@gobble}%
+  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#6\do{%
+   \stepcounter{MarkEnd}%
+   \edef\@Mark@Strings{\@Mark@Strings\MarkBoxMoji{MarkEnd}}%
+   \edef\@Mark@Array{\@Mark@Array,"\MarkBoxMoji{MarkEnd}"}%
+  }%
+  \unless\ifmeasuring@
+   \ifCenterWrite
+    \immediate\write\MarkAnswerWrite{%
+     $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#6}$\string\hspace{\string\CenterSkip}%
+    }%
+    \IfNoValueF{#2}{%
+     \immediate\write\@auxout{%
+      \string\newlabel{mark:#2}{{\@Mark@Strings}{\thepage}\@ifundefined{Hy@Message}{}{{}{}{}}}%
+     }%
+     \IfNoValueF{#3}{%
+      \def\@Mark@RefArray{\@gobble}%
+      \expandafter\@for\expandafter\member\expandafter:=\expandafter#3\do{%
+       \edef\@Mark@RefArray{\@Mark@RefArray,"\member"}%
+      }%
+      \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+       \pgfmatharray{\@Mark@Array}{\C-1}%
+       \let\@mark@array=\pgfmathresult
+       \pgfmatharray{\@Mark@RefArray}{\C-1}%
+       \let\@mark@refarray=\pgfmathresult
+       \immediate\write\@auxout{%
+        \string\newlabel{mark:#2:\@mark@refarray}{{\@mark@array}{\thepage}\@ifundefined{Hy@Message}{}{{}{}}}%
+       }%
+      }%
+     }%
+    }%
+   \fi
+  \fi
+  \IfBooleanTF{#1}{%
+   \,\tikz[baseline=(@M@O@.base),#4]\node[MarkBoxScriptNode,#5](@M@O@){\@Mark@Strings};\,%
+  }{%
+   \,\tikz[baseline=(@M@O@.base),#4]\node[MarkBoxNode,#5](@M@O@){\@Mark@Strings};\,%
+  }%
+ }%
+}%
+\let\MarkBox=\XMark
+%
 \NewDocumentCommand\RefMark{s D<>{}D(){}m}{%
  \@ifundefined{r@mark:#4}{%
   \leavevmode
@@ -5894,36 +5987,6 @@
 \def\@floorfunc#1{\ensuremath{\left\lfloor#1\right\rfloor}}%
 \def\floor@func#1{\ensuremath{\left[#1\right]}}%
 %% enumerate環境をすべてenumitemに移管 12/14/2016
-\def\あいう#1{\expandafter\@あいう\csname c@#1\endcsname}%
-\def\@あいう#1{\ifcase#1\or %
-あ\or い\or う\or え\or お\or か\or き\or く\or け\or こ\or%
-さ\or し\or す\or せ\or そ\or た\or ち\or つ\or て\or と\or%
-な\or に\or ぬ\or ね\or の\or は\or ひ\or ふ\or へ\or ほ\or%
-ま\or み\or む\or め\or も\or や\or ゆ\or よ\or%
-ら\or り\or る\or れ\or ろ\or わ\or ゐ\or ゑ\or を\or ん\else\@ctrerr\fi%
-}%
-\def\アイウ#1{\expandafter\@アイウ\csname c@#1\endcsname}%
-\def\@アイウ#1{\ifcase#1\or %
-ア\or イ\or ウ\or エ\or オ\or カ\or キ\or ク\or ケ\or コ\or%
-サ\or シ\or ス\or セ\or ソ\or タ\or チ\or ツ\or テ\or ト\or%
-ナ\or ニ\or ヌ\or ネ\or ノ\or ハ\or ヒ\or フ\or ヘ\or ホ\or%
-マ\or ミ\or ム\or メ\or モ\or ヤ\or ユ\or ヨ\or%
-ラ\or リ\or ル\or レ\or ロ\or ワ\or ヰ\or ヱ\or ヲ\or ン\else\@ctrerr\fi%
-}%
-\def\いろは#1{\expandafter\@いろは\csname c@#1\endcsname}%
-\def\@いろは#1{\ifcase#1\or %
-い\or ろ\or は\or に\or ほ\or へ\or と\or ち\or り\or ぬ\or る\or を\or%
-わ\or か\or よ\or た\or れ\or そ\or つ\or ね\or な\or ら\or む\or %
-う\or ゐ\or の\or お\or く\or や\or ま\or け\or ふ\or こ\or え\or て\or%
-あ\or さ\or き\or ゆ\or め\or み\or し\or ゑ\or ひ\or も\or せ\or す\or ん\else\@ctrerr\fi%
-}%
-\def\イロハ#1{\expandafter\@イロハ\csname c@#1\endcsname}%
-\def\@イロハ#1{\ifcase#1\or %
-イ\or ロ\or ハ\or ニ\or ホ\or ヘ\or ト\or チ\or リ\or ヌ\or ル\or ヲ\or%
-ワ\or カ\or ヨ\or タ\or レ\or ソ\or ツ\or ネ\or ナ\or ラ\or ム\or%
-ウ\or ヰ\or ノ\or オ\or ク\or ヤ\or マ\or ケ\or フ\or コ\or エ\or テ\or%
-ア\or サ\or キ\or ユ\or メ\or ミ\or シ\or ヱ\or ヒ\or モ\or セ\or ス\or ン\else\@ctrerr\fi%
-}%
 \def\CenterNumbering#1{\expandafter\@CenterNumbering\csname c@#1\endcsname}%
 \def\@CenterNumbering#1{\ifcase#1\or
 0\or 1\or 2\or 3\or 4\or 5\or 6\or 7\or 8\or 9\or A\or B\or C\or D\or
@@ -6090,7 +6153,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  }{%else
   \leavevmode
   \bgroup
-   \preEqlabel{}\postEqlabel{}\tagform@{\href{\getrefbykeydefault{#1}{anchor}{}}{\getrefnumber{#1}}}%
+   \preEqlabel{}\postEqlabel{}\textup{\tagform@{\href{\getrefbykeydefault{#1}{anchor}{}}{\getrefnumber{#1}}}}%
   \egroup
  }%
 }%
