@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/08/2017 Ver.0.1126]%
+\ProvidesPackage{tikzxelatexsetup}[11/11/2017 Ver.0.1127]%
+% \SetAngle のこの中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
 % \MarkBox に代わる \XMark を新設 枠は \node[draw,rectangle] で出力
 % \eqref を再定義
 % \EuclidDiv を定義 expl3 を使用する
@@ -4866,22 +4867,23 @@
 %}%
 \define@key{SetAngles}{strings only}[true]{\def\@SA@stringonly{0}}%
 \define@key{SetAngles}{point}{\def\@SA@Point{#1}}%
+\newcounter{anglenumber}%
 \NewDocumentCommand\SetAngles{D<>{}O{}mO{}m}{%
  \def\@SA@stringonly{1}%
  \def\@SA@Point{P}%
  \setkeys{SetAngles}{#1}%
  \@SetAngles[#2][#4]{#3}#5;/%
- \setcounter{tempcntc}{0}%
+ \setcounter{anglenumber}{0}%
 }%
 \def\@SetAngles[#1][#2]#3#4,#5,#6;{%
- \addtocounter{tempcntc}{1}%
+ \addtocounter{anglenumber}{1}%
  \ifcase\@SA@stringonly
   \pic[#2,"#3"'{#1}]{angle=#4--#5--#6};
  \or
   \pic[draw,#2,"#3"'{#1}]{angle=#4--#5--#6};
  \else
  \fi
- \pic[inner sep=0pt,outer sep=0pt,"{}",angle eccentricity=1](\@SA@Point\thetempcntc){angle=#4--#5--#6};
+ \pic[inner sep=0pt,outer sep=0pt,"{}",#2,angle eccentricity=1](\@SA@Point\theanglenumber){angle=#4--#5--#6};
  \@ifnextchar/{\@gobble}{\@SetAngles[#1][#2]{#3}}%
 }%
 %% \Touhenkigou<#1>[#2]{#3}%
