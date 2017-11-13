@@ -1,6 +1,7 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/11/2017 Ver.0.1127]%
-% \SetAngle のこの中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
+\ProvidesPackage{tikzxelatexsetup}[11/11/2017 Ver.0.1128]%
+% \HakoHige を改変(\TateHakoHige が必要になったらそのとき作ることにする) 11/13/2017
+% \SetAngle の弧の中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
 % \MarkBox に代わる \XMark を新設 枠は \node[draw,rectangle] で出力
 % \eqref を再定義
 % \EuclidDiv を定義 expl3 を使用する
@@ -4843,6 +4844,142 @@
  \ifnum\@YokoHako@Show@Med=\@ne\relax
   \node at(\@YokoHako@Total/\@YokoHakoHige@Max,-\@YokoHakoHige@Number){\@YokoHako@Med@Mark};
  \fi
+}%
+%% \GetSubArray{#1}{#2}{#3}{#4}%
+%%% #1 : 切り出す列の元となる列
+%%% #2 : 切り出す列の元となる列の最初の元の番号
+%%% #3 : 切り出す列の元となる列の最後の元の番号
+%%% #4 : 切り出す列の名前
+\NewDocumentCommand\GetSubArray{mmmm}{%
+ \def#4{\@gobble}%
+ \foreach \N in {1,...,#3}{%
+  \pgfmatharray{#1}{\N-1}%
+  \ifthenelse{\N=#2\OR\N>#2}{\xdef#4{#4,\pgfmathresult}}{}%
+ }%
+}%
+%% \GetArrayMed{#1}{#2}%
+%%% #1 : 中央値を調べる列
+%%% #2 : 中央値を収めるコントロールシーケンス
+\NewDocumentCommand\GetArrayMed{mm}{%
+ \c@tempcnta=\z@
+ \expandafter\@for\expandafter\member\expandafter:\expandafter=#1\do{%
+  \advance\c@tempcnta by\@ne
+ }%
+ \ifodd\c@tempcnta
+  \pgfmatharray{#1}{(\c@tempcnta-1)/2}%
+  \edef#2{\pgfmathresult}%
+ \else
+  \pgfmatharray{#1}{\c@tempcnta/2-1}%
+  \let\@temp@getarray@f=\pgfmathresult
+  \pgfmatharray{#1}{\c@tempcnta/2}%
+  \let\@temp@getarray@s=\pgfmathresult
+  \tikzmath{\@temp@med=(\@temp@getarray@f+\@temp@getarray@s)/2;}
+  \edef#2{\@temp@med}%
+ \fi
+}%
+%% \HakoHigeReset
+%%% \hakohigenumber を 0 にする
+\NewDocumentCommand\HakoHigeReset{}{%
+ \setcounter{hakohigenumber}{0}%
+}%
+\newcounter{hakohigenumber}%
+\define@key{HakoHige}{width}{\def\@HakoHige@Width{#1}}%
+\define@key{HakoHige}{space}{\def\@HakoHige@Space{#1}}%
+\define@key{HakoHige}{hige width}{\def\@HakoHige@HigeWidth{#1}}%
+\define@key{HakoHige}{data}{\def\@HakoHige@Data{#1}}%
+\define@key{HakoHige}{show ave}[1]{\def\@HakoHige@ShowAve{#1}}%
+\define@key{HakoHige}{ave mark}{\def\@HakoHige@AveMark{#1}}%
+%% \HakoHige<#1>[#2](#3):#4:{#5}%
+%%% #1 : オリジナルオプション
+%%%     width      : 箱の幅(15mm)
+%%%     space      : 箱と箱の間隔(5mm)
+%%%     hige width : ひげの幅(10mm)
+%%%     data       : #5 を用いず最小値，第1四分位数，中央値，第3四分位数，最大値を順にカンマ区切りで指定する
+%%%     show ave   : 平均値を表示する
+%%%     ave mark   : 平均値のマークの変更($+$)
+%%% #2 : 箱に対するオプション
+%%% #3 : ひげに対するオプション
+%%% #4 : 平均値に対するオプション
+%%% #5 : データ(カンマ区切り)
+\RenewDocumentCommand\HakoHige{D<>{}O{}D(){}D::{}m}{%
+ \let\@HakoHige@Data=\relax
+ \def\@HakoHige@Width{15mm}%
+ \def\@HakoHige@Space{5mm}%
+ \def\@HakoHige@HigeWidth{10mm}%
+ \def\@HakoHige@ShowAve{0}%
+ \def\@HakoHige@AveMark{$+$}%
+ \setkeys{HakoHige}{#1}%
+ \stepcounter{hakohigenumber}%
+ \tikzmath{%
+  coordinate \C;
+  \C=(1,0);
+  \@HakoHige@Width@=\@HakoHige@Width/\Cx;
+  \@HakoHige@Space@=\@HakoHige@Space/\Cx;
+  \@HakoHige@HigeWidth@=\@HakoHige@HigeWidth/\Cx;
+ }%
+ \@ifundefined{@HakoHige@Data}{%
+  \Sort{HakoHige}{#5}\@HakoHige@Number\@HakoHige@Array
+  \def\@Hako@Avr{0}%
+  \expandafter\@for\expandafter\member\expandafter:\expandafter=\@HakoHige@Array\do{%
+  \tikzmath{%
+   \@Hako@Avr=\@Hako@Avr+\member;
+  }%
+ }%
+\tikzmath{\@Hako@Avr=\@Hako@Avr/\@HakoHige@Number;}%
+  \ifodd\@HakoHige@Number
+   \GetSubArray\@HakoHige@Array{1}{\numexpr(\@HakoHige@Number+1)/2}\@HakoHige@FirstArray
+   \GetSubArray\@HakoHige@Array{\numexpr(\@HakoHige@Number+1)/2}{\@HakoHige@Number}\@HakoHige@SecondArray
+  \else
+   \GetSubArray\@HakoHige@Array{1}{\numexpr\@HakoHige@Number/2}\@HakoHige@FirstArray
+   \GetSubArray\@HakoHige@Array{\numexpr\@HakoHige@Number/2+1}{\@HakoHige@Number}\@HakoHige@SecondArray
+  \fi
+  \GetArrayMed\@HakoHige@Array\@HakoHige@Med
+  \GetArrayMed\@HakoHige@FirstArray\@HakoHige@FQ
+  \GetArrayMed\@HakoHige@SecondArray\@HakoHige@TQ
+  \GetSubArray\@HakoHige@Array{1}{1}\@HakoHige@MIN
+  \GetSubArray\@HakoHige@Array{\@HakoHige@Number}{\@HakoHige@Number}\@HakoHige@MAX
+ }{%
+  \def\@HakoHige@Data@Split##1,##2,##3,##4,##5\@nil{%
+   \edef\@HakoHige@MIN{##1}%
+   \edef\@HakoHige@FQ{##2}%
+   \edef\@HakoHige@Med{##3}%
+   \edef\@HakoHige@TQ{##4}%
+   \edef\@HakoHige@MAX{##5}%
+  }%
+  \expandafter\@HakoHige@Data@Split\@HakoHige@Data\@nil
+ }%
+ \coordinate(HAKO\thehakohigenumber BL)at%
+  (\@HakoHige@FQ,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@});
+ \coordinate(HAKO\thehakohigenumber BM)at%
+  (\@HakoHige@Med,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@});
+ \coordinate(HAKO\thehakohigenumber BR)at%
+  (\@HakoHige@TQ,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@});
+ \coordinate(HAKO\thehakohigenumber TL)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@Width@)$);
+ \coordinate(HAKO\thehakohigenumber TM)at($(HAKO\thehakohigenumber BM)+(0,\@HakoHige@Width@)$);
+ \coordinate(HAKO\thehakohigenumber TR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@Width@)$);
+ \coordinate(HAKO\thehakohigenumber ML)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@Width@/2)$);
+ \coordinate(HAKO\thehakohigenumber MR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@Width@/2)$);
+ \coordinate(HAKOHIGE\thehakohigenumber LM)at%
+  (\@HakoHige@MIN,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@+\@HakoHige@Width@/2});
+ \coordinate(HAKOHIGE\thehakohigenumber RM)at%
+  (\@HakoHige@MAX,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@+\@HakoHige@Width@/2});
+ \coordinate(HAKOHIGE\thehakohigenumber LT)at($(HAKOHIGE\thehakohigenumber LM)+(0,\@HakoHige@HigeWidth@/2)$);
+ \coordinate(HAKOHIGE\thehakohigenumber RT)at($(HAKOHIGE\thehakohigenumber RM)+(0,\@HakoHige@HigeWidth@/2)$);
+ \coordinate(HAKOHIGE\thehakohigenumber LB)at($(HAKOHIGE\thehakohigenumber LM)+(0,-\@HakoHige@HigeWidth@/2)$);
+ \coordinate(HAKOHIGE\thehakohigenumber RB)at($(HAKOHIGE\thehakohigenumber RM)+(0,-\@HakoHige@HigeWidth@/2)$);
+ \draw[thick,#2](HAKO\thehakohigenumber BL)rectangle(HAKO\thehakohigenumber TR)%
+  (HAKO\thehakohigenumber BM)--(HAKO\thehakohigenumber TM);%
+ \draw[thick,#3](HAKOHIGE\thehakohigenumber RM)--(HAKO\thehakohigenumber MR)%
+  (HAKO\thehakohigenumber ML)--(HAKOHIGE\thehakohigenumber LM)%
+  (HAKOHIGE\thehakohigenumber LT)--(HAKOHIGE\thehakohigenumber LB)%
+  (HAKOHIGE\thehakohigenumber RT)--(HAKOHIGE\thehakohigenumber RB);
+ \@ifundefined{@HakoHige@Data}{%
+  \coordinate(HAKO\thehakohigenumber AV)at%
+   (\@Hako@Avr,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@+\@HakoHige@Width@/2});
+  \ifnum\@HakoHige@ShowAve=\@ne
+   \node at(HAKO\thehakohigenumber AV)[#4]{\@HakoHige@AveMark};
+  \fi
+ }{}%
 }%
 %% \SetAngles<#1>[#2]{#3}[#4]{#5}% 02/01/2016 文字列にもオプションを与えられるようにする
 %%                             それに伴いオプションの位置を変更する
