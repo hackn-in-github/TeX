@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/11/2017 Ver.0.1128]%
+\ProvidesPackage{tikzxelatexsetup}[11/11/2017 Ver.0.1129]%
+% \HakoHige の平均を出す計算式を修正 11/14/2017
 % \HakoHige を改変(\TateHakoHige が必要になったらそのとき作ることにする) 11/13/2017
 % \SetAngle の弧の中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
 % \MarkBox に代わる \XMark を新設 枠は \node[draw,rectangle] で出力
@@ -4922,7 +4923,7 @@
   \def\@Hako@Avr{0}%
   \expandafter\@for\expandafter\member\expandafter:\expandafter=\@HakoHige@Array\do{%
   \tikzmath{%
-   \@Hako@Avr=\@Hako@Avr+\member;
+   \@Hako@Avr=\@Hako@Avr+(\member);
   }%
  }%
 \tikzmath{\@Hako@Avr=\@Hako@Avr/\@HakoHige@Number;}%
