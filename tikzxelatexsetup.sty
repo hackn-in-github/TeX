@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/11/2017 Ver.0.1129]%
+\ProvidesPackage{tikzxelatexsetup}[11/14/2017 Ver.0.1130]%
+% \HakoHige のスタイルを広域的に設定できるようにする 11/14/2017
 % \HakoHige の平均を出す計算式を修正 11/14/2017
 % \HakoHige を改変(\TateHakoHige が必要になったらそのとき作ることにする) 11/13/2017
 % \SetAngle の弧の中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
@@ -4882,7 +4883,25 @@
 %%% \hakohigenumber を 0 にする
 \NewDocumentCommand\HakoHigeReset{}{%
  \setcounter{hakohigenumber}{0}%
+ \SetHakoHigeBoxWidth{15mm}%
+ \SetHakoHigeHigeWidth{10mm}%
+ \SetHakoHigeSpaceWidth{5mm}%
+ \SetHakoHigeAveMark{$+$}%
+ \tikzset{HakoHigeBox/.style={},%
+          HakoHigeHige/.style={thick},%
+          HakoHigeAve/.style={}}%
 }%
+\tikzset{HakoHigeBox/.style={},%
+         HakoHigeHige/.style={thick},%
+         HakoHigeAve/.style={}}%
+\NewDocumentCommand\SetHakoHigeBoxWidth{m}{\def\@HakoHige@Box@Width@Default{#1}}%
+\NewDocumentCommand\SetHakoHigeHigeWidth{m}{\def\@HakoHige@Hige@Width@Default{#1}}%
+\NewDocumentCommand\SetHakoHigeSpaceWidth{m}{\def\@HakoHige@Space@Width@Default{#1}}%
+\NewDocumentCommand\SetHakoHigeAveMark{m}{\def\@HakoHige@Ave@Mark{#1}}%
+\SetHakoHigeBoxWidth{15mm}%
+\SetHakoHigeHigeWidth{10mm}%
+\SetHakoHigeSpaceWidth{5mm}%
+\SetHakoHigeAveMark{$+$}%
 \newcounter{hakohigenumber}%
 \define@key{HakoHige}{width}{\def\@HakoHige@Width{#1}}%
 \define@key{HakoHige}{space}{\def\@HakoHige@Space{#1}}%
@@ -4904,11 +4923,11 @@
 %%% #5 : データ(カンマ区切り)
 \RenewDocumentCommand\HakoHige{D<>{}O{}D(){}D::{}m}{%
  \let\@HakoHige@Data=\relax
- \def\@HakoHige@Width{15mm}%
- \def\@HakoHige@Space{5mm}%
- \def\@HakoHige@HigeWidth{10mm}%
+ \let\@HakoHige@Width=\@HakoHige@Box@Width@Default
+ \let\@HakoHige@HigeWidth=\@HakoHige@Hige@Width@Default
+ \let\@HakoHige@Space=\@HakoHige@Space@Width@Default
+ \let\@HakoHige@AveMark=\@HakoHige@Ave@Mark
  \def\@HakoHige@ShowAve{0}%
- \def\@HakoHige@AveMark{$+$}%
  \setkeys{HakoHige}{#1}%
  \stepcounter{hakohigenumber}%
  \tikzmath{%
@@ -4926,7 +4945,7 @@
    \@Hako@Avr=\@Hako@Avr+(\member);
   }%
  }%
-\tikzmath{\@Hako@Avr=\@Hako@Avr/\@HakoHige@Number;}%
+ \tikzmath{\@Hako@Avr=\@Hako@Avr/\@HakoHige@Number;}%
   \ifodd\@HakoHige@Number
    \GetSubArray\@HakoHige@Array{1}{\numexpr(\@HakoHige@Number+1)/2}\@HakoHige@FirstArray
    \GetSubArray\@HakoHige@Array{\numexpr(\@HakoHige@Number+1)/2}{\@HakoHige@Number}\@HakoHige@SecondArray
@@ -4961,24 +4980,24 @@
  \coordinate(HAKO\thehakohigenumber ML)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@Width@/2)$);
  \coordinate(HAKO\thehakohigenumber MR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@Width@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber LM)at%
-  (\@HakoHige@MIN,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@+\@HakoHige@Width@/2});
+  (\@HakoHige@MIN,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1/2)*\@HakoHige@Width@});
  \coordinate(HAKOHIGE\thehakohigenumber RM)at%
-  (\@HakoHige@MAX,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@+\@HakoHige@Width@/2});
+  (\@HakoHige@MAX,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1/2)*\@HakoHige@Width@});
  \coordinate(HAKOHIGE\thehakohigenumber LT)at($(HAKOHIGE\thehakohigenumber LM)+(0,\@HakoHige@HigeWidth@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber RT)at($(HAKOHIGE\thehakohigenumber RM)+(0,\@HakoHige@HigeWidth@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber LB)at($(HAKOHIGE\thehakohigenumber LM)+(0,-\@HakoHige@HigeWidth@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber RB)at($(HAKOHIGE\thehakohigenumber RM)+(0,-\@HakoHige@HigeWidth@/2)$);
- \draw[thick,#2](HAKO\thehakohigenumber BL)rectangle(HAKO\thehakohigenumber TR)%
+ \draw[HakoHigeBox,HakoHigeHige,#2](HAKO\thehakohigenumber BL)rectangle(HAKO\thehakohigenumber TR)%
   (HAKO\thehakohigenumber BM)--(HAKO\thehakohigenumber TM);%
- \draw[thick,#3](HAKOHIGE\thehakohigenumber RM)--(HAKO\thehakohigenumber MR)%
+ \draw[HakoHigeHige,#3](HAKOHIGE\thehakohigenumber RM)--(HAKO\thehakohigenumber MR)%
   (HAKO\thehakohigenumber ML)--(HAKOHIGE\thehakohigenumber LM)%
   (HAKOHIGE\thehakohigenumber LT)--(HAKOHIGE\thehakohigenumber LB)%
   (HAKOHIGE\thehakohigenumber RT)--(HAKOHIGE\thehakohigenumber RB);
  \@ifundefined{@HakoHige@Data}{%
   \coordinate(HAKO\thehakohigenumber AV)at%
-   (\@Hako@Avr,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@+\@HakoHige@Width@/2});
+   (\@Hako@Avr,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1/2)*\@HakoHige@Width@});
   \ifnum\@HakoHige@ShowAve=\@ne
-   \node at(HAKO\thehakohigenumber AV)[#4]{\@HakoHige@AveMark};
+   \node at(HAKO\thehakohigenumber AV)[HakoHigeAve,#4]{\@HakoHige@AveMark};
   \fi
  }{}%
 }%
