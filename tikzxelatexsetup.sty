@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/14/2017 Ver.0.1130]%
+\ProvidesPackage{tikzxelatexsetup}[12/05/2017 Ver.0.1131]%
+% \RefMark を \XMark に合わせて再定義する
 % \HakoHige のスタイルを広域的に設定できるようにする 11/14/2017
 % \HakoHige の平均を出す計算式を修正 11/14/2017
 % \HakoHige を改変(\TateHakoHige が必要になったらそのとき作ることにする) 11/13/2017
@@ -5836,7 +5837,7 @@
 }%
 \let\MarkBox=\XMark
 %
-\NewDocumentCommand\RefMark{s D<>{}D(){}m}{%
+\NewDocumentCommand\RefMark{s D<>{}D(){}m}{%12/05/2017 廃止
  \@ifundefined{r@mark:#4}{%
   \leavevmode
   \hbox{%
@@ -5912,6 +5913,25 @@
      \kern1pt\relax
     \fi
    }%
+  }%
+ }%
+}%
+% \RefMark 12/05/2017 \XMark に合せて再定義
+\tikzset{RefMarkBoxNode/.style={inner xsep=\MarkXSep,inner ysep=\MarkYSep,draw,rectangle,%
+                                minimum width=3\zw+2*\MarkXSep,align=center},%
+         RefMarkBoxScriptNode/.style={inner sep=1pt,draw,rectangle,font=\scriptsize}}%
+\RenewDocumentCommand\RefMark{sO{}m}{%
+ \IfRefUndefinedExpandable{mark:#3}{%
+  \,%
+  \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
+   \node[draw,text width=3\zw,inner ysep=2.5pt,text=red,align=center](@O@){??};
+  }%
+  \,%
+ }{%
+  \IfBooleanTF{#1}{%
+   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxScriptNode,#2](@M@O@){\ref{mark:#3}};\,
+  }{%
+   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxNode,#2](@M@O@){\ref{mark:#3}};\,
   }%
  }%
 }%
