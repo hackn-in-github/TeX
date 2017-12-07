@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/07/2017 Ver.0.1132]%
+\ProvidesPackage{tikzxelatexsetup}[12/07/2017 Ver.0.1133]%
+% \XMark の multi オプション時の設定ミスを修正
 % \XMark で1つの記号に複数の数値を解答とする multi オプションを設置
 % \RefMark を \XMark に合わせて再定義する
 % \HakoHige のスタイルを広域的に設定できるようにする 11/14/2017
@@ -5866,6 +5867,7 @@
   \expandafter\@for\expandafter\member\expandafter:\expandafter=#7\do{%
    \edef\@Mark@Array{\@Mark@Array \@XMark@multi@conjunction\member}%
   }%
+  \stepcounter{MarkEnd}%
  \else
   \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#7\do{%
    \stepcounter{MarkEnd}%
