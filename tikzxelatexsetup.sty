@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/05/2017 Ver.0.1131]%
+\ProvidesPackage{tikzxelatexsetup}[12/07/2017 Ver.0.1132]%
+% \XMark で1つの記号に複数の数値を解答とする multi オプションを設置
 % \RefMark を \XMark に合わせて再定義する
 % \HakoHige のスタイルを広域的に設定できるようにする 11/14/2017
 % \HakoHige の平均を出す計算式を修正 11/14/2017
@@ -5832,6 +5833,84 @@
    \,\tikz[baseline=(@M@O@.base),#4]\node[MarkBoxScriptNode,#5](@M@O@){\@Mark@Strings};\,%
   }{%
    \,\tikz[baseline=(@M@O@.base),#4]\node[MarkBoxNode,#5](@M@O@){\@Mark@Strings};\,%
+  }%
+ }%
+}%
+% \XMark(*)<#1>[#2][#3](#4)|#5|{#6}%
+% *  : script に \XMark が置かれるときに指定する
+% #1 : オリジナルオプション
+%      multi : 記号1つに対して複数の解答を指定するときに用いる
+%              #1 で multi を指定した場合は #6 には 0,2,5 のようにカンマ区切りで複数の数値を指定する
+% #2 : \RefMark で参照させるときに参照文字列を指定する
+% #3 : #2 が指定されさらに #6 が複数の文字列のときそれら各々の文字列に対してさらに参照させるときに参照文字列を指定する
+% #4 : \tikz 本体に対するオプション指定
+% #5 : #6 が含まれる \node に対するオプション指定
+\define@key{XMark}{multi}[true]{\def\@XMark@multi{1}}%
+\def\SetXMarkMultiConjunction#1{\def\@XMark@multi@conjunction{#1}\ignorespaces}%
+\SetXMarkMultiConjunction{\ と\ }%
+\RenewDocumentCommand\XMark{sD<>{}ooD(){}D||{}m}{%
+ \def\@XMark@multi{0}%
+ \setkeys{XMark}{#2}%
+ \ifthenelse{\equal{#7}{\empty}}{%
+  \IfBooleanTF{#1}{%
+   \,\tikz[baseline=(@M@O@.base),#5]\node[MarkBoxScriptNode,#6](@M@O@){\phantom{あ}};\,%
+  }{%
+   \,\tikz[baseline=(@M@O@.base),#5]\node[MarkBoxNode,#6](@M@O@){\phantom{あ}};\,%
+  }%
+ }{%
+  \setcounter{MarkFirst}{\numexpr\c@MarkEnd+\@ne}%
+  \def\@Mark@Strings{}%
+  \def\@Mark@Array{\@gobble}%
+ \ifnum\@XMark@multi=\@ne
+  \edef\@Mark@Strings{\MarkBoxMoji{MarkFirst}}%
+  \expandafter\@for\expandafter\member\expandafter:\expandafter=#7\do{%
+   \edef\@Mark@Array{\@Mark@Array \@XMark@multi@conjunction\member}%
+  }%
+ \else
+  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#7\do{%
+   \stepcounter{MarkEnd}%
+   \edef\@Mark@Strings{\@Mark@Strings\MarkBoxMoji{MarkEnd}}%
+   \edef\@Mark@Array{\@Mark@Array,"\MarkBoxMoji{MarkEnd}"}%
+  }%
+ \fi
+  \unless\ifmeasuring@
+   \ifCenterWrite
+    \ifnum\@XMark@multi=\@ne
+     \immediate\write\MarkAnswerWrite{%
+      $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=\@Mark@Array}$%
+      \string\hspace{\string\CenterSkip}%
+     }%
+    \else
+     \immediate\write\MarkAnswerWrite{%
+      $\string\boldsymbol{\string\text{\string\textbf{\@Mark@Strings}}=#7}$\string\hspace{\string\CenterSkip}%
+     }%
+    \fi
+    \IfNoValueF{#3}{%
+     \immediate\write\@auxout{%
+      \string\newlabel{mark:#3}{{\@Mark@Strings}{\thepage}\@ifundefined{Hy@Message}{}{{}{}{}}}%
+     }%
+     \IfNoValueF{#4}{%
+      \def\@Mark@RefArray{\@gobble}%
+      \expandafter\@for\expandafter\member\expandafter:=\expandafter#4\do{%
+       \edef\@Mark@RefArray{\@Mark@RefArray,"\member"}%
+      }%
+      \foreach[count=\C]\N in {\c@MarkFirst,...,\c@MarkEnd}{%
+       \pgfmatharray{\@Mark@Array}{\C-1}%
+       \let\@mark@array=\pgfmathresult
+       \pgfmatharray{\@Mark@RefArray}{\C-1}%
+       \let\@mark@refarray=\pgfmathresult
+       \immediate\write\@auxout{%
+        \string\newlabel{mark:#3:\@mark@refarray}{{\@mark@array}{\thepage}\@ifundefined{Hy@Message}{}{{}{}}}%
+       }%
+      }%
+     }%
+    }%
+   \fi
+  \fi
+  \IfBooleanTF{#1}{%
+   \,\tikz[baseline=(@M@O@.base),#5]\node[MarkBoxScriptNode,#6](@M@O@){\@Mark@Strings};\,%
+  }{%
+   \,\tikz[baseline=(@M@O@.base),#5]\node[MarkBoxNode,#6](@M@O@){\@Mark@Strings};\,%
   }%
  }%
 }%
