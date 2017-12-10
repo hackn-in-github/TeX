@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/07/2017 Ver.0.1133]%
+\ProvidesPackage{tikzxelatexsetup}[12/11/2017 Ver.0.1134]%
+% \IncludeGraphics[#1]{#2}を新設
 % \XMark の multi オプション時の設定ミスを修正
 % \XMark で1つの記号に複数の数値を解答とする multi オプションを設置
 % \RefMark を \XMark に合わせて再定義する
@@ -6239,6 +6240,25 @@
  }{%
   \includegraphics[#1]{\PATH#2}%
  }%
+}%
+% \IncludeGraphics[#1]{#2}
+% \IncludePDF[#1]{#2} の LaTeX で扱える任意の画像ファイル版
+% \IncludePDF 同様 dpth ファイルがあればその内容を読み込み画像を上下させる
+\NewDocumentCommand\IncludeGraphics{O{}m}{%
+ \GetGraphicsDepthFileName{\PATH#2}\@GraphicsDepthFile
+ \IfFileExists{\@GraphicsDepthFile}{%
+  \immediate\openin\pdf@depthfile=\@GrahphicsDepthFile
+  \read\pdf@depthfile to\@GraphicsDepth
+  \raisebox{-\@GraphicsDepth}{\includegraphics[#1]{\PATH#2}}%
+ }{%
+  \includegraphics[#1]{\PATH#2}%
+ }%
+}%
+\NewDocumentCommand\GetGraphicsDepthFileName{mm}{%
+ \@GetGraphicsDepthFileName{#2}#1\@nil
+}%
+\def\@GetGraphicsDepthFileName#1#2.#3\@nil{%
+ \edef#1{#2.dpth}%
 }%
 %% 床関数・天井関数の定義
 %% \floorfunc* でガウス記号
