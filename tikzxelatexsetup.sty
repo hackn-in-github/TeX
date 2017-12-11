@@ -1,6 +1,7 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/11/2017 Ver.0.1134]%
-% \IncludeGraphics[#1]{#2}を新設
+\ProvidesPackage{tikzxelatexsetup}[12/11/2017 Ver.0.1135]%
+% \XMark 使用時に hyperref ワーニングが出るため修正 12/11/2017
+% \IncludeGraphics[#1]{#2}を新設 12/11/2017
 % \XMark の multi オプション時の設定ミスを修正
 % \XMark で1つの記号に複数の数値を解答とする multi オプションを設置
 % \RefMark を \XMark に合わせて再定義する
@@ -5861,6 +5862,7 @@
   }%
  }{%
   \setcounter{MarkFirst}{\numexpr\c@MarkEnd+\@ne}%
+%  \@ifundefined{Hy@Message}{}{\stepcounter{Item}}%
   \def\@Mark@Strings{}%
   \def\@Mark@Array{\@gobble}%
  \ifnum\@XMark@multi=\@ne
@@ -5890,7 +5892,7 @@
     \fi
     \IfNoValueF{#3}{%
      \immediate\write\@auxout{%
-      \string\newlabel{mark:#3}{{\@Mark@Strings}{\thepage}\@ifundefined{Hy@Message}{}{{}{}{}}}%
+      \string\newlabel{mark:#3}{{\@Mark@Strings}{\thepage}\@ifundefined{Hy@Message}{}{{}{Item.\theItem}{}}}%
      }%
      \IfNoValueF{#4}{%
       \def\@Mark@RefArray{\@gobble}%
