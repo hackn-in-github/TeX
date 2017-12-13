@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/11/2017 Ver.0.1135]%
+\ProvidesPackage{tikzxelatexsetup}[12/13/2017 Ver.0.1136]%
+% \IncludeGraphics の修正 12/13/2017
 % \XMark 使用時に hyperref ワーニングが出るため修正 12/11/2017
 % \IncludeGraphics[#1]{#2}を新設 12/11/2017
 % \XMark の multi オプション時の設定ミスを修正
@@ -6249,7 +6250,7 @@
 \NewDocumentCommand\IncludeGraphics{O{}m}{%
  \GetGraphicsDepthFileName{\PATH#2}\@GraphicsDepthFile
  \IfFileExists{\@GraphicsDepthFile}{%
-  \immediate\openin\pdf@depthfile=\@GrahphicsDepthFile
+  \immediate\openin\pdf@depthfile=\@GraphicsDepthFile
   \read\pdf@depthfile to\@GraphicsDepth
   \raisebox{-\@GraphicsDepth}{\includegraphics[#1]{\PATH#2}}%
  }{%
