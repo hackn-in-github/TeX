@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/13/2017 Ver.0.1136]%
+\ProvidesPackage{tikzxelatexsetup}[12/31/2017 Ver.0.1137]%
+% spacename 環境を新設さらに \spacelabel，\spaceref，\spacepageref も新設
 % \IncludeGraphics の修正 12/13/2017
 % \XMark 使用時に hyperref ワーニングが出るため修正 12/11/2017
 % \IncludeGraphics[#1]{#2}を新設 12/11/2017
@@ -6440,6 +6441,92 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
   \egroup
  }%
 }%
+%% spacename 環境
+%% \spacelabel および \spaceref において使う \@name@spacename を定義する(一意な名前になるようにする)
+%% spacename 環境内では基本的に \spacelabel{hoge}，\spaceref{refname}{hoge}，\spacepageref{refname}{hoge} は
+%% \label{\@name@spacename @hoge}，\ref{\@name@spacename @hoge}，\pageref{\@name@spacename @hoge} となる．
+%% \spaceref，\spacepageref の refname は enum，eq，sec など任意の文字列を指定できる
+%% refname に合わせて \setspaceref* コマンドで \spaceref の動作を指定できる
+%% \spacepageref の動作は \setspacepageref* コマンドで指定する
+\newcounter{spaceref}%
+\NewDocumentEnvironment{spacename}{m}{%
+ \def\@name@spacename{#1}%
+}{}%
+\NewDocumentCommand{\spacelabel}{m}{%
+ \label{\@name@spacename @#1}%
+}%
+\NewDocumentCommand{\setspacerefprefix}{mm}{\expandafter\def\csname @spaceref@#1@prefix\endcsname{#2}}%
+\NewDocumentCommand{\setspacerefsurfix}{mm}{\expandafter\def\csname @spaceref@#1@surfix\endcsname{#2}}%
+\NewDocumentCommand{\setspacerefconj}{mm}{\expandafter\def\csname @spaceref@#1@conj\endcsname{#2}}%
+\NewDocumentCommand{\setspacereflastconj}{mm}{\expandafter\def\csname @spaceref@#1@lastconj\endcsname{#2}}%
+\NewDocumentCommand{\setspacerefbeforesymbol}{mm}{\expandafter\def\csname @spaceref@#1@beforesymbol\endcsname{#2}}%
+\NewDocumentCommand{\setspacerefaftersymbol}{mm}{\expandafter\def\csname @spaceref@#1@aftersymbol\endcsname{#2}}%
+\NewDocumentCommand{\setspacepagerefprefix}{m}{\def\@spacepageref@prefix{#1}}%
+\NewDocumentCommand{\setspacepagerefsurfix}{m}{\def\@spacepageref@surfix{#1}}%
+\NewDocumentCommand{\setspacepagerefconj}{m}{\def\@spacepageref@conj{#1}}%
+\NewDocumentCommand{\setspacepagereflastconj}{m}{\def\@spacepageref@lastconj{#1}}%
+\NewDocumentCommand{\spaceref}{omm}{%
+ \c@spaceref=\z@
+ \@tempcnta=\z@
+ \expandafter\let\expandafter\@tempcsconj\expandafter=\csname @spaceref@#2@conj\endcsname
+ \expandafter\let\expandafter\@tempcslastconj\expandafter=\csname @spaceref@#2@lastconj\endcsname
+ \expandafter\let\expandafter\@tempcsbefore\expandafter=\csname @spaceref@#2@beforesymbol\endcsname
+ \expandafter\let\expandafter\@tempcsafter\expandafter=\csname @spaceref@#2@aftersymbol\endcsname
+ \let\@spaceref@gobble=\@gobble
+ \IfValueTF{#1}{\edef\@nameref@spacename{#1}}{\edef\@nameref@spacename{\@name@spacename}}%
+ \@for\member:=#3\do{\advance\@tempcnta by\@ne}%
+ \@nameuse{@spaceref@#2@prefix}%
+ \@for\member:=#3\do{%
+  \@ifundefined{r@\@nameref@spacename @\member}%
+               {\emph{I can't find label ``\@nameref@spacename @\member''. }}{%
+   \advance\c@spaceref by\@ne
+   \ifnum\c@spaceref=\@tempcnta
+    \let\@tempcsconj=\@tempcslastconj
+   \fi
+   \@spaceref@gobble\@tempcsconj\@tempcsbefore
+   {\ref{\@nameref@spacename @\member}}%
+   \@tempcsafter\relax
+   \let\@spaceref@gobble=\relax
+  }%
+ }%
+ \@nameuse{@spaceref@#2@surfix}%
+}%
+\def\@spacepageref[#1]#2\@nil{\def\@spacepageref@pre{#1}\def\@spacepageref@post{#2}}%
+\NewDocumentCommand{\spacepageref}{m}{%
+ \c@spaceref=\z@
+ \@tempcnta=\z@
+ \let\@spaceref@gobble=\@gobble
+ \@spacepageref@prefix
+ \@for\member:=#1\do{\advance\@tempcnta by\@ne}%
+ \@for\member:=#1\do{%
+  \expandafter\@spacepageref\member\@nil
+  \@ifundefined{r@\@spacepageref@pre @\@spacepageref@post}%
+               {\emph{I can't find label ``\@spacepageref@pre @\@spacepageref@post''. }}{%
+   \advance\c@spaceref by\@ne
+   \ifnum\@tempcnta=\c@spaceref \let\@spacepageref@conj=\@spacepageref@lastconj\fi
+   \@spaceref@gobble\@spacepageref@conj
+   \pageref{\@spacepageref@pre @\@spacepageref@post}%
+   \let\@spaceref@gobble=\relax
+  }%
+ }%
+ \@spacepageref@surfix
+}%
+\setspacerefprefix{enum}{}%
+\setspacerefsurfix{enum}{}%
+\setspacerefconj{enum}{，}%
+\setspacereflastconj{enum}{および}%
+\setspacerefbeforesymbol{enum}{}%
+\setspacerefaftersymbol{enum}{}%
+\setspacerefprefix{eq}{}%
+\setspacerefsurfix{eq}{}%
+\setspacerefconj{eq}{，}%
+\setspacereflastconj{eq}{および}%
+\setspacerefbeforesymbol{eq}{\maru}%
+\setspacerefaftersymbol{eq}{}%
+\setspacepagerefprefix{}%
+\setspacepagerefsurfix{ページ}%
+\setspacepagerefconj{，}%
+\setspacepagereflastconj{および}%
 \ExplSyntaxOn
 \int_new:N \l_tmp_node_number_int
 \int_new:N \l_tmp_hijosu_int
