@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[12/31/2017 Ver.0.1137]%
+\ProvidesPackage{tikzxelatexsetup}[01/18/2018 Ver.0.1138]%
+% \spacepageref の使用法を記述する
 % spacename 環境を新設さらに \spacelabel，\spaceref，\spacepageref も新設
 % \IncludeGraphics の修正 12/13/2017
 % \XMark 使用時に hyperref ワーニングが出るため修正 12/11/2017
@@ -6491,6 +6492,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  }%
  \@nameuse{@spaceref@#2@surfix}%
 }%
+% \spacepageref の引数は [空間名]ラベル名 の組をカンマ(,)区切りで指定する
 \def\@spacepageref[#1]#2\@nil{\def\@spacepageref@pre{#1}\def\@spacepageref@post{#2}}%
 \NewDocumentCommand{\spacepageref}{m}{%
  \c@spaceref=\z@
