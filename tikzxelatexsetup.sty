@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/07/2018 Ver.0.1139]%
+\ProvidesPackage{tikzxelatexsetup}[02/07/2018 Ver.0.1140]%
+% \漢数字変換 を修正(1000000001が一億万一と表示されていたのを修正)
 % \漢数字変換 を新設
 % \spacepageref の使用法を記述する
 % spacename 環境を新設さらに \spacelabel，\spaceref，\spacepageref も新設
@@ -6542,34 +6543,39 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  }%
 }%
 \NewDocumentCommand\漢数字変換{m}{%
- \@tempcnta=\z@\relax
  \def\@数字列{}%
  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#1\do{%
   \edef\@数字列{\member\@数字列}%
  }%
- \def\@漢数字列{}%
+ \@tempcnta=\z@\relax
  \@tempcntb=\z@\relax
+ \def\@漢数字列{}%
+ \def\@@漢数字列{}%
  \expandafter\@tfor\expandafter\member\expandafter:\expandafter=\@数字列\do{%
-  \ifnum\@tempcntb=\z@\relax
-   \edef\@漢数字列{%
-    \kansuji\member\relax
-    \ifnum\member>\z@\relax\GetListItem{\命数１}{\the\@tempcntb}\fi
-    \GetListItem{\命数２}{\the\@tempcnta}\@漢数字列
-   }%
+ \ifnum\@tempcnta=\z@\relax
+  \ifnum\member>\z@\relax
+   \edef\@漢数字列{\kansuji\member\relax\@漢数字列}%
+  \fi
+ \else
+  \ifnum\member>\@ne\relax
+   \edef\@漢数字列{\kansuji\member\relax\GetListItem{\命数１}{\the\@tempcnta}\@漢数字列}%
   \else
-   \edef\@漢数字列{%
-    \ifnum\member>\@ne\relax\kansuji\member\relax\fi
-    \ifnum\member>\z@\relax\GetListItem{\命数１}{\the\@tempcntb}\fi
-    \@漢数字列
-   }%
+   \ifnum\member>\z@\relax
+    \edef\@漢数字列{\GetListItem{\命数１}{\the\@tempcnta}\@漢数字列}%
+   \fi
+  \fi
+ \fi
+ \advance\@tempcnta by\@ne\relax
+ \ifnum\@tempcnta=4\relax
+  \unless\ifx\@漢数字列\@empty
+   \edef\@@漢数字列{\@漢数字列\GetListItem{\命数２}{\the\@tempcntb}\@@漢数字列}%
   \fi
   \advance\@tempcntb by\@ne\relax
-  \ifnum\@tempcntb=4\relax
-   \advance\@tempcnta by\@ne\relax
-   \@tempcntb=\z@\relax
-  \fi
+  \def\@漢数字列{}%
+  \@tempcnta=\z@\relax
+ \fi
  }%
- \@漢数字列
+ \@@漢数字列
 }%
 \ExplSyntaxOn
 \int_new:N \l_tmp_node_number_int
