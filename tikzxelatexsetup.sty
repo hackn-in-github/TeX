@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[01/18/2018 Ver.0.1138]%
+\ProvidesPackage{tikzxelatexsetup}[02/07/2018 Ver.0.1139]%
+% \漢数字変換 を新設
 % \spacepageref の使用法を記述する
 % spacename 環境を新設さらに \spacelabel，\spaceref，\spacepageref も新設
 % \IncludeGraphics の修正 12/13/2017
@@ -6529,6 +6530,47 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 \setspacepagerefsurfix{ページ}%
 \setspacepagerefconj{，}%
 \setspacepagereflastconj{および}%
+% \漢数字変換{num} : num(英数字)を漢数字に変換
+%                : 𥝱を出力するためにlualatexが前提
+\def\命数１{十,百,千}%
+\def\命数２{万,億,兆,京,垓,𥝱,穣,溝,澗,正,載,極,恒河沙,阿僧祇,那由他,不可思議,無量大数,over flow}%
+\NewDocumentCommand\GetListItem{mm}{%
+ \@tempcnta=\z@\relax
+ \expandafter\@for\expandafter\member\expandafter:\expandafter=#1\do{%
+  \advance\@tempcnta by\@ne\relax
+  \ifnum#2=\@tempcnta\relax\member\fi
+ }%
+}%
+\NewDocumentCommand\漢数字変換{m}{%
+ \@tempcnta=\z@\relax
+ \def\@数字列{}%
+ \expandafter\@tfor\expandafter\member\expandafter:\expandafter=#1\do{%
+  \edef\@数字列{\member\@数字列}%
+ }%
+ \def\@漢数字列{}%
+ \@tempcntb=\z@\relax
+ \expandafter\@tfor\expandafter\member\expandafter:\expandafter=\@数字列\do{%
+  \ifnum\@tempcntb=\z@\relax
+   \edef\@漢数字列{%
+    \kansuji\member\relax
+    \ifnum\member>\z@\relax\GetListItem{\命数１}{\the\@tempcntb}\fi
+    \GetListItem{\命数２}{\the\@tempcnta}\@漢数字列
+   }%
+  \else
+   \edef\@漢数字列{%
+    \ifnum\member>\@ne\relax\kansuji\member\relax\fi
+    \ifnum\member>\z@\relax\GetListItem{\命数１}{\the\@tempcntb}\fi
+    \@漢数字列
+   }%
+  \fi
+  \advance\@tempcntb by\@ne\relax
+  \ifnum\@tempcntb=4\relax
+   \advance\@tempcnta by\@ne\relax
+   \@tempcntb=\z@\relax
+  \fi
+ }%
+ \@漢数字列
+}%
 \ExplSyntaxOn
 \int_new:N \l_tmp_node_number_int
 \int_new:N \l_tmp_hijosu_int
