@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/13/2018 Ver.0.1142]%
+\ProvidesPackage{tikzxelatexsetup}[02/13/2018 Ver.0.1143]%
+% \漢数字変換 の引数の数字をカンマ(,)区切りを許容する
 % \漢数字変換 を修正
 % \漢数字変換 を expl3 で作成し直す(念の為 \RenewDocumentCommand で再定義した)
 % \漢数字変換 を修正(1000000001が一億万一と表示されていたのを修正)
@@ -6651,6 +6652,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  \tl_clear:N \l_tmpa_tl
  \tl_clear:N \l_tmpb_tl
  \tl_set:Nn \l_my_sujiretsu_tl {#1}
+ \tl_remove_all:Nn \l_my_sujiretsu_tl {,}
  \tl_reverse:N \l_my_sujiretsu_tl
  \int_do_while:nNnn {\tl_count:N \l_my_sujiretsu_tl} > {\l_tmpa_int} {
   \int_incr:N \l_tmpa_int
