@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/13/2018 Ver.0.1141]%
+\ProvidesPackage{tikzxelatexsetup}[02/13/2018 Ver.0.1142]%
+% \漢数字変換 を修正
 % \漢数字変換 を expl3 で作成し直す(念の為 \RenewDocumentCommand で再定義した)
 % \漢数字変換 を修正(1000000001が一億万一と表示されていたのを修正)
 % \漢数字変換 を新設
@@ -6642,7 +6643,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 % \漢数字列{#1} 英数字#1を漢数字に変換する
 \tl_new:N \l_my_sujiretsu_tl
 \RenewDocumentCommand \漢数字変換{m}{%
- \seq_set_from_clist:Nn \l_tmpa_seq {\empty,十,百,千}
+ \seq_set_from_clist:Nn \l_tmpa_seq {千,\empty,十,百}
  \seq_set_from_clist:Nn \l_tmpb_seq
   {\empty,万,億,兆,京,垓,𥝱,穣,溝,澗,正,載,極,恒河沙,阿僧祇,那由他,不可思議,無量大数,over flow}
  \int_zero:N \l_tmpa_int
@@ -6651,24 +6652,18 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  \tl_clear:N \l_tmpb_tl
  \tl_set:Nn \l_my_sujiretsu_tl {#1}
  \tl_reverse:N \l_my_sujiretsu_tl
- \int_do_while:nNnn {\tl_count:N \l_my_sujiretsu_tl} > {\l_tmpa_int} {%
+ \int_do_while:nNnn {\tl_count:N \l_my_sujiretsu_tl} > {\l_tmpa_int} {
   \int_incr:N \l_tmpa_int
   \tl_put_left:Nx \l_tmpa_tl {
    \int_compare:nNnTF {\int_mod:nn {\l_tmpa_int} {\c_four}} = {\c_one} {
     \kansuji\tl_item:Nn \l_my_sujiretsu_tl {\l_tmpa_int}
    }{
     \int_compare:nNnTF {\tl_item:Nn \l_my_sujiretsu_tl {\l_tmpa_int}} = {\c_one} {
-     \int_compare:nNnT {\int_mod:nn {\l_tmpa_int} {\c_four}} = {\c_zero} {
-      \seq_item:Nn \l_tmpa_seq {\c_four}
-     }
-     \seq_item:Nn \l_tmpa_seq {\int_mod:nn {\l_tmpa_int} {\c_four}}
+     \seq_item:Nn \l_tmpa_seq {\int_mod:nn {\l_tmpa_int} {\c_four} + \c_one}
     }{
      \int_compare:nNnT {\tl_item:Nn \l_my_sujiretsu_tl {\l_tmpa_int}} > {\c_zero} {
       \kansuji\tl_item:Nn \l_my_sujiretsu_tl {\l_tmpa_int}
-      \int_compare:nNnT {\int_mod:nn {\l_tmpa_int} {\c_four}} = {\c_zero} {
-       \seq_item:Nn \l_tmpa_seq {\c_four}
-      }
-      \seq_item:Nn \l_tmpa_seq {\int_mod:nn {\l_tmpa_int} {\c_four}}
+      \seq_item:Nn \l_tmpa_seq {\int_mod:nn {\l_tmpa_int} {\c_four} + \c_one}
      }
     }
    }
@@ -6681,11 +6676,11 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
    \tl_clear:N \l_tmpa_tl
   }
  }
- \int_compare:nNnT {\tl_count:N \l_tmpa_tl} > {\c_zero} {%
+ \int_compare:nNnT {\tl_count:N \l_tmpa_tl} > {\c_zero} {
   \tl_put_left:Nx \l_tmpb_tl {\l_tmpa_tl\seq_item:Nn \l_tmpb_seq {\l_tmpb_int + \c_one}}
  }
  \tl_use:N \l_tmpb_tl
-}%
+}
 \ExplSyntaxOff
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
