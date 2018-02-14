@@ -1,5 +1,7 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/13/2018 Ver.0.1143]%
+\ProvidesPackage{tikzxelatexsetup}[02/14/2018 Ver.0.1144]%
+% \IncludeGraphics を expl3 で再定義
+% \PicMaru を定義し直す \foreach にカンマリストを入れるだけにする
 % \漢数字変換 の引数の数字をカンマ(,)区切りを許容する
 % \漢数字変換 を修正
 % \漢数字変換 を expl3 で作成し直す(念の為 \RenewDocumentCommand で再定義した)
@@ -6410,17 +6412,19 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  kuromaru/.default={1.5pt},%
  shiromaru/.default={1.5pt},%
 }%
-\NewDocumentCommand\PicMaru{sD<>{1.5pt}O{}m}{%
- \IfBooleanTF{#1}{\@PicMaru@B<#2>[#3]#4,;}{\@PicMaru@W<#2>[#3]#4,;}%
-}%
-\def\@PicMaru@B<#1>[#2]#3,{%
- \pic[#2]at(#3){kuromaru={#1}};%
- \@ifnextchar;{\@gobble}{\@PicMaru@B<#1>[#2]}%
-}%
-\def\@PicMaru@W<#1>[#2]#3,{%
- \pic[#2]at(#3){shiromaru={#1}};%
- \@ifnextchar;{\@gobble}{\@PicMaru@W<#1>[#2]}%
-}%
+\NewDocumentCommand \PicMaru {sD<>{1.5pt}O{}m}{
+ \IfBooleanTF{#1}{\@PicMaru@B<#2>[#3]{#4}}{\@PicMaru@W<#2>[#3]{#4}}
+}
+\NewDocumentCommand \@PicMaru@B {D<>{}O{}m}{
+ \foreach\P in {#3}{
+  \pic[#2]at(\P){kuromaru={#1}};
+ }
+}
+\NewDocumentCommand \@PicMaru@W {D<>{}O{}m}{
+ \foreach\P in {#3}{
+  \pic[#2]at(\P){shiromaru={#1}};
+ }
+}
 % 複素数の実部および虚部の表記
 \def\Re{\mathop{\mathrm{Re}}}%
 \def\Im{\mathop{\mathrm{Im}}}%
@@ -6682,6 +6686,18 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
   \tl_put_left:Nx \l_tmpb_tl {\l_tmpa_tl\seq_item:Nn \l_tmpb_seq {\l_tmpb_int + \c_one}}
  }
  \tl_use:N \l_tmpb_tl
+}
+\ior_new:N \l_tmpa_ior
+\RenewDocumentCommand \IncludeGraphics {O{}m}{
+ \exp_args:Nx \file_parse_full_name:nNNN {\PATH#2} \my_graphicsfile_path \my_graphicsfile_name \my_graphicsfile_ext
+ \file_if_exist:nTF {\my_graphicsfile_path /\my_graphicsfile_name .dpth} {
+  \ior_open:Nn \l_tmpa_ior {\my_graphicsfile_path /\my_graphicsfile_name .dpth}
+  \ior_get:NN \l_tmpa_ior \l_tmpa_tl
+  \ior_close:N \l_tmpa_ior
+  \raisebox{-\l_tmpa_tl}{\includegraphics[#1]{\PATH#2}}
+ }{
+  \includegraphics[#1]{\PATH#2}%
+ }
 }
 \ExplSyntaxOff
 %%何ものかがペナルティを書き換えている
