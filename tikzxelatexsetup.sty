@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/17/2018 Ver.0.1145]%
+\ProvidesPackage{tikzxelatexsetup}[02/17/2018 Ver.0.1146]%
+% \SetPoints の不要なカンタの削除および修正
 % \SetPoint を expl3 で再定義し \SetPoints に改名
 % \IncludeGraphics を expl3 で再定義
 % \PicMaru を定義し直す \foreach にカンマリストを入れるだけにする
@@ -6720,8 +6721,6 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 \str_const:Nn \c_right_bracket_str {]}
 \str_const:Nn \c_left_paren_str {(}
 \str_const:Nn \c_right_paren_str {)}
-\int_new:N \l_setpoints_first_str_int
-\int_new:N \l_setpoints_end_str_int
 \int_new:N \l_setpoints_paren_count_int
 \NewDocumentCommand \SetPoints {sd<>m}{
  \flag_raise:n {setpoints/show}
@@ -6781,9 +6780,6 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
    \tl_put_left:Nn \l_setpoints_coor_tl {$(}
    \tl_put_right:Nn \l_setpoints_coor_tl {)+\l_setpoints_shift_tl$}
   }
-  \tl_set:Nx \l_setpoints_coor_tl
-   {\tl_range:Nnn \l_setpoints_coor_tl {\c_one} {\tl_count:N \l_setpoints_coor_tl - \c_one}
-    \tl_item:Nn \l_setpoints_coor_tl {\tl_count:N \l_setpoints_coor_tl}}
   \str_if_eq_x:nnT {\tl_head:N \l_setpoints_dir_tl} {\c_left_bracket_str} {
    \tl_set:Nx \l_setpoints_dir_tl {\tl_range:Nnn \l_setpoints_dir_tl {\c_two}
     {\tl_count:N \l_setpoints_dir_tl - \c_one}}
