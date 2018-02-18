@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/17/2018 Ver.0.1146]%
+\ProvidesPackage{tikzxelatexsetup}[02/18/2018 Ver.0.1147]%
+% \Zahyo を expl3 で再定義する
 % \SetPoints の不要なカンタの削除および修正
 % \SetPoint を expl3 で再定義し \SetPoints に改名
 % \IncludeGraphics を expl3 で再定義
@@ -6811,6 +6812,48 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  \node~at(#1)[#2]{#3};
 }
 \cs_set_eq:NN \SetPoint \SetPoints
+% Zahyo{#1}{#2} : ---> (\,#1,\;#2\,)
+%%space:座標間のスペース(\;)
+%%sign:座標間の区切り(,)
+%%pspace:括弧と座標のスペース(\,)
+%%paren:括弧の種類({(,)}) paren={\{,\}}などと指定する
+%%      paren={,}で括弧をなくする
+\keys_define:nn {Zahyo} {
+ space .tl_set:N = \l_my_zahyo_space_tl,
+ sign .tl_set:N = \l_my_zahyo_sign_tl,
+ pspace .tl_set:N = \l_my_zahyo_pspace_tl,
+ paren .tl_set:N = \l_my_zahyo_parens_tl,
+}
+\RenewDocumentCommand \Zahyo {d<>m}{
+ \tl_set:Nn \l_my_zahyo_space_tl {\;}
+ \tl_set:Nn \l_my_zahyo_sign_tl {,}
+ \tl_set:Nn \l_my_zahyo_pspace_tl {\,}
+ \tl_set:Nn \l_my_zahyo_parens_tl {(,)}
+ \IfValueT {#1} {
+  \keys_set:nn {Zahyo} {#1}
+ }
+ \seq_set_from_clist:NN \l_my_zahyo_parens_seq \l_my_zahyo_parens_tl
+ \seq_set_from_clist:Nn \l_my_zahyo_items_seq {#2}
+ \int_zero:N \l_tmpa_int
+ \str_if_eq_x:nnF {\seq_item:Nn \l_my_zahyo_parens_seq {\c_one}} {\empty} {
+  \left
+  \seq_item:Nn \l_my_zahyo_parens_seq {\c_one}
+  \tl_use:N \l_my_zahyo_pspace_tl
+ }
+ \int_do_while:nNnn {\seq_count:N \l_my_zahyo_items_seq} > {\l_tmpa_int} {
+  \int_incr:N \l_tmpa_int
+  \seq_item:Nn \l_my_zahyo_items_seq {\l_tmpa_int}
+  \int_compare:nNnT {\seq_count:N \l_my_zahyo_items_seq} > {\l_tmpa_int} {
+   \tl_use:N \l_my_zahyo_sign_tl
+   \tl_use:N \l_my_zahyo_space_tl
+  }
+ }
+ \str_if_eq_x:nnF {\seq_item:Nn \l_my_zahyo_parens_seq {\c_two}} {\empty} {
+  \tl_use:N \l_my_zahyo_pspace_tl
+  \right
+  \seq_item:Nn \l_my_zahyo_parens_seq {\c_two}
+ }
+}
 \ExplSyntaxOff
 %%何ものかがペナルティを書き換えている
 %\prebreakpenalty`，=10000
