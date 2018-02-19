@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/19/2018 Ver.0.1148]%
+\ProvidesPackage{tikzxelatexsetup}[02/19/2018 Ver.0.1149]%
+% \Integers のオプションに string を加える
 % \Integers を expl3 で再定義する
 % \Zahyo を expl3 で再定義する
 % \SetPoints の不要なカンタの削除および修正
@@ -6857,35 +6858,35 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 }
 % \Integers[#1]
 % #1 : オプション
-%     alph : 文字の指定(n)
-%     first : 最初の数字(1)
-%     end : 最後の数字(3)
-%     space : , と次の数字との間隔(\ )
-%     dots : dots の指定(\ldots)
+%     string : 文字の指定(n)
+%     alph   : 文字の指定(n)
+%     first  : 最初の数字(1)
+%     end    : 最後の数字(3)
+%     space  : , と次の数字との間隔(\ )
+%     dots   : dots の指定(\ldots)
 %     nodots : 指定すると最後の dots が表示されない
 \keys_define:nn {Integers} {
+ string .tl_set:N = \l_my_integers_alph_tl,
  alph .tl_set:N = \l_my_integers_alph_tl,
- first .tl_set:N = \l_my_integers_first_tl,
- end .tl_set:N = \l_my_integers_end_tl,
+ first .int_set:N = \l_my_integers_first_int,
+ end .int_set:N = \l_my_integers_end_int,
  space .tl_set:N = \l_my_integers_space_tl,
  dots .tl_set:N = \l_my_integers_dots_tl,
  nodots .bool_set:N = \l_my_integers_nodots_bool,
 }
 \NewDocumentCommand \Integers {o} {
  \tl_set:Nn \l_my_integers_alph_tl {n}
- \tl_set:Nn \l_my_integers_first_tl {1}
- \tl_set:Nn \l_my_integers_end_tl {3}
+ \int_set:Nn \l_my_integers_first_int {1}
+ \int_set:Nn \l_my_integers_end_int {3}
  \tl_set:Nn \l_my_integers_space_tl {\ }
  \tl_set:Nn \l_my_integers_dots_tl {\ldots}
- \IfValueT {#1} {
-  \keys_set:nn {Integers} {#1}
- }
+ \IfValueT {#1} {\keys_set:nn {Integers} {#1}}
  \tl_use:N \l_my_integers_alph_tl =
- \int_set:Nn \l_tmpa_int {\l_my_integers_first_tl - \c_one}
- \int_do_while:nNnn {\l_my_integers_end_tl} > {\l_tmpa_int} {
+ \int_set:Nn \l_tmpa_int {\l_my_integers_first_int - \c_one}
+ \int_do_while:nNnn {\l_my_integers_end_int} > {\l_tmpa_int} {
   \int_incr:N \l_tmpa_int
   \int_use:N \l_tmpa_int
-  \int_compare:nNnTF {\l_my_integers_end_tl} = {\l_tmpa_int} {
+  \int_compare:nNnTF {\l_my_integers_end_int} = {\l_tmpa_int} {
    \bool_if:nF \l_my_integers_nodots_bool {
     ,\tl_use:N \l_my_integers_dots_tl
    }
