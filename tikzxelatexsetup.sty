@@ -6874,7 +6874,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  dots .tl_set:N = \l_my_integers_dots_tl,
  nodots .bool_set:N = \l_my_integers_nodots_bool,
 }
-\NewDocumentCommand \Integers {o} {
+\RenewDocumentCommand \Integers {o} {
  \tl_set:Nn \l_my_integers_alph_tl {n}
  \int_set:Nn \l_my_integers_first_int {1}
  \int_set:Nn \l_my_integers_end_int {3}
