@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/19/2018 Ver.0.1149]%
+\ProvidesPackage{tikzxelatexsetup}[02/19/2018 Ver.0.1150]%
+% \SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
 % \Integers のオプションに string を加える
 % \Integers を expl3 で再定義する
 % \Zahyo を expl3 で再定義する
@@ -6751,6 +6752,9 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
     }
    }
   }
+  \int_compare:nNnT {\tl_count:N \l_setpoints_display_tl} = {\c_zero} {
+   \flag_clear:n {setpoints/show}
+   }
 % \l_setpoints_point_tl の取り出し
   \int_zero:N \l_tmpb_int
   \int_do_while:nNnn {\tl_count:N \l_tmpa_tl} > {\l_tmpb_int} {
