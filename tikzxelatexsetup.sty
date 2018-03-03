@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[02/19/2018 Ver.0.1150]%
+\ProvidesPackage{tikzxelatexsetup}[03/03/2018 Ver.0.1151]%
+% \SetPoints の下記の修正の修正
 % \SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
 % \Integers のオプションに string を加える
 % \Integers を expl3 で再定義する
@@ -6721,6 +6722,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  shift .tl_set:N = \l_setpoints_shift_tl,
 }
 \flag_new:n {setpoints/show}
+\flag_new:n {setpoints/undershow}
 \str_const:Nn \c_left_bracket_str {[}
 \str_const:Nn \c_right_bracket_str {]}
 \str_const:Nn \c_left_paren_str {(}
@@ -6734,6 +6736,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  \int_zero:N \l_tmpa_int
  \seq_set_split:Nnn \l_tmpa_seq {;} {#3}
  \int_do_while:nNnn {\seq_count:N \l_tmpa_seq} > {\l_tmpa_int} {
+  \flag_raise:n {setpoints/undershow}
   \tl_clear:N \l_setpoints_display_tl
   \tl_clear:N \l_setpoints_point_tl
   \tl_clear:N \l_setpoints_coor_tl
@@ -6746,14 +6749,14 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
    \int_do_while:nNnn {\tl_count:N \l_tmpa_tl} > {\l_tmpb_int} {
     \int_incr:N \l_tmpb_int
     \str_if_eq_x:nnT {\tl_item:Nn \l_tmpa_tl {\l_tmpb_int}} {\c_right_bracket_str} {
-     \tl_set:Nx \l_setpoints_display_tl {\tl_range:Nnn \l_tmpa_tl {\c_two} {\l_tmpb_int - \c_one}}
+     \tl_set:Nx \l_setpoints_display_tl {\tl_range:Nnn \l_tmpa_tl {\c_one} {\l_tmpb_int}}
      \tl_set:Nx \l_tmpa_tl {\tl_range:Nnn \l_tmpa_tl {\l_tmpb_int + \c_one} {\tl_count:N \l_tmpa_tl}}
      \int_set:Nn \l_tmpb_int {\tl_count:N \l_tmpa_tl}
     }
    }
   }
-  \int_compare:nNnT {\tl_count:N \l_setpoints_display_tl} = {\c_zero} {
-   \flag_clear:n {setpoints/show}
+  \int_compare:nNnT {\tl_count:N \l_setpoints_display_tl} = {\c_two} {
+   \flag_clear:n {setpoints/undershow}
    }
 % \l_setpoints_point_tl の取り出し
   \int_zero:N \l_tmpb_int
@@ -6792,20 +6795,32 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
     {\tl_count:N \l_setpoints_dir_tl - \c_one}}
   }
 % \l_setpoints_display_tl が empty のとき \l_setpoints_point_tl を代入する
-  \tl_if_empty:NT \l_setpoints_display_tl {\tl_set:Nx \l_setpoints_display_tl {\l_setpoints_point_tl}}
+  \tl_if_empty:NTF \l_setpoints_display_tl {
+   \tl_set:Nx \l_setpoints_display_tl {\l_setpoints_point_tl}
+  }{
+   \tl_set:Nx \l_setpoints_display_tl {\tl_tail:N \l_setpoints_display_tl}
+   \tl_reverse:N \l_setpoints_display_tl
+%\tl_log:N {\l_setpoints_display_tl}
+   \tl_set:Nx \l_setpoints_display_tl {\tl_tail:N \l_setpoints_display_tl}
+   \tl_reverse:N \l_setpoints_display_tl
+%\tl_log:N {\l_setpoints_display_tl}
+  }
 %  \coordinate(\l_setpoints_point_tl)at(\l_setpoints_coor_tl);
   \exp_args:Nxx \l_setpoints_coordinate_cs:nn {\l_setpoints_point_tl} {\l_setpoints_coor_tl}
   \flag_if_raised:nT {setpoints/show} {
-   \str_if_eq_x:nnTF {\tl_head:N \l_setpoints_dir_tl} {\c_left_paren_str} {
+   \flag_if_raised:nT {setpoints/undershow} {
+    \str_if_eq_x:nnTF {\tl_head:N \l_setpoints_dir_tl} {\c_left_paren_str} {
 %   \node~at(\l_setpoints_point_tl)[shift={\l_setpoints_dir_tl}]{\l_setpoints_display_tl};
-    \exp_args:Nxxx \l_setpoints_coordinate_shift_cs:nnn
-     {\l_setpoints_point_tl} {\l_setpoints_dir_tl} {\l_setpoints_display_tl}
-   }{
+     \exp_args:Nxxx \l_setpoints_coordinate_shift_cs:nnn
+      {\l_setpoints_point_tl} {\l_setpoints_dir_tl} {\l_setpoints_display_tl}
+    }{
 %   \node~at(\l_setpoints_point_tl)[\l_setpoints_dir_tl]{\l_setpoints_display_tl};
-    \exp_args:Nxxx \l_setpoints_coordinate_dir_cs:nnn
-     {\l_setpoints_point_tl} {\l_setpoints_dir_tl} {\l_setpoints_display_tl}
-   }%
+     \exp_args:Nxxx \l_setpoints_coordinate_dir_cs:nnn
+      {\l_setpoints_point_tl} {\l_setpoints_dir_tl} {\l_setpoints_display_tl}
+    }
+   }
   }
+  \flag_raise:n {setpoints/undershow}
  }
 }
 \cs_new:Npn \l_setpoints_coordinate_cs:nn #1#2 {
