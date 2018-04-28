@@ -14,7 +14,7 @@
 %\XeTeXgenerateactualtext=1 %PDF ファイルの検索やコピー & ペーストがうまく動作しない場合指定
 %\RequirePackage{luatex85}%\pdfナントカでエラーになったときに必要ってか02/01/2017時点で必要
 %hyperrefを新しい物にして不要になる
-\documentclass[a4j,lualatex,ja=standard,magstyle=nomag*]{bxjsreport}% ドライバ指定は無し
+\documentclass[a4j,lualatex,ja=standard,magstyle=nomag*,japaram={units}]{bxjsreport}% ドライバ指定は無し
 \setpagelayout{margin=20mm}%余白を若干狭く
 \usepackage{metalogo}% \XeLaTeX ロゴのため
 %% XeLaTeX
@@ -121,7 +121,7 @@
 %(4)(3)で測定した値と\lineskiplimitを比較する
 %(4-1)(3)の値>\lineskipならばそのまま
 %(4-2)そうでなければ，上の行の「下端」と下の行の「上端」の間を\lineskipにする
-%\mathord   ： 通常の記号、文字
+%\mathord   ： 通常の記号，文字
 %\mathop    ： 大型演算子
 %\mathbin   ： 二項演算子
 %\mathrel   ： 関係演算子
