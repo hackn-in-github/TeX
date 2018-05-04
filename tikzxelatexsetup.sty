@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[03/03/2018 Ver.0.1151]%
+\ProvidesPackage{tikzxelatexsetup}[05/04/2018 Ver.0.1152]%
+% 問題環境で equation, tabule, figure カウンタをリセットする
 % \SetPoints の下記の修正の修正
 % \SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
 % \Integers のオプションに string を加える
@@ -689,9 +690,10 @@
 % hyperref 使用時に equation.n1.n2.n3 のn3が\theequationの値になるが
 % n1およびn2が変化しないと\theequationをリセットするのでユニークな値にならない
 % そのためリンクがおかしくなるのを修正
+% 2017/05/04 \resetcounter{equation}\resetcounter{figure}\resetcounter{table}の追加
 \def\問題{%
- \@ifstar{\if問題\stepcounter{section}\else\expandafter\@問題\fi\ignorespaces}%01/27/2017 \ignorespacesの追加
-         {\if問題\stepcounter{section}\else\expandafter\@問題\fi\ignorespaces}}%2015/02/26 \Mark{}の前問からの番号が継続されない問題のため修正
+ \@ifstar{\if問題\stepcounter{section}\resetcounter{equation}\resetcounter{figure}\resetcounter{table}\else\expandafter\@問題\fi\ignorespaces}%01/27/2017 \ignorespacesの追加
+         {\if問題\stepcounter{section}\resetcounter{equation}\resetcounter{figure}\resetcounter{table}\else\expandafter\@問題\fi\ignorespaces}}%2015/02/26 \Mark{}の前問からの番号が継続されない問題のため修正
 \long\def\@問題#1\end#2{%
  \def\temp@envname{#2}%
  \def\@env問題{問題}%
