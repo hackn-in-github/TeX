@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/04/2018 Ver.0.1152]%
+\ProvidesPackage{tikzxelatexsetup}[05/24/2018 Ver.0.1153]%
+% \xkeyval の \define@cmdkeys で設定し直す
 % 問題環境で equation, tabule, figure カウンタをリセットする
 % \SetPoints の下記の修正の修正
 % \SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
@@ -62,7 +63,7 @@
 \newif\ifMarkSpc
 \MarkKeepWidthtrue
 \MarkSpctrue
-\RequirePackage{xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx,esvect,refcount}%
+\RequirePackage{xkeyval,xparse,amsmath,graphicx,tikz,array,hhline,cases,tcolorbox,siunitx,esvect,refcount}%
 \usetikzlibrary{arrows,shapes.symbols,decorations.pathreplacing,%
 	patterns,topaths,through,calc,intersections,%
 	shapes.geometric,shapes.misc,shapes.multipart,chains,angles,quotes,%
@@ -274,17 +275,18 @@
 % #1:左の括弧,#2:右の括弧,#3:options,#4:括弧をつける内容
 % option:braceupper=括弧の上げ幅(0pt),bracemag=括弧の倍率(1),
 %        display=括弧をつける位置(),upper=内容を含めた括弧の上げ幅
-\define@key{Brace}{braceupper}{\def\@BraceUpper{#1}}%
-\define@key{Brace}{bracemag}{\def\@BraceMag{#1}}%
-\define@key{Brace}{display}{\def\@BraceDis{#1}}%
-\define@key{Brace}{upper}{\def\@Brace@AllUpper{#1}}%
+\define@cmdkeys{Brace}[@Brace@]{braceupper,mag,display,upper}%xkeyvalで設定
+%\define@key{Brace}{braceupper}{\def\@Brace@braceupper{#1}}%
+%\define@key{Brace}{mag}{\def\@Brace@mag{#1}}%
+%\define@key{Brace}{display}{\def\@Brace@display{#1}}%
+%\define@key{Brace}{upper}{\def\@Brace@upper{#1}}%
 \def\@braces#1#2{\@ifnextchar[{\@@braces{#1}{#2}}{\@@braces{#1}{#2}[]}}
 \def\@@braces#1#2[#3]#4{%
  \bgroup
-  \def\@BraceUpper{0pt}%
-  \def\@BraceMag{1}%
-  \def\@BraceDis{}%
-  \def\@Brace@AllUpper{0pt}%
+  \def\@Brace@braceupper{0pt}%
+  \def\@Brace@mag{1}%
+  \def\@Brace@display{}%
+  \def\@Brace@upper{0pt}%
   \setkeys{Brace}{#3}%
   \leavevmode%
   \ifmmode%
@@ -309,7 +311,7 @@
    \else
     \lower\@tempdimc
     \hbox{%
-     \raise\@BraceUpper
+     \raise\@Brace@braceupper
      \hbox{%
       $\left#1\raise\@tempdimc
       \hbox{%
@@ -324,7 +326,7 @@
    \else
    \lower\@tempdimc
    \hbox{%
-    \raise\@BraceUpper
+    \raise\@Brace@braceupper
     \hbox{%
      $\left.\raise\@tempdimc
      \hbox{%
@@ -407,23 +409,24 @@
 % options:thickness=罫線の太さ(1pt),widthmag=幅の倍率(1),
 %         hyphenwidth=ハイフンの長さ(2.5mm),
 %         boxwidth=章番号，問題番号の幅
-\define@key{No}{thickness}{\def\@NoThick{#1}}%
-\define@key{No}{widthmag}{\def\@NoWidth{#1}}%
-\define@key{No}{hyphenwidth}{\def\@NoHyphenWidth{#1}}%
-\define@key{No}{boxwidth}{\def\@NoBoxWidth{#1}}%
+\define@cmdkeys{No}[@No@]{thickness,widthmag,hyphenwidth,boxwidth}%xkeyvalで設定
+%\define@key{No}{thickness}{\def\@No@thickness{#1}}%
+%\define@key{No}{widthmag}{\def\@No@widthmag{#1}}%
+%\define@key{No}{hyphenwidth}{\def\@No@hyphenwidth{#1}}%
+%\define@key{No}{boxwidth}{\def\@No@boxwidth{#1}}%
 \def\No{\@ifnextchar[{\@No}{\@No[]}}%
 \def\@No[#1]#2#3{%
  \bgroup
-  \def\@NoThick{1pt}%
-  \def\@NoWidth{1}%
-  \def\@NoHyphenWidth{2.5mm}%
-  \def\@NoBoxWidth{1.375\zw}%
+  \def\@No@thickness{1pt}%
+  \def\@No@widthmag{1}%
+  \def\@No@hyphenwidth{2.5mm}%
+  \def\@No@boxwidth{1.375\zw}%
   \setkeys{No}{#1}%
   \suppressfloats[t]%
   \noindent
   \setbox1=\hbox{%
    \bfseries\Large
-   \hbox to\@NoBoxWidth{%
+   \hbox to\@No@boxwidth{%
     \hss#2\hss
    }%
    \setbox0=\hbox{#2}%
@@ -435,7 +438,7 @@
     \hrule height\@NoThick width\@NoHyphenWidth%
    }%
    \hfill
-   \hbox to\@NoBoxWidth{%
+   \hbox to\@No@boxwidth{%
     \hss#3\hss
    }%
    \hfill
@@ -614,29 +617,30 @@
 \def\@Shu@Replace[#1]#2\@nil{%
  #2#1%
 }%
+\define@cmdkeys{Shutten}[Shu@]{no,matter}%xkeyvalで設定
 \define@key{Shutten}{year}{\def\Shu@Year{#1年}}%
 \define@key{Shutten}{term}{\def\Shu@Term{\Shu@Replace{期}{#1}}}%
 \define@key{Shutten}{university}{\def\Shu@Uni{\Shu@Replace{大学}{#1}}}%
 \define@key{Shutten}{faculty}{\def\Shu@Fac{\Shu@Replace{学部}{#1}}}%学部
 \define@key{Shutten}{department}{\def\Shu@Dep{\Shu@Replace{学科}{#1}}}%学科
-\define@key{Shutten}{no}{\def\Shu@No{#1}}%
-\define@key{Shutten}{matter}{\def\Shu@Matter{#1}}%
+%\define@key{Shutten}{no}{\def\Shu@no{#1}}%
+%\define@key{Shutten}{matter}{\def\Shu@matter{#1}}%
 \define@key{Shutten}{level}{\def\Shu@Level{[#1]}}%
 \def\Shu@Year{}%
 \def\Shu@Term{}%
 \def\Shu@Uni{}%
 \def\Shu@Fac{}%
 \def\Shu@Dep{}%
-\def\Shu@No{}%
-\def\Shu@Matter{}%
+\def\Shu@no{}%
+\def\Shu@matter{}%
 \def\Shu@Level{}%
 \def\Shutten#1{%
  \bgroup
   \setkeys{Shutten}{#1}%
   \begin{flushright}
    \Shu@Year\Shu@Term\quad\Shu@Uni\quad
-   \Shu@Fac\Shu@Dep\Shu@No\\
-   \Shu@Matter\Shu@Level
+   \Shu@Fac\Shu@Dep\Shu@no\\
+   \Shu@matter\Shu@Level
   \end{flushright}
  \egroup
 }%
@@ -780,64 +784,65 @@
 %        :width=箱の横幅,pos=width指定時の文字の位置[rcl](c)
 %        :strutheight=支柱の高さ(0pt),strutdepth=支柱の深さ(0pt)
 %        :strutwidth=支柱の太さ(0pt)
+\define@key{Fbox}[@Fbox@]{display,width,pos,strutheight,strutdepth,strutwidth}%xkeyvalでの設定
 \define@key{Fbox}{linewidth}{\FboxLine=#1}%
 \define@key{Fbox}{xspc}{\FboxXSpc=#1}%
 \define@key{Fbox}{yspc}{\FboxYSpc=#1}%
-\define@key{Fbox}{display}{\def\@Display{#1}}%
-\define@key{Fbox}{width}{\def\@Width{#1}}%
-\define@key{Fbox}{pos}{\def\@Pos{#1}}%
-\define@key{Fbox}{strutheight}{\def\@StrutH{#1}}%
-\define@key{Fbox}{strutdepth}{\def\@StrutD{#1}}%
-\define@key{Fbox}{strutwidth}{\def\@StrutW{#1}}%
+%\define@key{Fbox}{display}{\def\@Fbox@display{#1}}%
+%\define@key{Fbox}{width}{\def\@Fbox@width{#1}}%
+%\define@key{Fbox}{pos}{\def\@Fbox@pos{#1}}%
+%\define@key{Fbox}{strutheight}{\def\@Fbox@strutheight{#1}}%
+%\define@key{Fbox}{strutdepth}{\def\@Fbox@strutdepth{#1}}%
+%\define@key{Fbox}{strutwidth}{\def\@Fbox@strutwidth{#1}}%
 \def\Fbox{\@ifnextchar[{\@Fbox}{\@Fbox[]}}%
 \def\@Fbox[#1]#2{%
  \bgroup
   \FboxLine=.4pt\relax
   \FboxXSpc=2pt\relax
   \FboxYSpc=2pt\relax
-  \def\@Display{}%
-  \def\@Width{\empty}%
-  \def\@Pos{c}%
-  \def\@StrutH{0pt}%
-  \def\@StrutD{0pt}%
-  \def\@StrutW{0pt}%
+  \def\@Fbox@display{}%
+  \def\@Fbox@width{\empty}%
+  \def\@Fbox@pos{c}%
+  \def\@Fbox@strutheight{0pt}%
+  \def\@Fbox@strutdepth{0pt}%
+  \def\@Fbox@strutwidth{0pt}%
   \setkeys{Fbox}{#1}%
   \leavevmode%
-  \setbox0=\hbox{\vrule height\@StrutH depth\@StrutD width\@StrutW#2}%
+  \setbox0=\hbox{\vrule height\@Fbox@strutheight depth\@Fbox@strutdepth width\@Fbox@strutwidth#2}%
   \dimen0\dp0%
   \advance\dimen0 by\FboxLine%
   \advance\dimen0 by\FboxYSpc%
-  \expandafter\ifx\@Width\empty%
+  \expandafter\ifx\@Fbox@width\empty%
   \hbox{%
    \lower\dimen0%
    \hbox{%
-    \if\@Display r\relax\else\vrule width\FboxLine\fi%
+    \if\@Fbox@display r\relax\else\vrule width\FboxLine\fi%
     \vbox{%
      \hrule height\FboxLine\kern\FboxYSpc%
      \hbox{%
-      \kern\FboxXSpc\hss{\vrule height\@StrutH depth\@StrutD width\@StrutW#2}\hss\kern\FboxXSpc
+      \kern\FboxXSpc\hss{\vrule height\@Fbox@strutheight depth\@Fbox@strutdepth width\@Fbox@strutwidth#2}\hss\kern\FboxXSpc
      }%
      \kern\FboxYSpc\hrule height\FboxLine
     }%
-    \if\@Display l\relax\else\vrule width\FboxLine\fi
+    \if\@Fbox@display l\relax\else\vrule width\FboxLine\fi
    }%
   }%
  \else%
   \hbox{%
    \lower\dimen0%
    \hbox{%
-    \if\@Display r\relax\else\vrule width\FboxLine\fi%
+    \if\@Fbox@display r\relax\else\vrule width\FboxLine\fi%
     \vbox{%
      \hrule height\FboxLine\kern\FboxYSpc%
-     \hbox to\@Width{%
+     \hbox to\@Fbox@width{%
       \kern\FboxXSpc
-      \if\@Pos l\else\hss\fi
-      {\vrule height\@StrutH depth\@StrutD width\@StrutW#2}%
-      \if\@Pos r\else\hss\fi\kern\FboxXSpc
+      \if\@Fbox@pos l\else\hss\fi
+      {\vrule height\@Fbox@strutheight depth\@Fbox@strutdepth width\@Fbox@strutwidth#2}%
+      \if\@Fbox@pos r\else\hss\fi\kern\FboxXSpc
      }%
      \kern\FboxYSpc\hrule height\FboxLine
     }%
-    \if\@Display l\relax\else\vrule width\FboxLine\fi
+    \if\@Fbox@display l\relax\else\vrule width\FboxLine\fi
    }%
   }%
  \fi%
@@ -863,9 +868,9 @@
   \FboxLine=.4pt\relax
   \FboxXSpc=2pt\relax
   \FboxYSpc=2pt\relax
-  \def\@Display{}%
-  \def\@Width{\empty}%
-  \def\@Pos{c}%
+  \def\@Fbox@display{}%
+  \def\@Fbox@width{\empty}%
+  \def\@Fbox@pos{c}%
   \def\@USp{8pt}%
   \def\@LSp{8pt}%
   \setkeys{Fbox}{#1}%
@@ -885,9 +890,10 @@
 %%pspace:括弧と座標のスペース(\,)
 %%paren:括弧の種類({(,)}) paren={\{,\}}などと指定する
 %%      paren={.,.}で括弧をなくする
-\define@key{Zahyo}{space}{\def\@Zahyo@Space{#1}}%
-\define@key{Zahyo}{sign}{\def\@Zahyo@Sign{#1}}%
-\define@key{Zahyo}{pspace}{\def\@Zahyo@Pspace{#1}}%
+\define@cmdkeys{Zahyo}[@Zahyo@]{space,sign,pspace}%
+%\define@key{Zahyo}{space}{\def\@Zahyo@space{#1}}%
+%\define@key{Zahyo}{sign}{\def\@Zahyo@sign{#1}}%
+%\define@key{Zahyo}{pspace}{\def\@Zahyo@pspace{#1}}%
 \define@key{Zahyo}{paren}{\@Zahyo@Paren#1\@nil}%
 \def\@Zahyo@Paren#1,#2\@nil{%
  \def\@Zahyo@PreParen{#1}%
@@ -896,22 +902,22 @@
 \def\Zahyo{\@ifnextchar<{\@Zahyo}{\@Zahyo<>}}%
 \def\@Zahyo<#1>#2{%
  \bgroup
-  \def\@Zahyo@Space{\;}%
-  \def\@Zahyo@Sign{,}%
-  \def\@Zahyo@Pspace{\,}%
+  \def\@Zahyo@space{\;}%
+  \def\@Zahyo@sign{,}%
+  \def\@Zahyo@pspace{\,}%
   \@Zahyo@Paren(,)\@nil
   \setkeys{Zahyo}{#1}%
   \left\@Zahyo@PreParen
-	\@Zahyo@Pspace\@@Zahyo#2,\@empty\@nil
+	\@Zahyo@pspace\@@Zahyo#2,\@empty\@nil
   \right\@Zahyo@PostParen
  \egroup
 }%
 \def\@@Zahyo#1,#2\@nil{%
  #1%
  \ifx\@empty#2%\ifx#2\@emptyだと\Zahyo{1,22}では(1,)となってしまう
-  \expandafter\@Zahyo@Pspace
+  \expandafter\@Zahyo@pspace
  \else
-  \def\@ZahyoBody{\@Zahyo@Sign\@Zahyo@Space\@@Zahyo#2\@nil}%
+  \def\@ZahyoBody{\@Zahyo@sign\@Zahyo@space\@@Zahyo#2\@nil}%
   \expandafter\@ZahyoBody
  \fi
 }%
@@ -999,31 +1005,32 @@
 %         dots=点々の種類(ldots),nodots(dotsなし)
 \newif\ifintegerdots
 \integerdotstrue
-\define@key{Int}{alph}{\def\@IntAlph{#1}}%
-\define@key{Int}{first}{\def\@IntFirst{#1}}%
-\define@key{Int}{begin}{\def\@IntFirst{#1}}%
-\define@key{Int}{end}{\def\@IntEnd{#1}}%
-\define@key{Int}{space}{\def\@IntSpace{#1}}%
-\define@key{Int}{dots}{\def\@IntDots{#1}}%
+\define@cmdkeys{Int}[@Int@]{alph,first,end,space,dots}%
+%\define@key{Int}{alph}{\def\@Int@alph{#1}}%
+%\define@key{Int}{first}{\def\@Int@first{#1}}%
+\define@key{Int}{begin}{\def\@Int@first{#1}}%
+%\define@key{Int}{end}{\def\@Int@end{#1}}%
+%\define@key{Int}{space}{\def\@Int@space{#1}}%
+%\define@key{Int}{dots}{\def\@Int@dots{#1}}%
 \define@key{Int}{nodots}[true]{\integerdotsfalse}
 \def\Integers{\@ifnextchar[{\@Integers}{\@Integers[]}}%
 \def\@Integers[#1]{%
  \bgroup
-  \def\@IntAlph{n}%
-  \def\@IntFirst{1}%
-  \def\@IntEnd{3}%
-  \def\@IntSpace{\ }%
-  \def\@IntDots{\ldots}%
+  \def\@Int@alph{n}%
+  \def\@Int@first{1}%
+  \def\@Int@end{3}%
+  \def\@Int@space{\ }%
+  \def\@Int@dots{\ldots}%
   \setkeys{Int}{#1}%
-  \@IntAlph=%
-  \foreach\N in {\@IntFirst,...,\@IntEnd}{%
-   \N\ifnum\N<\@IntEnd,\@IntSpace\fi
+  \@Int@alph=%
+  \foreach\N in {\@Int@first,...,\@Int@end}{%
+   \N\ifnum\N<\@Int@end,\@Int@space\fi
   }%
   \ifintegerdots
-   ,\@IntDots
+   ,\@Int@dots
   \else
   \fi
-%  \@IntDots
+%  \@Int@dots
  \egroup
 }%
 %・・・・・(答)を出力
@@ -1124,9 +1131,10 @@
 %組立除法の鈎
 \newif\ifkumitateboxleft
 \kumitateboxlefttrue
-\define@key{kumitatebox}{rule}{\def\@kumitaterule{#1}}%
-\define@key{kumitatebox}{bottomspace}{\def\@kumitatebottomsp@ce{#1}}%
-\define@key{kumitatebox}{sidespace}{\def\@kumitatesidesp@ce{#1}}%
+\define@cmdkeys{kumitatebox}[@kumitate@]{rule,bottomspace,sidespace}%xkeyvalで設定
+\define@key{kumitatebox}{rule}{\def\@kumitate@rule{#1}}%
+\define@key{kumitatebox}{bottomspace}{\def\@kumitate@bottomspace{#1}}%
+\define@key{kumitatebox}{sidespace}{\def\@kumitate@sidespace{#1}}%
 \define@key{kumitatebox}{lefttrue}[lefttrue]{\kumitateboxlefttrue}%
 \define@key{kumitatebox}{leftfalse}[leftfalse]{\kumitateboxleftfalse}
 \define@key{kumitatebox}{left}[left]{\kumitateboxleftfalse}%
@@ -1136,39 +1144,39 @@
 }%
 \def\@kumitatebox[#1]#2{%
  \bgroup
-  \def\@kumitaterule{.4pt}%
-  \def\@kumitatebottomsp@ce{2pt}%
-  \def\@kumitatesidesp@ce{3pt}%
+  \def\@kumitate@rule{.4pt}%
+  \def\@kumitate@bottomspace{2pt}%
+  \def\@kumitate@sidespace{3pt}%
   \setkeys{kumitatebox}{#1}%
   \setbox0=\hbox{$#2$}%
-  \@tempdima=\@kumitaterule\relax
-  \advance\@tempdima by\@kumitatebottomsp@ce\relax
+  \@tempdima=\@kumitate@rule\relax
+  \advance\@tempdima by\@kumitate@bottomspace\relax
   \advance\@tempdima by\dp0\relax
   \edef\@kumitatesagehaba{\the\@tempdima}%
   \@tempdima=\ht0\relax
   \advance\@tempdima by\dp0\relax
-  \advance\@tempdima by\@kumitaterule\relax
-  \advance\@tempdima by\@kumitatebottomsp@ce\relax
+  \advance\@tempdima by\@kumitate@rule\relax
+  \advance\@tempdima by\@kumitate@bottomspace\relax
   \edef\@kumitatevruleheight{\the\@tempdima}%
   \@tempdima=\wd0\relax
-  \advance\@tempdima by\@kumitatesidesp@ce\relax
-  \advance\@tempdima by\@kumitatesidesp@ce\relax
+  \advance\@tempdima by\@kumitate@sidespace\relax
+  \advance\@tempdima by\@kumitate@sidespace\relax
   \edef\@kumitateboxwidth{\the\@tempdima}%
   \lower\@kumitatesagehaba%
    \hbox{%
     \ifkumitateboxleft
     \else
-     \vrule height\@kumitatevruleheight width\@kumitaterule%
+     \vrule height\@kumitatevruleheight width\@kumitate@rule%
     \fi
     \vbox{%
      \hbox to\@kumitateboxwidth{%
       \hss$#2$\hss
      }%
-     \kern\@kumitatebottomsp@ce%
-     \hrule height\@kumitaterule%
+     \kern\@kumitate@bottomspace%
+     \hrule height\@kumitate@rule%
     }%
     \ifkumitateboxleft
-     \vrule height\@kumitatevruleheight width\@kumitaterule%
+     \vrule height\@kumitatevruleheight width\@kumitate@rule%
      \global\kumitateboxleftfalse
     \else
      \global\kumitateboxlefttrue
@@ -1241,16 +1249,17 @@
 \tikzset{bigarrow/.style={>={Stealth[length=5pt,flex=1]}}}%2016/02/24新設
 \tikzset{Bigarrow/.style={>={Stealth[length=7.5pt,flex=1]}}}%2016/02/24新設
 \tikzset{3D/.style={x={(1cm,0cm)},y={(.385cm,.385cm)},z={(0cm,1cm)}}}%
-\define@key{mytikzpicture}{fontsize}{\def\@MTPfontsize{#1}}
-\define@key{mytikzpicture}{margin}{\def\@MTPmargin{#1}}%
-\define@key{mytikzpicture}{left margin}{\def\@MTPleftmargin{#1}}%
-\define@key{mytikzpicture}{right margin}{\def\@MTPrightmargin{#1}}%
-\define@key{mytikzpicture}{above margin}{\def\@MTPabovemargin{#1}}%
-\define@key{mytikzpicture}{below margin}{\def\@MTPbelowmargin{#1}}%
-\define@key{mytikzpicture}{lmargin}{\def\@MTPleftmargin{#1}}%
-\define@key{mytikzpicture}{rmargin}{\def\@MTPrightmargin{#1}}%
-\define@key{mytikzpicture}{amargin}{\def\@MTPabovemargin{#1}}%
-\define@key{mytikzpicture}{bmargin}{\def\@MTPbelowmargin{#1}}%
+\define@cmdkeys{mytikzpicture}[@MTP@]{fontsize,margin,lmargin,rmargin,amargin,bmargin}%
+%\define@key{mytikzpicture}{fontsize}{\def\@MTP@fontsize{#1}}
+%\define@key{mytikzpicture}{margin}{\def\@MTP@margin{#1}}%
+\define@key{mytikzpicture}{left margin}{\def\@MTP@lmargin{#1}}%
+\define@key{mytikzpicture}{right margin}{\def\@MTP@rmargin{#1}}%
+\define@key{mytikzpicture}{above margin}{\def\@MTP@amargin{#1}}%
+\define@key{mytikzpicture}{below margin}{\def\@MTPbmargin{#1}}%
+%\define@key{mytikzpicture}{lmargin}{\def\@MTP@lmargin{#1}}%
+%\define@key{mytikzpicture}{rmargin}{\def\@MTP@rmargin{#1}}%
+%\define@key{mytikzpicture}{amargin}{\def\@MTP@amargin{#1}}%
+%\define@key{mytikzpicture}{bmargin}{\def\@MTPbmargin{#1}}%
 \define@key{mytikzpicture}{grid}[true]{\def\@MTPgrid{1}}%
 \define@key{mytikzpicture}{grid option}{\def\@MTPgridoption{#1}}%
 \define@key{mytikzpicture}{o string}{\def\@MTPostring{#1}}%
@@ -1266,19 +1275,19 @@
 \def\@mytikzpicture{\@ifnextchar<{\@@mytikzpicture}{\@@mytikzpicture<>}}%
 \def\@@mytikzpicture<#1>{\@ifnextchar[{\@@@mytikzpicture<#1>}{\@@@mytikzpicture<#1>[]}}%
 \def\@@@mytikzpicture<#1>[#2](#3,#4)(#5,#6){%
- \def\@MTPfontsize{\scriptsize}%
-% \def\@MTPleftmargin{.25cm}%
+ \def\@MTP@fontsize{\scriptsize}%
+% \def\@MTP@lmargin{.25cm}%
 %% margin 関連の調整 20150623 start
-% \def\@MTPleftmargin{.25}%
-% \let\@MTPrightmargin=\@MTPleftmargin
-% \let\@MTPabovemargin=\@MTPleftmargin
-% \let\@MTPbelowmargin=\@MTPleftmargin
-% \def\@MTPmargin{}%
- \def\@MTPmargin{.25}%
- \let\@MTPleftmargin=\@MTPmargin
- \let\@MTPrightmargin=\@MTPmargin
- \let\@MTPabovemargin=\@MTPmargin
- \let\@MTPbelowmargin=\@MTPmargin
+% \def\@MTP@lmargin{.25}%
+% \let\@MTP@rmargin=\@MTP@lmargin
+% \let\@MTP@amargin=\@MTP@lmargin
+% \let\@MTPbmargin=\@MTP@lmargin
+% \def\@MTP@margin{}%
+ \def\@MTP@margin{.25}%
+ \let\@MTP@lmargin=\@MTP@margin
+ \let\@MTP@rmargin=\@MTP@margin
+ \let\@MTP@amargin=\@MTP@margin
+ \let\@MTPbmargin=\@MTP@margin
  \def\@MTPgrid{0}%
  \def\@MTPgridoption{}%
  \def\@MTPostring{O}%
@@ -1292,17 +1301,17 @@
 %% 再度上下左右のマージンを読み込む
 %% 順に margin=.2,lmargin=.3,bmargin=.5 と指定すると
 %% amarginとrmarginは.2にlmarginとbmarginはそれぞれ設定した値になるはず
- \let\@MTPleftmargin=\@MTPmargin
- \let\@MTPrightmargin=\@MTPmargin
- \let\@MTPabovemargin=\@MTPmargin
- \let\@MTPbelowmargin=\@MTPmargin
+ \let\@MTP@lmargin=\@MTP@margin
+ \let\@MTP@rmargin=\@MTP@margin
+ \let\@MTP@amargin=\@MTP@margin
+ \let\@MTPbmargin=\@MTP@margin
  \setkeys{mytikzpicture}{#1}%
-% \ifx\@MTPmargin\@empty
+% \ifx\@MTP@margin\@empty
 % \else
-%  \let\@MTPleftmargin=\@MTPmargin
-%  \let\@MTPrightmargin=\@MTPmargin
-%  \let\@MTPabovemargin=\@MTPmargin
-%  \let\@MTPbelowmargin=\@MTPmargin
+%  \let\@MTP@lmargin=\@MTP@margin
+%  \let\@MTP@rmargin=\@MTP@margin
+%  \let\@MTP@amargin=\@MTP@margin
+%  \let\@MTPbmargin=\@MTP@margin
 % \fi
 %% margin 関連の調整 20150623 end
  \begin{tikzpicture}[x=1cm,y=1cm,>={Stealth[length=5pt]},#2]%(#3,#4)(#5,#6)
@@ -1312,10 +1321,10 @@
   \let\xmax=\@xmax
   \let\ymin=\@ymin
   \let\ymax=\@ymax
-  \edef\truexmin{\xmin-\@MTPleftmargin}%2015/06/06 \true(xmin|xmax|ymin|ymax) の追加
-  \edef\truexmax{\xmax+\@MTPrightmargin}%
-  \edef\trueymin{\ymin-\@MTPbelowmargin}%
-  \edef\trueymax{\ymax+\@MTPabovemargin}%
+  \edef\truexmin{\xmin-\@MTP@lmargin}%2015/06/06 \true(xmin|xmax|ymin|ymax) の追加
+  \edef\truexmax{\xmax+\@MTP@rmargin}%
+  \edef\trueymin{\ymin-\@MTPbmargin}%
+  \edef\trueymax{\ymax+\@MTP@amargin}%
   \coordinate(O)at(0,0);
   \coordinate(XMIN)at(#3,0);
   \coordinate(XMAX)at(#4,0);
@@ -1325,14 +1334,14 @@
   \coordinate(RB)at(#4,#5);
   \coordinate(LT)at(#3,#6);
   \coordinate(LB)at(#3,#5);
-  \coordinate(trueXMIN)at(#3-\@MTPleftmargin,0);
-  \coordinate(trueXMAX)at(#4+\@MTPrightmargin,0);
-  \coordinate(trueYMIN)at(0,#5-\@MTPbelowmargin);
-  \coordinate(trueYMAX)at(0,#6+\@MTPabovemargin);
-  \coordinate(trueRT)at(#4+\@MTPrightmargin,#6+\@MTPabovemargin);
-  \coordinate(trueRB)at(#4+\@MTPrightmargin,#5-\@MTPbelowmargin);
-  \coordinate(trueLT)at(#3-\@MTPleftmargin,#6+\@MTPabovemargin);
-  \coordinate(trueLB)at(#3-\@MTPleftmargin,#5-\@MTPbelowmargin);
+  \coordinate(trueXMIN)at(#3-\@MTP@lmargin,0);
+  \coordinate(trueXMAX)at(#4+\@MTP@rmargin,0);
+  \coordinate(trueYMIN)at(0,#5-\@MTPbmargin);
+  \coordinate(trueYMAX)at(0,#6+\@MTP@amargin);
+  \coordinate(trueRT)at(#4+\@MTP@rmargin,#6+\@MTP@amargin);
+  \coordinate(trueRB)at(#4+\@MTP@rmargin,#5-\@MTPbmargin);
+  \coordinate(trueLT)at(#3-\@MTP@lmargin,#6+\@MTP@amargin);
+  \coordinate(trueLB)at(#3-\@MTP@lmargin,#5-\@MTPbmargin);
 %  \path[name path=Frame](RT)--(RB)--(LB)--(LT)--cycle;
   \path[name path=Frame](LB)rectangle(RT);
 %  \path[name path=trueFrame](trueRT)--(trueRB)--(trueLB)--(trueLT)--cycle;
@@ -1344,8 +1353,8 @@
 %  \path let \p1=($(#3,#5)-(#4,#6)$),\n1={veclen(\x1,\y1)} in
 %   node {\xdef\@MTPdiagonal{\n1}};
   \clip(trueLB)rectangle(trueRT);%描画範囲の指定
-%  \clip(#3-\@MTPleftmargin,#5-\@MTPbelowmargin)rectangle(#4+\@MTPrightmargin,#6+\@MTPabovemargin);
-  \@MTPfontsize
+%  \clip(#3-\@MTP@lmargin,#5-\@MTPbmargin)rectangle(#4+\@MTP@rmargin,#6+\@MTP@amargin);
+  \@MTP@fontsize
   \ifnum\@MTPxyaxis=\@ne\relax%座標軸の描画と縦軸・横軸・原点の記号の配置
 %01/11/2016 記号は描画終了直前に移行
    \draw[->](#3,0)--(#4,0);
@@ -1661,22 +1670,23 @@
 %% 将来的に波線のオプションと文字列のオプションを分ける必要が出るかもしれない
 \tikzset{MTHstyle/.style={#1}}%
 \tikzset{MTHstyle/.default={line width=.4pt,dash pattern=on 2pt off 2pt}}%
-\define@key{mytikzhenko}{distance}{\def\@MTHdistance{#1}}%弦と弧の距離default=.5em
+\define@cmdkeys{mytikzhenko}[@MTH@]{distance,rotate}%xkeyvalで設定
+%\define@key{mytikzhenko}{distance}{\def\@MTH@distancetance{#1}}%弦と弧の距離default=.5em
 \define@key{mytikzhenko}{inner sep}{\def\@MTHinnersep{#1}}%default=1pt
 \define@key{mytikzhenko}{fontsize}{\let\@MTHfontsize=#1}%default=\scriptsize
-\define@key{mytikzhenko}{rotate}{\def\@MTHrotate{#1}}%defalut=0:0で無回転，1で#3->#4の向き，-1で#4->#3の向き
+%\define@key{mytikzhenko}{rotate}{\def\@MTH@rotate{#1}}%defalut=0:0で無回転，1で#3->#4の向き，-1で#4->#3の向き
 \def\mytikzhenko{\@ifnextchar<{\@mytikzhenko}{\@mytikzhenko<>}}%
 \def\@mytikzhenko<#1>{\@ifnextchar[{\@@mytikzhenko<#1>}{\@@mytikzhenko<#1>[]}}%
 \def\@@mytikzhenko<#1>[#2]#3#4{%
- \def\@MTHdistance{.75em}%
+ \def\@MTH@distancetance{.75em}%
  \def\@MTHangle{20}%
  \def\@MTHinnersep{1pt}%
  \let\@MTHfontsize=\scriptsize
- \let\@MTHrotate=\z@
+ \let\@MTH@rotate=\z@
  \mytikzsetcoordinate{@MTH@A}{#3}%
  \mytikzsetcoordinate{@MTH@B}{\@MTH@Apost}%
  \setkeys{mytikzhenko}{#1}%
- \coordinate(@MTH@P)at($(@MTH@A)!.5!(@MTH@B)!\@MTHdistance!90:(@MTH@A)$);
+ \coordinate(@MTH@P)at($(@MTH@A)!.5!(@MTH@B)!\@MTH@distancetance!90:(@MTH@A)$);
 % \fill(@MTH@A)circle[radius=1.5pt];
 % \fill(@MTH@B)circle[radius=1.5pt];
 % \fill(@MTH@P)circle[radius=1.5pt];
@@ -1686,11 +1696,11 @@
  \ifdim\@MTH@sangle pt>\@MTH@eangle pt
   \mypgfmathparse{\@MTH@sangle-360}\@MTH@sangle
  \fi
- \ifnum\@MTHrotate=\z@
+ \ifnum\@MTH@rotate=\z@
   \let\@MTH@AB@angle=\z@
  \else
   \mytikzgetangle{($(@MTH@A)+(1,0)$)(@MTH@A)(@MTH@B)}\@MTH@AB@angle
-  \mypgfmathparse{\@MTH@AB@angle+(\@MTHrotate-1)*90}\@MTH@AB@angle
+  \mypgfmathparse{\@MTH@AB@angle+(\@MTH@rotate-1)*90}\@MTH@AB@angle
  \fi
  \draw[mydash,#2](@MTH@A)arc[start angle=\@MTH@sangle,end angle=\@MTH@eangle,radius=\GR];
  \node at(@MTH@P)[inner sep=0pt,rotate=\@MTH@AB@angle]{\fboxsep=\@MTHinnersep\colorbox{white}{#4}};%
@@ -1705,10 +1715,11 @@
 %% #2:オプション2(弧の色などを指定)
 %% #3:弦を表す2点(始点・終点の順に指定)
 %% #4:表示する文字列の指定
-\define@key{mytikzHenko}{angle}{\def\@MTH@angle{#1}}%
-\define@key{mytikzHenko}{fboxsep}{\def\@MTH@fboxsep{#1}}%
-\define@key{mytikzHenko}{rotate}{\def\@MTH@rotate{#1}}%
-\define@key{mytikzHenko}{pos}{\def\@MTH@pos{#1}}%
+\define@cmdkeys{mytikzHenko}[@MTH@]{angle,fboxsep,rotate,pos}%xkeyvalで設定
+%\define@key{mytikzHenko}{angle}{\def\@MTH@angle{#1}}%
+%\define@key{mytikzHenko}{fboxsep}{\def\@MTH@fboxsep{#1}}%
+%\define@key{mytikzHenko}{rotate}{\def\@MTH@rotate{#1}}%
+%\define@key{mytikzHenko}{pos}{\def\@MTH@pos{#1}}%
 \def\mytikzHenko{\@ifstar{\def\@MTH@flag{0}\@mytikzHenko}{\def\@MTH@flag{1}\@mytikzHenko}}%
 \def\@mytikzHenko{\@ifnextchar<{\@@mytikzHenko}{\@@mytikzHenko<>}}%
 \def\@@mytikzHenko<#1>{\@ifnextchar[{\@@@mytikzHenko<#1>}{\@@@mytikzHenko<#1>[]}}%
@@ -1955,19 +1966,20 @@
 %% #3:x座標を表す式
 %% #4:y座標を表す式
 %% #5:この関数のパスの名前(交点を求めるときに使える)
+\define@cmdkeys{mytikzfunction}[@MTF@]{rightP,leftP}%
 \define@key{mytikzfunction}{noline}[true]{\mytikzoutlinefalse}%
-\define@key{mytikzfunction}{rightP}{\def\@MTFrightP{#1}}%
-\define@key{mytikzfunction}{leftP}{\def\@MTFleftP{#1}}%
+%\define@key{mytikzfunction}{rightP}{\def\@MTF@rightP{#1}}%
+%\define@key{mytikzfunction}{leftP}{\def\@MTF@leftP{#1}}%
 \def\mytikzfunction{\@ifstar{\def\@MTFpath{0}\@mytikzfunction}{\def\@MTFpath{1}\@mytikzfunction}}%
 \def\@mytikzfunction{\@ifnextchar<{\@@mytikzfunction}{\@@mytikzfunction<>}}%
 \def\@@mytikzfunction<#1>{\@ifnextchar[{\@@@mytikzfunction<#1>}{\@@@mytikzfunction<#1>[]}}%
 \def\@@@mytikzfunction<#1>[#2]#3#4#5{%
  \mytikzoutlinetrue
- \def\@MTFrightP{rightP}%
- \def\@MTFleftP{leftP}%
+ \def\@MTF@rightP{rightP}%
+ \def\@MTF@leftP{leftP}%
  \setkeys{mytikzfunction}{#1}%
  \ifnum\@MTFpath=\@ne
-  \path[smooth,name path=#5,#2,domain=\@xmin-\@MTPleftmargin:\@xmax+\@MTPrightmargin]plot({#3},{#4});
+  \path[smooth,name path=#5,#2,domain=\@xmin-\@MTP@lmargin:\@xmax+\@MTP@rmargin]plot({#3},{#4});
  \fi
  \ifmytikzoutline
  \begin{scope}
@@ -1979,8 +1991,8 @@
   \path[name intersections={sort by=#5,of=#5 and Frame,name=@FuncP,total=\@total}]
    coordinate(leftP)at(@FuncP-1)
    coordinate(rightP)at(@FuncP-\@total);
-  \expandafter\coordinate\expandafter(\@MTFleftP)at(leftP);
-  \expandafter\coordinate\expandafter(\@MTFrightP)at(rightP);
+  \expandafter\coordinate\expandafter(\@MTF@leftP)at(leftP);
+  \expandafter\coordinate\expandafter(\@MTF@rightP)at(rightP);
  \fi
  \mytikzoutlinefalse
 }%
@@ -2314,14 +2326,15 @@
 %% #5:円2の中心
 %% #6:円2の半径
 %% #7:交点の名前接頭文字(Pを指定すると2点P-1，P-2が設定される)
-\define@key{mytikzCandC}{leftP}{\def\@MTCCleftP{#1}}%
-\define@key{mytikzCandC}{rightP}{\def\@MTCCrightP{#1}}%
+\define@cmdkeys{mytikzCandC}[@MTCC@]{leftP,rightP}%xkeyvalで設定
+%\define@key{mytikzCandC}{leftP}{\def\@MTCC@leftP{#1}}%
+%\define@key{mytikzCandC}{rightP}{\def\@MTCC@rightP{#1}}%
 \def\mytikzCandC{\@ifstar{\def\@MTCCdraw{1}\@mytikzCandC}{\def\@MTCCdraw{0}\@mytikzCandC}}%
 \def\@mytikzCandC{\@ifnextchar<{\@@mytikzCandC}{\@@mytikzCandC<>}}%
 \def\@@mytikzCandC<#1>{\@ifnextchar[{\@@@mytikzCandC<#1>}{\@@@mytikzCandC<#1>[]}}%
 \def\@@@mytikzCandC<#1>[#2]#3#4#5#6#7{%
- \let\@MTCCleftP=\@empty
- \let\@MTCCrightP=\@empty
+ \let\@MTCC@leftP=\@empty
+ \let\@MTCC@rightP=\@empty
  \setkeys{mytikzCandC}{#1}%
  \ifnum\@MTCCdraw=\@ne
   \begin{scope}
@@ -2366,13 +2379,13 @@
    \coordinate(#7-2)at(@MTCPP-1);
   \fi
  \fi
- \ifx\@MTCCleftP\@empty
+ \ifx\@MTCC@leftP\@empty
  \else
-  \expandafter\coordinate\expandafter(\@MTCCleftP)at(#7-1);
+  \expandafter\coordinate\expandafter(\@MTCC@leftP)at(#7-1);
  \fi
- \ifx\@MTCCrightP\@empty
+ \ifx\@MTCC@rightP\@empty
  \else
-  \expandafter\coordinate\expandafter(\@MTCCrightP)at(#7-2);
+  \expandafter\coordinate\expandafter(\@MTCC@rightP)at(#7-2);
  \fi
 }%
 %% 円と直線(2点)
@@ -2390,8 +2403,8 @@
 \def\@mytikzCandP{\@ifnextchar<{\@@mytikzCandP}{\@@mytikzCandP<>}}%
 \def\@@mytikzCandP<#1>{\@ifnextchar[{\@@@mytikzCandP<#1>}{\@@@mytikzCandP<#1>[]}}%
 \def\@@@mytikzCandP<#1>[#2]#3#4#5#6{%
- \let\@MTCCleftP=\@empty
- \let\@MTCCrightP=\@empty
+ \let\@MTCC@leftP=\@empty
+ \let\@MTCC@rightP=\@empty
  \setkeys{mytikzCandC}{#1}%
  \mytikzsetcoordinate{@MTCPA}{#5}%
  \mytikzsetcoordinate{@MTCPB}{\@MTCPApost}%
@@ -2438,13 +2451,13 @@
    \coordinate(#6-2)at(@MTCPP-1);
   \fi
  \fi
- \ifx\@MTCCleftP\@empty
+ \ifx\@MTCC@leftP\@empty
  \else
-  \expandafter\coordinate\expandafter(\@MTCCleftP)at(#6-1);
+  \expandafter\coordinate\expandafter(\@MTCC@leftP)at(#6-1);
  \fi
- \ifx\@MTCCrightP\@empty
+ \ifx\@MTCC@rightP\@empty
  \else
-  \expandafter\coordinate\expandafter(\@MTCCrightP)at(#6-2);
+  \expandafter\coordinate\expandafter(\@MTCC@rightP)at(#6-2);
  \fi
 }%
 %% 円と直線(傾き)
@@ -2773,9 +2786,10 @@
 %% #3:円の中心
 %% #4:弧を表す端点(時計回りに指定)
 %%    ;で区切って複数指定可能
-\define@key{mytikztoukokigou}{width}{\def\@MTTKK@width{#1}}%
-\define@key{mytikztoukokigou}{length}{\def\@MTTKK@length{#1}}%
-\define@key{mytikztoukokigou}{num}{\def\@MTTKK@num{#1}}%
+\define@cmdkeys{mytikztoukokigou}[@MTTKK@]{width,length,num}%xkeyvalで設定
+%\define@key{mytikztoukokigou}{width}{\def\@MTTKK@width{#1}}%
+%\define@key{mytikztoukokigou}{length}{\def\@MTTKK@length{#1}}%
+%\define@key{mytikztoukokigou}{num}{\def\@MTTKK@num{#1}}%
 \def\mytikztoukokigou{\@ifnextchar<{\@mytikztoukokigou}{\@mytikztoukokigou<>}}%
 \def\@mytikztoukokigou<#1>{\@ifnextchar[{\@@mytikztoukokigou<#1>}{\@@mytikztoukokigou<#1>[]}}%
 \def\@@mytikztoukokigou<#1>[#2]#3#4{%
@@ -3125,18 +3139,19 @@
 %% #3,#4:2端点をカンマ区切りで指定
 %% #5:配置文字列#6に関するTikZオプション
 %% #6:配置文字列の指定
-\define@key{MTHenko}{rotate}{\def\@MTH@rotate{#1}}%
-\define@key{MTHenko}{pos}{\def\@MTH@pos{#1}}%
-\define@key{MTHenko}{distance}{\def\@MTH@dis{#1}}%
+\define@cmdkeys{HTHenko}[@MTH@]{rotate,pos,distance}%xkeyvalで設定
+%\define@key{MTHenko}{rotate}{\def\@MTH@rotate{#1}}%
+%\define@key{MTHenko}{pos}{\def\@MTH@pos{#1}}%
+%\define@key{MTHenko}{distance}{\def\@MTH@distance{#1}}%
 \NewDocumentCommand\Henko{D<>{}O{}mO{}m}{%
- \def\@MTH@dis{5mm}%
+ \def\@MTH@distance{5mm}%
  \def\@MTH@rotate{0}%
  \def\@MTH@pos{.5}%
  \setkeys{MTHenko}{#1}%
  \@Henko<#1>[#2](#3)[#4]{#5}%
 }%
 \def\@Henko<#1>[#2](#3,#4)[#5]#6{%
- \coordinate(@HK@ADD)at($(#3)!\@MTH@dis!-90:(#4)-(#3)$);
+ \coordinate(@HK@ADD)at($(#3)!\@MTH@distance!-90:(#4)-(#3)$);
  \foreach\N in {1,...,4}{%
   \coordinate(@HK@P\N)at($(#3)!\N/5!(#4)+(@HK@ADD)$);
  }%
@@ -4673,10 +4688,10 @@
 \def\GetSortNum#1#2#3{%
  \expandafter\edef\expandafter#3\expandafter{\csname#1@array/#2\endcsname}%
 }%
-% 0<\@Hako@Width<1
-\def\HakoHigeWidth#1{\edef\@Hako@Width{#1}}%
-% 0<\@Hako@Hige@Width<1
-\def\HakoHigeHigeWidth#1{\edef\@Hako@Hige@Width{#1}}%
+% 0<\@HakoHige@width<1
+\def\HakoHigeWidth#1{\edef\@HakoHige@width{#1}}%
+% 0<\@HakoHige@higewidth<1
+\def\HakoHigeHigeWidth#1{\edef\@HakoHige@higewidth{#1}}%
 \HakoHigeWidth{.5}%
 \HakoHigeHigeWidth{.4}%
 % \HakoHige<#1>[#2](#3){#4}
@@ -4689,18 +4704,19 @@
 % #2:箱のオプション指定
 % #3:ひげのオプション指定
 % #4:箱ひげを作るためのデータをカンマ区切りで指定
-\define@key{HakoHige}{width}{\def\@Hako@Width{#1}}%
-\define@key{HakoHige}{higewidth}{\def\@Hako@Hige@Width{#1}}%
-\define@key{HakoHige}{data}{\def\@Hako@Data{#1}}%
+\define@cmdkeys{HakoHige}[@HakoHige@]{width,higewidth,data,medmark}%xkeyvalで設定
+%\define@key{HakoHige}{width}{\def\@HakoHige@width{#1}}%
+%\define@key{HakoHige}{higewidth}{\def\@HakoHige@higewidth{#1}}%
+%\define@key{HakoHige}{data}{\def\@HakoHige@data{#1}}%
 \define@key{HakoHige}{showmed}[1]{\def\@Hako@Show@Med{#1}}%
-\define@key{HakoHige}{medmark}{\def\@Hako@Med@Mark{#1}}%
+%\define@key{HakoHige}{medmark}{\def\@HakoHige@medmark{#1}}%
 \def\HakoHige{\@ifnextchar<{\@HakoHige}{\@HakoHige<>}}%
 \def\@HakoHige<#1>{\@ifnextchar[{\@@HakoHige<#1>}{\@@HakoHige<#1>[]}}%
 \def\@@HakoHige<#1>[#2]{\@ifnextchar({\@@@HakoHige<#1>[#2]}{\@@@HakoHige<#1>[#2]()}}%
 \def\@@@HakoHige<#1>[#2](#3)#4{%
- \let\@Hako@Data=\@empty
+ \let\@HakoHige@data=\@empty
  \def\@Hako@Show@Med{0}%
- \def\@Hako@Med@Mark{$+$}%
+ \def\@HakoHige@medmark{$+$}%
  \setkeys{HakoHige}{#1}%
  \def\@Hako@Total{0}%
  \expandafter\@for\expandafter\@HH@x\expandafter:\expandafter=#4\do{%
@@ -4712,14 +4728,14 @@
   }{%
    \GetMathparse{int(\@HakoHige@Number+1)}\@HakoHige@Number
   }%
- \def\@Hako@Data@Split##1,##2,##3,##4,##5\@nil{%
+ \def\@HakoHige@data@Split##1,##2,##3,##4,##5\@nil{%
   \def\@HakoHige@Min@Num{##1}%
   \def\@HakoHige@FQua@Num{##2}%
   \def\@HakoHige@Mid@Num{##3}%
   \def\@HakoHige@TQua@Num{##4}%
   \def\@HakoHige@Max@Num{##5}%
  }%
- \ifx\@Hako@Data\@empty
+ \ifx\@HakoHige@data\@empty
   \Sort{HakoHige}{#4}\@HakoHige@Max\@HakoHige@Array
   \GetMathparse{(1+\@HakoHige@Max)/2}\@HakoHige@Mid
   \GetMathparse{(1+\@HakoHige@Mid)/2}\@HakoHige@FQua%1/4
@@ -4754,28 +4770,28 @@
   \GetSortNum{HakoHige}{1}\@HakoHige@Min@Num
   \GetSortNum{HakoHige}{\@HakoHige@Max}\@HakoHige@Max@Num
  \else
-  \expandafter\@Hako@Data@Split\@Hako@Data\@nil
+  \expandafter\@HakoHige@data@Split\@HakoHige@data\@nil
  \fi
- \draw[thick,#2](\@HakoHige@Number-1/2*\@Hako@Width,\@HakoHige@FQua@Num)%
-       rectangle(\@HakoHige@Number+1/2*\@Hako@Width,\@HakoHige@TQua@Num)
-                (\@HakoHige@Number-1/2*\@Hako@Width,\@HakoHige@Mid@Num)%
-              --(\@HakoHige@Number+1/2*\@Hako@Width,\@HakoHige@Mid@Num);%
- \draw[thick,#3](\@HakoHige@Number-1/2*\@Hako@Hige@Width,\@HakoHige@Min@Num)%
-              --(\@HakoHige@Number+1/2*\@Hako@Hige@Width,\@HakoHige@Min@Num)%
-                (\@HakoHige@Number-1/2*\@Hako@Hige@Width,\@HakoHige@Max@Num)%
-              --(\@HakoHige@Number+1/2*\@Hako@Hige@Width,\@HakoHige@Max@Num)%
+ \draw[thick,#2](\@HakoHige@Number-1/2*\@HakoHige@width,\@HakoHige@FQua@Num)%
+       rectangle(\@HakoHige@Number+1/2*\@HakoHige@width,\@HakoHige@TQua@Num)
+                (\@HakoHige@Number-1/2*\@HakoHige@width,\@HakoHige@Mid@Num)%
+              --(\@HakoHige@Number+1/2*\@HakoHige@width,\@HakoHige@Mid@Num);%
+ \draw[thick,#3](\@HakoHige@Number-1/2*\@HakoHige@higewidth,\@HakoHige@Min@Num)%
+              --(\@HakoHige@Number+1/2*\@HakoHige@higewidth,\@HakoHige@Min@Num)%
+                (\@HakoHige@Number-1/2*\@HakoHige@higewidth,\@HakoHige@Max@Num)%
+              --(\@HakoHige@Number+1/2*\@HakoHige@higewidth,\@HakoHige@Max@Num)%
                 (\@HakoHige@Number,\@HakoHige@Min@Num)%
               --(\@HakoHige@Number,\@HakoHige@FQua@Num)%
                 (\@HakoHige@Number,\@HakoHige@TQua@Num)%
               --(\@HakoHige@Number,\@HakoHige@Max@Num);
  \ifnum\@Hako@Show@Med=\@ne\relax
-  \node at(\@HakoHige@Number,\@Hako@Total/\@HakoHige@Max){\@Hako@Med@Mark};
+  \node at(\@HakoHige@Number,\@Hako@Total/\@HakoHige@Max){\@HakoHige@medmark};
  \fi
 }%
 %% \HakoHige が非常に使いにくいので \YokoHakoHige を新設 06/09/2017
-\def\YokoHakoHigeWidth#1{\edef\@YokoHako@Width{#1}}%
-% 0<\@YokoHako@Hige@Width<1
-\def\YokoHakoHigeHigeWidth#1{\edef\@YokoHako@Hige@Width{#1}}%
+\def\YokoHakoHigeWidth#1{\edef\@YokoHakoHige@width{#1}}%
+% 0<\@YokoHakoHige@higewidth<1
+\def\YokoHakoHigeHigeWidth#1{\edef\@YokoHakoHige@higewidth{#1}}%
 \YokoHakoHigeWidth{.5}%
 \YokoHakoHigeHigeWidth{.4}%
 % \YokoHakoHige<#1>[#2](#3){#4}
@@ -4788,18 +4804,19 @@
 % #2:箱のオプション指定
 % #3:ひげのオプション指定
 % #4:箱ひげを作るためのデータをカンマ区切りで指定
-\define@key{YokoHakoHige}{width}{\def\@YokoHako@Width{#1}}%
-\define@key{YokoHakoHige}{higewidth}{\def\@YokoHako@Hige@Width{#1}}%
-\define@key{YokoHakoHige}{data}{\def\@YokoHako@Data{#1}}%
-\define@key{YokoHakoHige}{showmed}[1]{\def\@YokoHako@Show@Med{#1}}%
-\define@key{YokoHakoHige}{medmark}{\def\@YokoHako@Med@Mark{#1}}%
+\define@cmdkeys{YokoHakoHige}[@YokoHakoHige@]{width,higewidth,data,medmark}%xkeyvalで設定
+%\define@key{YokoHakoHige}{width}{\def\@YokoHakoHige@width{#1}}%
+%\define@key{YokoHakoHige}{higewidth}{\def\@YokoHakoHige@higewidth{#1}}%
+%\define@key{YokoHakoHige}{data}{\def\@YokoHakoHige@data{#1}}%
+\define@key{YokoHakoHige}{showmed}[1]{\def\@YokoHakoHige@showmed{#1}}%
+%\define@key{YokoHakoHige}{medmark}{\def\@YokoHakoHige@medmark{#1}}%
 \def\YokoHakoHige{\@ifnextchar<{\@YokoHakoHige}{\@YokoHakoHige<>}}%
 \def\@YokoHakoHige<#1>{\@ifnextchar[{\@@YokoHakoHige<#1>}{\@@YokoHakoHige<#1>[]}}%
 \def\@@YokoHakoHige<#1>[#2]{\@ifnextchar({\@@@YokoHakoHige<#1>[#2]}{\@@@YokoHakoHige<#1>[#2]()}}%
 \def\@@@YokoHakoHige<#1>[#2](#3)#4{%
- \let\@YokoHako@Data=\@empty
- \def\@YokoHako@Show@Med{0}%
- \def\@YokoHako@Med@Mark{$+$}%
+ \let\@YokoHakoHige@data=\@empty
+ \def\@YokoHakoHige@showmed{0}%
+ \def\@YokoHakoHige@medmark{$+$}%
  \setkeys{YokoHakoHige}{#1}%
  \def\@YokoHako@Total{0}%
  \expandafter\@for\expandafter\@HH@x\expandafter:\expandafter=#4\do{%
@@ -4811,14 +4828,14 @@
   }{%
    \GetMathparse{int(\@YokoHakoHige@Number+1)}\@YokoHakoHige@Number
   }%
- \def\@YokoHako@Data@Split##1,##2,##3,##4,##5\@nil{%
+ \def\@YokoHakoHige@data@Split##1,##2,##3,##4,##5\@nil{%
   \def\@YokoHakoHige@Min@Num{##1}%
   \def\@YokoHakoHige@FQua@Num{##2}%
   \def\@YokoHakoHige@Mid@Num{##3}%
   \def\@YokoHakoHige@TQua@Num{##4}%
   \def\@YokoHakoHige@Max@Num{##5}%
  }%
- \ifx\@YokoHako@Data\@empty
+ \ifx\@YokoHakoHige@data\@empty
   \Sort{YokoHakoHige}{#4}\@YokoHakoHige@Max\@YokoHakoHige@Array
   \GetMathparse{(1+\@YokoHakoHige@Max)/2}\@YokoHakoHige@Mid
   \GetMathparse{(1+\@YokoHakoHige@Mid)/2}\@YokoHakoHige@FQua%1/4
@@ -4853,22 +4870,22 @@
   \GetSortNum{YokoHakoHige}{1}\@YokoHakoHige@Min@Num
   \GetSortNum{YokoHakoHige}{\@YokoHakoHige@Max}\@YokoHakoHige@Max@Num
  \else
-  \expandafter\@YokoHako@Data@Split\@YokoHako@Data\@nil
+  \expandafter\@YokoHakoHige@data@Split\@YokoHakoHige@data\@nil
  \fi
- \draw[thick,#2](\@YokoHakoHige@FQua@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Width)%
-       rectangle(\@YokoHakoHige@TQua@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Width)
-                (\@YokoHakoHige@Mid@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Width)%
-              --(\@YokoHakoHige@Mid@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Width);%
- \draw[thick,#3](\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Hige@Width)%
-              --(\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Hige@Width)%
-                (\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number+1/2*\@YokoHako@Hige@Width)%
-              --(\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number-1/2*\@YokoHako@Hige@Width)%
+ \draw[thick,#2](\@YokoHakoHige@FQua@Num,-\@YokoHakoHige@Number+1/2*\@YokoHakoHige@width)%
+       rectangle(\@YokoHakoHige@TQua@Num,-\@YokoHakoHige@Number-1/2*\@YokoHakoHige@width)
+                (\@YokoHakoHige@Mid@Num,-\@YokoHakoHige@Number+1/2*\@YokoHakoHige@width)%
+              --(\@YokoHakoHige@Mid@Num,-\@YokoHakoHige@Number-1/2*\@YokoHakoHige@width);%
+ \draw[thick,#3](\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number+1/2*\@YokoHakoHige@higewidth)%
+              --(\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number-1/2*\@YokoHakoHige@higewidth)%
+                (\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number+1/2*\@YokoHakoHige@higewidth)%
+              --(\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number-1/2*\@YokoHakoHige@higewidth)%
                 (\@YokoHakoHige@Min@Num,-\@YokoHakoHige@Number)%
               --(\@YokoHakoHige@FQua@Num,-\@YokoHakoHige@Number)%
                 (\@YokoHakoHige@TQua@Num,-\@YokoHakoHige@Number)%
               --(\@YokoHakoHige@Max@Num,-\@YokoHakoHige@Number);
- \ifnum\@YokoHako@Show@Med=\@ne\relax
-  \node at(\@YokoHako@Total/\@YokoHakoHige@Max,-\@YokoHakoHige@Number){\@YokoHako@Med@Mark};
+ \ifnum\@YokoHakoHige@showmed=\@ne\relax
+  \node at(\@YokoHako@Total/\@YokoHakoHige@Max,-\@YokoHakoHige@Number){\@YokoHakoHige@medmark};
  \fi
 }%
 %% \GetSubArray{#1}{#2}{#3}{#4}%
@@ -4920,17 +4937,18 @@
          HakoHigeAve/.style={}}%
 \NewDocumentCommand\SetHakoHigeBoxWidth{m}{\def\@HakoHige@Box@Width@Default{#1}}%
 \NewDocumentCommand\SetHakoHigeHigeWidth{m}{\def\@HakoHige@Hige@Width@Default{#1}}%
-\NewDocumentCommand\SetHakoHigeSpaceWidth{m}{\def\@HakoHige@Space@Width@Default{#1}}%
+\NewDocumentCommand\SetHakoHigeSpaceWidth{m}{\def\@HakoHige@space@Width@Default{#1}}%
 \NewDocumentCommand\SetHakoHigeAveMark{m}{\def\@HakoHige@Ave@Mark{#1}}%
 \SetHakoHigeBoxWidth{15mm}%
 \SetHakoHigeHigeWidth{10mm}%
 \SetHakoHigeSpaceWidth{5mm}%
 \SetHakoHigeAveMark{$+$}%
 \newcounter{hakohigenumber}%
-\define@key{HakoHige}{width}{\def\@HakoHige@Width{#1}}%
-\define@key{HakoHige}{space}{\def\@HakoHige@Space{#1}}%
+\define@cmdkeys{HakoHige}[@HakoHige@]{width,space,data}%xkeyvalで設定
+%\define@key{HakoHige}{width}{\def\@HakoHige@width{#1}}%
+%\define@key{HakoHige}{space}{\def\@HakoHige@space{#1}}%
 \define@key{HakoHige}{hige width}{\def\@HakoHige@HigeWidth{#1}}%
-\define@key{HakoHige}{data}{\def\@HakoHige@Data{#1}}%
+%\define@key{HakoHige}{data}{\def\@HakoHige@data{#1}}%
 \define@key{HakoHige}{show ave}[1]{\def\@HakoHige@ShowAve{#1}}%
 \define@key{HakoHige}{ave mark}{\def\@HakoHige@AveMark{#1}}%
 %% \HakoHige<#1>[#2](#3):#4:{#5}%
@@ -4946,10 +4964,10 @@
 %%% #4 : 平均値に対するオプション
 %%% #5 : データ(カンマ区切り)
 \RenewDocumentCommand\HakoHige{D<>{}O{}D(){}D::{}m}{%
- \let\@HakoHige@Data=\relax
- \let\@HakoHige@Width=\@HakoHige@Box@Width@Default
+ \let\@HakoHige@data=\relax
+ \let\@HakoHige@width=\@HakoHige@Box@Width@Default
  \let\@HakoHige@HigeWidth=\@HakoHige@Hige@Width@Default
- \let\@HakoHige@Space=\@HakoHige@Space@Width@Default
+ \let\@HakoHige@space=\@HakoHige@space@Width@Default
  \let\@HakoHige@AveMark=\@HakoHige@Ave@Mark
  \def\@HakoHige@ShowAve{0}%
  \setkeys{HakoHige}{#1}%
@@ -4957,8 +4975,8 @@
  \tikzmath{%
   coordinate \C;
   \C=(1,0);
-  \@HakoHige@Width@=\@HakoHige@Width/\Cx;
-  \@HakoHige@Space@=\@HakoHige@Space/\Cx;
+  \@HakoHige@width@=\@HakoHige@width/\Cx;
+  \@HakoHige@space@=\@HakoHige@space/\Cx;
   \@HakoHige@HigeWidth@=\@HakoHige@HigeWidth/\Cx;
  }%
  \@ifundefined{@HakoHige@Data}{%
@@ -4983,30 +5001,30 @@
   \GetSubArray\@HakoHige@Array{1}{1}\@HakoHige@MIN
   \GetSubArray\@HakoHige@Array{\@HakoHige@Number}{\@HakoHige@Number}\@HakoHige@MAX
  }{%
-  \def\@HakoHige@Data@Split##1,##2,##3,##4,##5\@nil{%
+  \def\@HakoHige@data@Split##1,##2,##3,##4,##5\@nil{%
    \edef\@HakoHige@MIN{##1}%
    \edef\@HakoHige@FQ{##2}%
    \edef\@HakoHige@Med{##3}%
    \edef\@HakoHige@TQ{##4}%
    \edef\@HakoHige@MAX{##5}%
   }%
-  \expandafter\@HakoHige@Data@Split\@HakoHige@Data\@nil
+  \expandafter\@HakoHige@data@Split\@HakoHige@data\@nil
  }%
  \coordinate(HAKO\thehakohigenumber BL)at%
-  (\@HakoHige@FQ,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@});
+  (\@HakoHige@FQ,{\thehakohigenumber*\@HakoHige@space@+(\thehakohigenumber-1)*\@HakoHige@width@});
  \coordinate(HAKO\thehakohigenumber BM)at%
-  (\@HakoHige@Med,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@});
+  (\@HakoHige@Med,{\thehakohigenumber*\@HakoHige@space@+(\thehakohigenumber-1)*\@HakoHige@width@});
  \coordinate(HAKO\thehakohigenumber BR)at%
-  (\@HakoHige@TQ,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1)*\@HakoHige@Width@});
- \coordinate(HAKO\thehakohigenumber TL)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@Width@)$);
- \coordinate(HAKO\thehakohigenumber TM)at($(HAKO\thehakohigenumber BM)+(0,\@HakoHige@Width@)$);
- \coordinate(HAKO\thehakohigenumber TR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@Width@)$);
- \coordinate(HAKO\thehakohigenumber ML)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@Width@/2)$);
- \coordinate(HAKO\thehakohigenumber MR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@Width@/2)$);
+  (\@HakoHige@TQ,{\thehakohigenumber*\@HakoHige@space@+(\thehakohigenumber-1)*\@HakoHige@width@});
+ \coordinate(HAKO\thehakohigenumber TL)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@width@)$);
+ \coordinate(HAKO\thehakohigenumber TM)at($(HAKO\thehakohigenumber BM)+(0,\@HakoHige@width@)$);
+ \coordinate(HAKO\thehakohigenumber TR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@width@)$);
+ \coordinate(HAKO\thehakohigenumber ML)at($(HAKO\thehakohigenumber BL)+(0,\@HakoHige@width@/2)$);
+ \coordinate(HAKO\thehakohigenumber MR)at($(HAKO\thehakohigenumber BR)+(0,\@HakoHige@width@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber LM)at%
-  (\@HakoHige@MIN,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1/2)*\@HakoHige@Width@});
+  (\@HakoHige@MIN,{\thehakohigenumber*\@HakoHige@space@+(\thehakohigenumber-1/2)*\@HakoHige@width@});
  \coordinate(HAKOHIGE\thehakohigenumber RM)at%
-  (\@HakoHige@MAX,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1/2)*\@HakoHige@Width@});
+  (\@HakoHige@MAX,{\thehakohigenumber*\@HakoHige@space@+(\thehakohigenumber-1/2)*\@HakoHige@width@});
  \coordinate(HAKOHIGE\thehakohigenumber LT)at($(HAKOHIGE\thehakohigenumber LM)+(0,\@HakoHige@HigeWidth@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber RT)at($(HAKOHIGE\thehakohigenumber RM)+(0,\@HakoHige@HigeWidth@/2)$);
  \coordinate(HAKOHIGE\thehakohigenumber LB)at($(HAKOHIGE\thehakohigenumber LM)+(0,-\@HakoHige@HigeWidth@/2)$);
@@ -5019,7 +5037,7 @@
   (HAKOHIGE\thehakohigenumber RT)--(HAKOHIGE\thehakohigenumber RB);
  \@ifundefined{@HakoHige@Data}{%
   \coordinate(HAKO\thehakohigenumber AV)at%
-   (\@Hako@Avr,{\thehakohigenumber*\@HakoHige@Space@+(\thehakohigenumber-1/2)*\@HakoHige@Width@});
+   (\@Hako@Avr,{\thehakohigenumber*\@HakoHige@space@+(\thehakohigenumber-1/2)*\@HakoHige@width@});
   \ifnum\@HakoHige@ShowAve=\@ne
    \node at(HAKO\thehakohigenumber AV)[HakoHigeAve,#4]{\@HakoHige@AveMark};
   \fi
@@ -5068,27 +5086,28 @@
  \@ifnextchar/{\@gobble}{\@SetAngles[#1][#2]{#3}}%
 }%
 %% \Touhenkigou<#1>[#2]{#3}%
-\define@key{Touhenkigou}{pos}{\def\@TK@Pos{#1}}%
+\define@cmdkeys{Touhenkigou}[@TK@]{pos,space,num,symbol}%xkeyvalで設定
+%\define@key{Touhenkigou}{pos}{\def\@TK@pos{#1}}%
 \define@key{Touhenkigou}{x size}{\def\@TK@XSize{#1}}%
 \define@key{Touhenkigou}{y size}{\def\@TK@YSize{#1}}%
-\define@key{Touhenkigou}{space}{\def\@TK@Space{#1}}%
-\define@key{Touhenkigou}{num}{\def\@TK@Num{#1}}%
-\define@key{Touhenkigou}{symbol}{\def\@TK@Symbol{#1}}%
+%\define@key{Touhenkigou}{space}{\def\@TK@space{#1}}%
+%\define@key{Touhenkigou}{num}{\def\@TK@num{#1}}%
+%\define@key{Touhenkigou}{symbol}{\def\@TK@symbol{#1}}%
 \def\Touhenkigou{\@ifnextchar<{\@Touhenkigou}{\@Touhenkigou<>}}%
 \def\@Touhenkigou<#1>{\@ifnextchar[{\@@Touhenkigou<#1>}{\@@Touhenkigou<#1>[]}}%
 \def\@@Touhenkigou<#1>[#2]#3{%
  \bgroup
-  \def\@TK@Pos{.5}%
+  \def\@TK@pos{.5}%
   \def\@TK@XSize{1}%
   \def\@TK@YSize{1}%
-  \def\@TK@Space{0pt}%
-  \def\@TK@Num{2}%
-  \def\@TK@Symbol{|}%
+  \def\@TK@space{0pt}%
+  \def\@TK@num{2}%
+  \def\@TK@symbol{|}%
   \setkeys{Touhenkigou}{#1}%
-  \edef\@TK@Strings{\@TK@Symbol}%
-  \foreach\N in {1,...,\@TK@Num}{%
-   \ifnum\N<\@TK@Num\relax
-    \xdef\@TK@Strings{\@TK@Strings\kern\@TK@Space\@TK@Symbol}%
+  \edef\@TK@Strings{\@TK@symbol}%
+  \foreach\N in {1,...,\@TK@num}{%
+   \ifnum\N<\@TK@num\relax
+    \xdef\@TK@Strings{\@TK@Strings\kern\@TK@space\@TK@symbol}%
    \fi
   }%
   \expandafter\@@Touhenkigou@#3;/%
@@ -5098,7 +5117,7 @@
  \coordinate(@TK@V)at($(#2)-(#1)$);
  \GetCoordinate{@TK@V}\@TK@VX\@TK@VY
  \GetMathparse{atan2(\@TK@VY,\@TK@VX)}\@TK@Angle
- \node[rotate=\@TK@Angle]at($(#1)!\@TK@Pos!(#2)$){\tiny\scalebox{\@TK@XSize}[\@TK@YSize]{$\@TK@Strings$}};
+ \node[rotate=\@TK@Angle]at($(#1)!\@TK@pos!(#2)$){\tiny\scalebox{\@TK@XSize}[\@TK@YSize]{$\@TK@Strings$}};
  \@ifnextchar/{\@gobble}{\@@Touhenkigou@}%
 }%
 %% \SetParallels<#1>[#2]{#3}
@@ -5113,34 +5132,35 @@
 %% #2:TikZのオプション
 %% #3:平行記号を置く辺を指定
 %%  A,B;C,D;E,F のように複数指定する
-\define@key{SetParallels}{num}{\def\@PARA@Num{#1}}%
-\define@key{SetParallels}{angle}{\def\@PARA@Angle{#1}}%
-\define@key{SetParallels}{space}{\def\@PARA@Space{#1}}%
-\define@key{SetParallels}{scale}{\def\@PARA@Scale{#1}}%
-\define@key{SetParallels}{length}{\def\@PARA@Length{#1}}%
-\define@key{SetParallels}{pos}{\def\@PARA@Pos{#1}}%
+\define@cmdkeys{SetParallels}[@PARA@]{num,angle,space,scale,length,pos}%xkeyvalで設定
+%\define@key{SetParallels}{num}{\def\@PARA@num{#1}}%
+%\define@key{SetParallels}{angle}{\def\@PARA@angle{#1}}%
+%\define@key{SetParallels}{space}{\def\@PARA@space{#1}}%
+%\define@key{SetParallels}{scale}{\def\@PARA@scale{#1}}%
+%\define@key{SetParallels}{length}{\def\@PARA@length{#1}}%
+%\define@key{SetParallels}{pos}{\def\@PARA@pos{#1}}%
 \def\SetParallels{\@ifnextchar<{\@SetParallels}{\@SetParallels<>}}%
 \def\@SetParallels<#1>{\@ifnextchar[{\@@SetParallels<#1>}{\@@SetParallels<#1>[]}}%
 \def\@@SetParallels<#1>[#2]#3{%
- \def\@PARA@Num{2}%
- \def\@PARA@Angle{25}%
- \def\@PARA@Space{1.5mm}%
- \def\@PARA@Scale{1}%
- \def\@PARA@Length{2mm}%
- \def\@PARA@Pos{.5}%
+ \def\@PARA@num{2}%
+ \def\@PARA@angle{25}%
+ \def\@PARA@space{1.5mm}%
+ \def\@PARA@scale{1}%
+ \def\@PARA@length{2mm}%
+ \def\@PARA@pos{.5}%
  \setkeys{SetParallels}{#1}%
  \tikzset{%
   macroparallels/.pic={%
-   \foreach\N in {1,...,\@PARA@Num}{%
-    \draw[scale=\@PARA@Scale,#2]({\@PARA@Length*cos(\@PARA@Angle)/2+(\N-1-(\@PARA@Num-1)/2)*\@PARA@Space},0)--+({180-(\@PARA@Angle)}:\@PARA@Length);
-    \draw[scale=\@PARA@Scale,#2]({\@PARA@Length*cos(\@PARA@Angle)/2+(\N-1-(\@PARA@Num-1)/2)*\@PARA@Space},0)--+({-180+(\@PARA@Angle)}:\@PARA@Length);
+   \foreach\N in {1,...,\@PARA@num}{%
+    \draw[scale=\@PARA@scale,#2]({\@PARA@length*cos(\@PARA@angle)/2+(\N-1-(\@PARA@num-1)/2)*\@PARA@space},0)--+({180-(\@PARA@angle)}:\@PARA@length);
+    \draw[scale=\@PARA@scale,#2]({\@PARA@length*cos(\@PARA@angle)/2+(\N-1-(\@PARA@num-1)/2)*\@PARA@space},0)--+({-180+(\@PARA@angle)}:\@PARA@length);
    }%
   }%
  }%
  \@@@SetParallels#3;/%
 }%
 \def\@@@SetParallels#1,#2;{%
- \path(#1)to pic[pos=\@PARA@Pos,sloped]{macroparallels}(#2);
+ \path(#1)to pic[pos=\@PARA@pos,sloped]{macroparallels}(#2);
  \@ifnextchar/{\@gobble}{\@@@SetParallels}%
 }%
 %% \SetEquilaterals<#1>[#2]{#3}
@@ -5154,31 +5174,32 @@
 %% #2:TikZのオプション
 %% #3:平行記号を置く辺を指定
 %%  A,B;C,D;E,F のように複数指定する
-\define@key{SetEquilaterals}{num}{\def\@EQUI@Num{#1}}%
-\define@key{SetEquilaterals}{space}{\def\@EQUI@Space{#1}}%
-\define@key{SetEquilaterals}{scale}{\def\@EQUI@Scale{#1}}%
-\define@key{SetEquilaterals}{length}{\def\@EQUI@Length{#1}}%
-\define@key{SetEquilaterals}{pos}{\def\@EQUI@Pos{#1}}%
+\define@cmdkeys{SetEquilaterals}[@EQUI@]{num,space,scale,length,pos}%xkeyvalで設定
+%\define@key{SetEquilaterals}{num}{\def\@EQUI@num{#1}}%
+%\define@key{SetEquilaterals}{space}{\def\@EQUI@space{#1}}%
+%\define@key{SetEquilaterals}{scale}{\def\@EQUI@scale{#1}}%
+%\define@key{SetEquilaterals}{length}{\def\@EQUI@length{#1}}%
+%\define@key{SetEquilaterals}{pos}{\def\@EQUI@pos{#1}}%
 \def\SetEquilaterals{\@ifnextchar<{\@SetEquilaterals}{\@SetEquilaterals<>}}%
 \def\@SetEquilaterals<#1>{\@ifnextchar[{\@@SetEquilaterals<#1>}{\@@SetEquilaterals<#1>[]}}%
 \def\@@SetEquilaterals<#1>[#2]#3{%
- \def\@EQUI@Num{2}%
- \def\@EQUI@Space{.75mm}%
- \def\@EQUI@Scale{1}%
- \def\@EQUI@Length{2mm}%
- \def\@EQUI@Pos{.5}%
+ \def\@EQUI@num{2}%
+ \def\@EQUI@space{.75mm}%
+ \def\@EQUI@scale{1}%
+ \def\@EQUI@length{2mm}%
+ \def\@EQUI@pos{.5}%
  \setkeys{SetEquilaterals}{#1}%
  \tikzset{%
   macroequilaterals/.pic={%
-   \foreach\N in {1,...,\@EQUI@Num}{%
-    \draw[scale=\@EQUI@Scale,#2]({(\N-1-(\@EQUI@Num-1)/2)*\@EQUI@Space},\@EQUI@Length/2)--+(0,-\@EQUI@Length);
+   \foreach\N in {1,...,\@EQUI@num}{%
+    \draw[scale=\@EQUI@scale,#2]({(\N-1-(\@EQUI@num-1)/2)*\@EQUI@space},\@EQUI@length/2)--+(0,-\@EQUI@length);
    }%
   }%
  }%
  \@@@SetEquilaterals#3;/%
 }%
 \def\@@@SetEquilaterals#1,#2;{%
- \path(#1)to pic[pos=\@EQUI@Pos,sloped]{macroequilaterals}(#2);
+ \path(#1)to pic[pos=\@EQUI@pos,sloped]{macroequilaterals}(#2);
  \@ifnextchar/{\@gobble}{\@@@SetEquilaterals}%
 }%
 %%% \DrawPolygons<#1>[#2]{#3}%
@@ -5216,19 +5237,21 @@
 %%   #1:overratio
 %%     :leftratio
 %%     :rightratio
-\define@key{DrawSegments}{shift}{\def\@DS@Shift{#1}}%
-\define@key{DrawSegments}{overratio}{\def\@DS@OverRatio{#1}}%
+\define@cmdkeys{DrawSegments}[@DS@]{shift,overratio}%xkeyvalで設定
+%\define@key{DrawSegments}{shift}{\def\@DS@shift{#1}}%
+%\define@key{DrawSegments}{overratio}{\def\@DS@overratio{#1}}%
 \def\DrawSegments{\@ifnextchar<{\@DrawSegments}{\@DrawSegments<>}}%
 \def\@DrawSegments<#1>{\@ifnextchar[{\@@DrawSegments<#1>}{\@@DrawSegments<#1>[]}}%
 \def\@@DrawSegments<#1>[#2]#3{%
- \def\@DS@Shift{0,0}%
- \def\@DS@OverRatio{0}%
+ \def\@DS@shift{0,0}%
+ \def\@DS@overratio{0}%
  \setkeys{DrawSegments}{#1}%
  \@DrawSegmentsSub[#2]#3;/%
 }%
-\define@key{DrawSegmentsSub}{overratio}{\def\@DS@Sub@overratio{#1}}%
-\define@key{DrawSegmentsSub}{leftratio}{\def\@DS@Sub@leftratio{#1}}%
-\define@key{DrawSegmentsSub}{rightratio}{\def\@DS@Sub@rightratio{#1}}%
+\define@cmdkeys{DrawSegmentsSub}[@DS@Sub@]{overratio,leftratio,rightratio}%xkeyvalで設定
+%\define@key{DrawSegmentsSub}{overratio}{\def\@DS@Sub@overratio{#1}}%
+%\define@key{DrawSegmentsSub}{leftratio}{\def\@DS@Sub@leftratio{#1}}%
+%\define@key{DrawSegmentsSub}{rightratio}{\def\@DS@Sub@rightratio{#1}}%
 \def\@DrawSegmentsSub[#1]{%
  \@ifnextchar<{\@@DrawSegmentsSub[#1]}{\@@DrawSegmentsSub[#1]<>}%
 }%
@@ -5236,9 +5259,9 @@
  \@ifnextchar[{\@@@DrawSegmentsSub[#1]<#2>}{\@@@DrawSegmentsSub[#1]<#2>[]}%
 }%
 \def\@@@DrawSegmentsSub[#1]<#2>[#3]#4,#5;{%
- \coordinate(@DS@F@Point)at($(\@DS@Shift)+(#4)$);
- \coordinate(@DS@E@Point)at($(\@DS@Shift)+(#5)$);
- \edef\@DS@Sub@overratio{\@DS@OverRatio}%
+ \coordinate(@DS@F@Point)at($(\@DS@shift)+(#4)$);
+ \coordinate(@DS@E@Point)at($(\@DS@shift)+(#5)$);
+ \edef\@DS@Sub@overratio{\@DS@overratio}%
  \setkeys{DrawSegmentsSub}{#2}%
  \edef\@DS@Sub@leftratio{\@DS@Sub@overratio}%
  \edef\@DS@Sub@rightratio{\@DS@Sub@overratio}%
@@ -5260,12 +5283,13 @@
 %% #5:パスの名前
 \newif\ifDVleft
 \newif\ifDVright
+\define@cmdkeys{DrawVline}[@DV@]{leftP,rightP}%xkeyvalで設定
 \define@key{DrawVline}{half}[half]{\DVrighttrue\DVleftfalse}%
 \define@key{DrawVline}{left}[left]{\DVlefttrue\DVrightfalse}%
 \define@key{DrawVline}{right}[right]{\DVrighttrue\DVleftfalse}%
 \define@key{DrawVline}{noline}[noline]{\DVrightfalse\DVleftfalse}%
-\define@key{DrawVline}{leftP}{\def\@DV@leftP{#1}}%
-\define@key{DrawVline}{rightP}{\def\@DV@rightP{#1}}%
+%\define@key{DrawVline}{leftP}{\def\@DV@leftP{#1}}%
+%\define@key{DrawVline}{rightP}{\def\@DV@rightP{#1}}%
 \def\DrawVline{\@ifstar{\def\@DVline@flag{0}\@DrawVline}{\def\@DVline@flag{1}\@DrawVline}}%
 \def\@DrawVline{\@ifnextchar<{\@@DrawVline}{\@@DrawVline<>}}%
 \def\@@DrawVline<#1>{\@ifnextchar[{\@@@DrawVline<#1>}{\@@@DrawVline<#1>[]}}%
