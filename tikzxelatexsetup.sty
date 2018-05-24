@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/24/2018 Ver.0.1153]%
+\ProvidesPackage{tikzxelatexsetup}[05/24/2018 Ver.0.1154]%
+% 下記修正時のエラーの修正
 % \xkeyval の \define@cmdkeys で設定し直す
 % 問題環境で equation, tabule, figure カウンタをリセットする
 % \SetPoints の下記の修正の修正
@@ -298,16 +299,16 @@
    \setbox0=\hbox{\StopCenter#4\StartCenter}%
    \setbox1=\hbox{\StopCenter$\left(\hbox{#4}\right)$\StartCenter}%
   \fi%
-  \@tempdima=\@BraceMag\ht0\relax
-  \@tempdimb=\@BraceMag\dp0\relax
+  \@tempdima=\@Brace@mag\ht0\relax
+  \@tempdimb=\@Brace@mag\dp0\relax
   \@tempdimc=\ht1\relax%
   \advance\@tempdimc by-\dp1\relax%
   \advance\@tempdimc by-\ht0\relax%
   \advance\@tempdimc by\dp0\relax%
   \divide\@tempdimc by2\relax%
-  \raise\@Brace@AllUpper%
+  \raise\@Brace@braceupper%
   \hbox{%
-   \if\@BraceDis r\relax
+   \if\@Brace@display r\relax
    \else
     \lower\@tempdimc
     \hbox{%
@@ -322,7 +323,7 @@
     }%
    \fi%
    \kern-.75pt\@bracesmode#4\@bracesmode\kern-.75pt%
-   \if\@BraceDis l\relax
+   \if\@Brace@display l\relax
    \else
    \lower\@tempdimc
    \hbox{%
@@ -431,11 +432,11 @@
    }%
    \setbox0=\hbox{#2}%
    \@tempdima=\ht0\relax
-   \advance\@tempdima by-\@NoThick\relax
+   \advance\@tempdima by-\@No@thickness\relax
    \divide\@tempdima by2\relax
    \raise\@tempdima
    \vbox{%
-    \hrule height\@NoThick width\@NoHyphenWidth%
+    \hrule height\@No@thickness width\@No@hyphenwidth%
    }%
    \hfill
    \hbox to\@No@boxwidth{%
@@ -444,20 +445,20 @@
    \hfill
   }%
   \setbox0=\hbox{%
-   \vrule width\@NoThick
+   \vrule width\@No@thickness
    \vbox{%
-    \hrule height\@NoThick%
+    \hrule height\@No@thickness%
     \vskip1.5mm%
     \box1%
     \vskip1.5mm%
-    \hrule height\@NoThick%
+    \hrule height\@No@thickness%
    }%
-   \vrule width\@NoThick%
+   \vrule width\@No@thickness%
   }%
-  \dimen0=\@NoWidth\linewidth%
+  \dimen0=\@No@widthmag\linewidth%
   \advance\dimen0 by-\wd0%
   \setbox1=\vbox{%
-   \hrule width\dimen0 height\@NoThick%
+   \hrule width\dimen0 height\@No@thickness%
   }%
   \dimen0=\ht0%
   \advance\dimen0 by-\ht1%
