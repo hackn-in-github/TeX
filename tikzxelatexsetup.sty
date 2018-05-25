@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/24/2018 Ver.0.1154]%
+\ProvidesPackage{tikzxelatexsetup}[05/25/2018 Ver.0.1155]%
+% \Henko の \define@cmdkeys のファミリーネームを修正
 % 下記修正時のエラーの修正
 % \xkeyval の \define@cmdkeys で設定し直す
 % 問題環境で equation, tabule, figure カウンタをリセットする
@@ -3140,7 +3141,7 @@
 %% #3,#4:2端点をカンマ区切りで指定
 %% #5:配置文字列#6に関するTikZオプション
 %% #6:配置文字列の指定
-\define@cmdkeys{HTHenko}[@MTH@]{rotate,pos,distance}%xkeyvalで設定
+\define@cmdkeys{MTHenko}[@MTH@]{rotate,pos,distance}%xkeyvalで設定
 %\define@key{MTHenko}{rotate}{\def\@MTH@rotate{#1}}%
 %\define@key{MTHenko}{pos}{\def\@MTH@pos{#1}}%
 %\define@key{MTHenko}{distance}{\def\@MTH@distance{#1}}%
