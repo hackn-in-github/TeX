@@ -1,5 +1,6 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/25/2018 Ver.0.1155]%
+\ProvidesPackage{tikzxelatexsetup}[05/27/2018 Ver.0.1156]%
+% tikzpicture 環境の bmargin オプションの修正
 % \Henko の \define@cmdkeys のファミリーネームを修正
 % 下記修正時のエラーの修正
 % \xkeyval の \define@cmdkeys で設定し直す
@@ -1257,11 +1258,11 @@
 \define@key{mytikzpicture}{left margin}{\def\@MTP@lmargin{#1}}%
 \define@key{mytikzpicture}{right margin}{\def\@MTP@rmargin{#1}}%
 \define@key{mytikzpicture}{above margin}{\def\@MTP@amargin{#1}}%
-\define@key{mytikzpicture}{below margin}{\def\@MTPbmargin{#1}}%
+\define@key{mytikzpicture}{below margin}{\def\@MTP@bmargin{#1}}%
 %\define@key{mytikzpicture}{lmargin}{\def\@MTP@lmargin{#1}}%
 %\define@key{mytikzpicture}{rmargin}{\def\@MTP@rmargin{#1}}%
 %\define@key{mytikzpicture}{amargin}{\def\@MTP@amargin{#1}}%
-%\define@key{mytikzpicture}{bmargin}{\def\@MTPbmargin{#1}}%
+%\define@key{mytikzpicture}{bmargin}{\def\@MTP@bmargin{#1}}%
 \define@key{mytikzpicture}{grid}[true]{\def\@MTPgrid{1}}%
 \define@key{mytikzpicture}{grid option}{\def\@MTPgridoption{#1}}%
 \define@key{mytikzpicture}{o string}{\def\@MTPostring{#1}}%
@@ -1283,13 +1284,13 @@
 % \def\@MTP@lmargin{.25}%
 % \let\@MTP@rmargin=\@MTP@lmargin
 % \let\@MTP@amargin=\@MTP@lmargin
-% \let\@MTPbmargin=\@MTP@lmargin
+% \let\@MTP@bmargin=\@MTP@lmargin
 % \def\@MTP@margin{}%
  \def\@MTP@margin{.25}%
  \let\@MTP@lmargin=\@MTP@margin
  \let\@MTP@rmargin=\@MTP@margin
  \let\@MTP@amargin=\@MTP@margin
- \let\@MTPbmargin=\@MTP@margin
+ \let\@MTP@bmargin=\@MTP@margin
  \def\@MTPgrid{0}%
  \def\@MTPgridoption{}%
  \def\@MTPostring{O}%
@@ -1306,14 +1307,14 @@
  \let\@MTP@lmargin=\@MTP@margin
  \let\@MTP@rmargin=\@MTP@margin
  \let\@MTP@amargin=\@MTP@margin
- \let\@MTPbmargin=\@MTP@margin
+ \let\@MTP@bmargin=\@MTP@margin
  \setkeys{mytikzpicture}{#1}%
 % \ifx\@MTP@margin\@empty
 % \else
 %  \let\@MTP@lmargin=\@MTP@margin
 %  \let\@MTP@rmargin=\@MTP@margin
 %  \let\@MTP@amargin=\@MTP@margin
-%  \let\@MTPbmargin=\@MTP@margin
+%  \let\@MTP@bmargin=\@MTP@margin
 % \fi
 %% margin 関連の調整 20150623 end
  \begin{tikzpicture}[x=1cm,y=1cm,>={Stealth[length=5pt]},#2]%(#3,#4)(#5,#6)
@@ -1325,7 +1326,7 @@
   \let\ymax=\@ymax
   \edef\truexmin{\xmin-\@MTP@lmargin}%2015/06/06 \true(xmin|xmax|ymin|ymax) の追加
   \edef\truexmax{\xmax+\@MTP@rmargin}%
-  \edef\trueymin{\ymin-\@MTPbmargin}%
+  \edef\trueymin{\ymin-\@MTP@bmargin}%
   \edef\trueymax{\ymax+\@MTP@amargin}%
   \coordinate(O)at(0,0);
   \coordinate(XMIN)at(#3,0);
@@ -1338,12 +1339,12 @@
   \coordinate(LB)at(#3,#5);
   \coordinate(trueXMIN)at(#3-\@MTP@lmargin,0);
   \coordinate(trueXMAX)at(#4+\@MTP@rmargin,0);
-  \coordinate(trueYMIN)at(0,#5-\@MTPbmargin);
+  \coordinate(trueYMIN)at(0,#5-\@MTP@bmargin);
   \coordinate(trueYMAX)at(0,#6+\@MTP@amargin);
   \coordinate(trueRT)at(#4+\@MTP@rmargin,#6+\@MTP@amargin);
-  \coordinate(trueRB)at(#4+\@MTP@rmargin,#5-\@MTPbmargin);
+  \coordinate(trueRB)at(#4+\@MTP@rmargin,#5-\@MTP@bmargin);
   \coordinate(trueLT)at(#3-\@MTP@lmargin,#6+\@MTP@amargin);
-  \coordinate(trueLB)at(#3-\@MTP@lmargin,#5-\@MTPbmargin);
+  \coordinate(trueLB)at(#3-\@MTP@lmargin,#5-\@MTP@bmargin);
 %  \path[name path=Frame](RT)--(RB)--(LB)--(LT)--cycle;
   \path[name path=Frame](LB)rectangle(RT);
 %  \path[name path=trueFrame](trueRT)--(trueRB)--(trueLB)--(trueLT)--cycle;
@@ -1355,7 +1356,7 @@
 %  \path let \p1=($(#3,#5)-(#4,#6)$),\n1={veclen(\x1,\y1)} in
 %   node {\xdef\@MTPdiagonal{\n1}};
   \clip(trueLB)rectangle(trueRT);%描画範囲の指定
-%  \clip(#3-\@MTP@lmargin,#5-\@MTPbmargin)rectangle(#4+\@MTP@rmargin,#6+\@MTP@amargin);
+%  \clip(#3-\@MTP@lmargin,#5-\@MTP@bmargin)rectangle(#4+\@MTP@rmargin,#6+\@MTP@amargin);
   \@MTP@fontsize
   \ifnum\@MTPxyaxis=\@ne\relax%座標軸の描画と縦軸・横軸・原点の記号の配置
 %01/11/2016 記号は描画終了直前に移行
