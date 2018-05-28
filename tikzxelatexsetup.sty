@@ -1,9 +1,10 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/27/2018 Ver.0.1156]%
+\ProvidesPackage{tikzxelatexsetup}[05/28/2018 Ver.0.1157]%
+% xkeyval で \presetkyes を使うようにする
 % tikzpicture 環境の bmargin オプションの修正
 % \Henko の \define@cmdkeys のファミリーネームを修正
 % 下記修正時のエラーの修正
-% \xkeyval の \define@cmdkeys で設定し直す
+% xkeyval の \define@cmdkeys で設定し直す
 % 問題環境で equation, tabule, figure カウンタをリセットする
 % \SetPoints の下記の修正の修正
 % \SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
@@ -279,6 +280,7 @@
 % option:braceupper=括弧の上げ幅(0pt),bracemag=括弧の倍率(1),
 %        display=括弧をつける位置(),upper=内容を含めた括弧の上げ幅
 \define@cmdkeys{Brace}[@Brace@]{braceupper,mag,display,upper}%xkeyvalで設定
+\presetkeys{Brace}{braceupper=0pt,mag=1,display={},upper=0pt}{}%
 %\define@key{Brace}{braceupper}{\def\@Brace@braceupper{#1}}%
 %\define@key{Brace}{mag}{\def\@Brace@mag{#1}}%
 %\define@key{Brace}{display}{\def\@Brace@display{#1}}%
@@ -286,10 +288,10 @@
 \def\@braces#1#2{\@ifnextchar[{\@@braces{#1}{#2}}{\@@braces{#1}{#2}[]}}
 \def\@@braces#1#2[#3]#4{%
  \bgroup
-  \def\@Brace@braceupper{0pt}%
-  \def\@Brace@mag{1}%
-  \def\@Brace@display{}%
-  \def\@Brace@upper{0pt}%
+%  \def\@Brace@braceupper{0pt}%
+%  \def\@Brace@mag{1}%
+%  \def\@Brace@display{}%
+%  \def\@Brace@upper{0pt}%
   \setkeys{Brace}{#3}%
   \leavevmode%
   \ifmmode%
@@ -413,6 +415,7 @@
 %         hyphenwidth=ハイフンの長さ(2.5mm),
 %         boxwidth=章番号，問題番号の幅
 \define@cmdkeys{No}[@No@]{thickness,widthmag,hyphenwidth,boxwidth}%xkeyvalで設定
+\presetkeys{No}{thickness=1pt,widthmag=1,hyphenwidth=2.5mm,boxwidth=1.375\zw}{}%
 %\define@key{No}{thickness}{\def\@No@thickness{#1}}%
 %\define@key{No}{widthmag}{\def\@No@widthmag{#1}}%
 %\define@key{No}{hyphenwidth}{\def\@No@hyphenwidth{#1}}%
@@ -420,10 +423,10 @@
 \def\No{\@ifnextchar[{\@No}{\@No[]}}%
 \def\@No[#1]#2#3{%
  \bgroup
-  \def\@No@thickness{1pt}%
-  \def\@No@widthmag{1}%
-  \def\@No@hyphenwidth{2.5mm}%
-  \def\@No@boxwidth{1.375\zw}%
+%  \def\@No@thickness{1pt}%
+%  \def\@No@widthmag{1}%
+%  \def\@No@hyphenwidth{2.5mm}%
+%  \def\@No@boxwidth{1.375\zw}%
   \setkeys{No}{#1}%
   \suppressfloats[t]%
   \noindent
@@ -621,6 +624,7 @@
  #2#1%
 }%
 \define@cmdkeys{Shutten}[Shu@]{no,matter}%xkeyvalで設定
+\presetkeys{Shutten}{year={},term={},university={},faculty={},department={},no={},matter={},level={}}{}%
 \define@key{Shutten}{year}{\def\Shu@Year{#1年}}%
 \define@key{Shutten}{term}{\def\Shu@Term{\Shu@Replace{期}{#1}}}%
 \define@key{Shutten}{university}{\def\Shu@Uni{\Shu@Replace{大学}{#1}}}%
@@ -629,14 +633,14 @@
 %\define@key{Shutten}{no}{\def\Shu@no{#1}}%
 %\define@key{Shutten}{matter}{\def\Shu@matter{#1}}%
 \define@key{Shutten}{level}{\def\Shu@Level{[#1]}}%
-\def\Shu@Year{}%
-\def\Shu@Term{}%
-\def\Shu@Uni{}%
-\def\Shu@Fac{}%
-\def\Shu@Dep{}%
-\def\Shu@no{}%
-\def\Shu@matter{}%
-\def\Shu@Level{}%
+%\def\Shu@Year{}%
+%\def\Shu@Term{}%
+%\def\Shu@Uni{}%
+%\def\Shu@Fac{}%
+%\def\Shu@Dep{}%
+%\def\Shu@no{}%
+%\def\Shu@matter{}%
+%\def\Shu@Level{}%
 \def\Shutten#1{%
  \bgroup
   \setkeys{Shutten}{#1}%
@@ -788,6 +792,8 @@
 %        :strutheight=支柱の高さ(0pt),strutdepth=支柱の深さ(0pt)
 %        :strutwidth=支柱の太さ(0pt)
 \define@key{Fbox}[@Fbox@]{display,width,pos,strutheight,strutdepth,strutwidth}%xkeyvalでの設定
+\presetkeys{Fbox}{linewidth=.4pt,xspc=2pt,yspc=2pt,display={},width=\empty,pos=c,strutheight=0pt,%
+                  strutdepth=0pt,strutwidth=0pt}{}%
 \define@key{Fbox}{linewidth}{\FboxLine=#1}%
 \define@key{Fbox}{xspc}{\FboxXSpc=#1}%
 \define@key{Fbox}{yspc}{\FboxYSpc=#1}%
@@ -800,15 +806,15 @@
 \def\Fbox{\@ifnextchar[{\@Fbox}{\@Fbox[]}}%
 \def\@Fbox[#1]#2{%
  \bgroup
-  \FboxLine=.4pt\relax
-  \FboxXSpc=2pt\relax
-  \FboxYSpc=2pt\relax
-  \def\@Fbox@display{}%
-  \def\@Fbox@width{\empty}%
-  \def\@Fbox@pos{c}%
-  \def\@Fbox@strutheight{0pt}%
-  \def\@Fbox@strutdepth{0pt}%
-  \def\@Fbox@strutwidth{0pt}%
+%  \FboxLine=.4pt\relax
+%  \FboxXSpc=2pt\relax
+%  \FboxYSpc=2pt\relax
+%  \def\@Fbox@display{}%
+%  \def\@Fbox@width{\empty}%
+%  \def\@Fbox@pos{c}%
+%  \def\@Fbox@strutheight{0pt}%
+%  \def\@Fbox@strutdepth{0pt}%
+%  \def\@Fbox@strutwidth{0pt}%
   \setkeys{Fbox}{#1}%
   \leavevmode%
   \setbox0=\hbox{\vrule height\@Fbox@strutheight depth\@Fbox@strutdepth width\@Fbox@strutwidth#2}%
@@ -894,6 +900,7 @@
 %%paren:括弧の種類({(,)}) paren={\{,\}}などと指定する
 %%      paren={.,.}で括弧をなくする
 \define@cmdkeys{Zahyo}[@Zahyo@]{space,sign,pspace}%
+\presetkeys{Zahyo}{space=\;,sign={,},pspace={\,},paren={(,)}}{}%
 %\define@key{Zahyo}{space}{\def\@Zahyo@space{#1}}%
 %\define@key{Zahyo}{sign}{\def\@Zahyo@sign{#1}}%
 %\define@key{Zahyo}{pspace}{\def\@Zahyo@pspace{#1}}%
@@ -905,10 +912,10 @@
 \def\Zahyo{\@ifnextchar<{\@Zahyo}{\@Zahyo<>}}%
 \def\@Zahyo<#1>#2{%
  \bgroup
-  \def\@Zahyo@space{\;}%
-  \def\@Zahyo@sign{,}%
-  \def\@Zahyo@pspace{\,}%
-  \@Zahyo@Paren(,)\@nil
+%  \def\@Zahyo@space{\;}%
+%  \def\@Zahyo@sign{,}%
+%  \def\@Zahyo@pspace{\,}%
+%  \@Zahyo@Paren(,)\@nil
   \setkeys{Zahyo}{#1}%
   \left\@Zahyo@PreParen
 	\@Zahyo@pspace\@@Zahyo#2,\@empty\@nil
@@ -1009,6 +1016,7 @@
 \newif\ifintegerdots
 \integerdotstrue
 \define@cmdkeys{Int}[@Int@]{alph,first,end,space,dots}%
+\presetkeys{Int}{alph=n,first=1,end=3,space={\ },dots=\ldots}{}%
 %\define@key{Int}{alph}{\def\@Int@alph{#1}}%
 %\define@key{Int}{first}{\def\@Int@first{#1}}%
 \define@key{Int}{begin}{\def\@Int@first{#1}}%
@@ -1019,11 +1027,11 @@
 \def\Integers{\@ifnextchar[{\@Integers}{\@Integers[]}}%
 \def\@Integers[#1]{%
  \bgroup
-  \def\@Int@alph{n}%
-  \def\@Int@first{1}%
-  \def\@Int@end{3}%
-  \def\@Int@space{\ }%
-  \def\@Int@dots{\ldots}%
+%  \def\@Int@alph{n}%
+%  \def\@Int@first{1}%
+%  \def\@Int@end{3}%
+%  \def\@Int@space{\ }%
+%  \def\@Int@dots{\ldots}%
   \setkeys{Int}{#1}%
   \@Int@alph=%
   \foreach\N in {\@Int@first,...,\@Int@end}{%
@@ -1135,9 +1143,10 @@
 \newif\ifkumitateboxleft
 \kumitateboxlefttrue
 \define@cmdkeys{kumitatebox}[@kumitate@]{rule,bottomspace,sidespace}%xkeyvalで設定
-\define@key{kumitatebox}{rule}{\def\@kumitate@rule{#1}}%
-\define@key{kumitatebox}{bottomspace}{\def\@kumitate@bottomspace{#1}}%
-\define@key{kumitatebox}{sidespace}{\def\@kumitate@sidespace{#1}}%
+\presetkeys{kumitatebox}{rule=.4pt,bottomspace=2pt,sidespace=3pt}{}%
+%\define@key{kumitatebox}{rule}{\def\@kumitate@rule{#1}}%
+%\define@key{kumitatebox}{bottomspace}{\def\@kumitate@bottomspace{#1}}%
+%\define@key{kumitatebox}{sidespace}{\def\@kumitate@sidespace{#1}}%
 \define@key{kumitatebox}{lefttrue}[lefttrue]{\kumitateboxlefttrue}%
 \define@key{kumitatebox}{leftfalse}[leftfalse]{\kumitateboxleftfalse}
 \define@key{kumitatebox}{left}[left]{\kumitateboxleftfalse}%
@@ -1147,9 +1156,9 @@
 }%
 \def\@kumitatebox[#1]#2{%
  \bgroup
-  \def\@kumitate@rule{.4pt}%
-  \def\@kumitate@bottomspace{2pt}%
-  \def\@kumitate@sidespace{3pt}%
+%  \def\@kumitate@rule{.4pt}%
+%  \def\@kumitate@bottomspace{2pt}%
+%  \def\@kumitate@sidespace{3pt}%
   \setkeys{kumitatebox}{#1}%
   \setbox0=\hbox{$#2$}%
   \@tempdima=\@kumitate@rule\relax
@@ -1253,6 +1262,8 @@
 \tikzset{Bigarrow/.style={>={Stealth[length=7.5pt,flex=1]}}}%2016/02/24新設
 \tikzset{3D/.style={x={(1cm,0cm)},y={(.385cm,.385cm)},z={(0cm,1cm)}}}%
 \define@cmdkeys{mytikzpicture}[@MTP@]{fontsize,margin,lmargin,rmargin,amargin,bmargin}%
+\presetkeys{mytikzpicture}{fontsize=\scriptsize,margin=.25,o string=O,o pos=sw,%
+                           x string=$x$,x pos=below,y string=$y$,y pos=w}{}%
 %\define@key{mytikzpicture}{fontsize}{\def\@MTP@fontsize{#1}}
 %\define@key{mytikzpicture}{margin}{\def\@MTP@margin{#1}}%
 \define@key{mytikzpicture}{left margin}{\def\@MTP@lmargin{#1}}%
@@ -1278,27 +1289,27 @@
 \def\@mytikzpicture{\@ifnextchar<{\@@mytikzpicture}{\@@mytikzpicture<>}}%
 \def\@@mytikzpicture<#1>{\@ifnextchar[{\@@@mytikzpicture<#1>}{\@@@mytikzpicture<#1>[]}}%
 \def\@@@mytikzpicture<#1>[#2](#3,#4)(#5,#6){%
- \def\@MTP@fontsize{\scriptsize}%
-% \def\@MTP@lmargin{.25cm}%
-%% margin 関連の調整 20150623 start
-% \def\@MTP@lmargin{.25}%
-% \let\@MTP@rmargin=\@MTP@lmargin
-% \let\@MTP@amargin=\@MTP@lmargin
-% \let\@MTP@bmargin=\@MTP@lmargin
-% \def\@MTP@margin{}%
- \def\@MTP@margin{.25}%
+% \def\@MTP@fontsize{\scriptsize}%
+%% \def\@MTP@lmargin{.25cm}%
+%%% margin 関連の調整 20150623 start
+%% \def\@MTP@lmargin{.25}%
+%% \let\@MTP@rmargin=\@MTP@lmargin
+%% \let\@MTP@amargin=\@MTP@lmargin
+%% \let\@MTP@bmargin=\@MTP@lmargin
+%% \def\@MTP@margin{}%
+% \def\@MTP@margin{.25}%
  \let\@MTP@lmargin=\@MTP@margin
  \let\@MTP@rmargin=\@MTP@margin
  \let\@MTP@amargin=\@MTP@margin
  \let\@MTP@bmargin=\@MTP@margin
  \def\@MTPgrid{0}%
  \def\@MTPgridoption{}%
- \def\@MTPostring{O}%
- \def\@MTPxstring{$x$}%
- \def\@MTPystring{$y$}%
- \def\@MTPostringpos{below left}%
- \def\@MTPxstringpos{above}%
- \def\@MTPystringpos{left}%
+% \def\@MTPostring{O}%
+% \def\@MTPxstring{$x$}%
+% \def\@MTPystring{$y$}%
+% \def\@MTPostringpos{below left}%
+% \def\@MTPxstringpos{above}%
+% \def\@MTPystringpos{left}%
  \setkeys{mytikzpicture}{#1}%
 %% 一度すべてのマージンを margin と同じにして
 %% 再度上下左右のマージンを読み込む
@@ -1398,15 +1409,16 @@
 \define@key{mytikzarc}{number of line segment}{\def\@MTAnumber{#1}}%default=0
 \define@key{mytikzarc}{space}{\@tempdima=#1}%default=1.5pt
 \define@key{mytikzarc}{length}{\@tempdimb=#1}%default=3pt
+\presetkeys{mytikzarc}{number of line segment=0,space=1.5pt,length=3pt}{}%
 \def\mytikzarc{\@ifstar{\mytikzoutlinetrue\@mytikzarc}{\mytikzoutlinefalse\@mytikzarc}}
 \def\@mytikzarc{\@ifnextchar<{\@@mytikzarc}{\@@mytikzarc<>}}
 \def\@@mytikzarc<#1>{\@ifnextchar[{\@@@mytikzarc<#1>}{\@@@mytikzarc<#1>[]}}
 \def\@@@mytikzarc<#1>[#2]#3#4#5#6{%
  \bgroup
  \def\@mytikz@arc@option{}%
- \def\@MTAnumber{0}%
- \@tempdima=1.5pt\relax%間隔
- \@tempdimb=3pt\relax%長さ
+% \def\@MTAnumber{0}%
+% \@tempdima=1.5pt\relax%間隔
+% \@tempdimb=3pt\relax%長さ
  \setkeys{mytikzarc}{#1}%
  \ISub\@MTAnumber\@ne\@MTAMAX
  \multiply\@tempdima by\@MTAMAX
@@ -1442,6 +1454,7 @@
 %%  both ends:両端にも線分を配置する
 \define@key{mytikzbunten}{length}{\@tempdima=#1\relax}%default=4pt
 \define@key{mytikzbunten}{both ends}[true]{\mytikzoutlinetrue}
+\presetkeys{mytikzbunten}{length=4pt}{}%
 \def\mytikzbunten{\@ifnextchar<{\@mytikzbunten}{\@mytikzbunten<>}}
 \def\@mytikzbunten<#1>{\@ifnextchar[{\@@mytikzbunten<#1>}{\@@mytikzbunten<#1>[]}}
 \def\@@mytikzbunten<#1>[#2]#3#4{%
@@ -1452,7 +1465,7 @@
 %  \@xp\coordinate\@xp(\@xp @\@xp M\@xp T\@xp B\@xp B\@xp)\@xp a\@xp t\@MTBpost;
   \mytikzsetcoordinate{@MTBA}{#3}%
   \mytikzsetcoordinate{@MTBB}{\@MTBApost}%
-  \@tempdima=4pt\relax
+%  \@tempdima=4pt\relax
   \mytikzoutlinefalse
   \setkeys{mytikzbunten}{#1}%
   \divide\@tempdima by\tw@\relax
@@ -1481,6 +1494,7 @@
 \define@key{mytikztouhenkigouput}{space}{\@tempdima=#1\relax}
 \define@key{mytikztouhenkigouput}{length}{\@tempdimb=#1\relax}
 \define@key{mytikztouhenkigouput}{number of line segment}{\def\@MTTKPnumber{#1}}
+\presetkeys{mytikztouhenkigouput}{space=3pt,length=8pt,number of line segment=2}{}%
 \def\mytikztouhenkigouput{\@ifnextchar<{\@mytikztouhenkigouput}{\@mytikztouhenkigouput<>}}
 \def\@mytikztouhenkigouput<#1>{\@ifnextchar[{\@@mytikztouhenkigouput<#1>}{\@@mytikztouhenkigouput<#1>[]}}
 \def\@@mytikztouhenkigouput<#1>[#2]#3{%
@@ -1492,9 +1506,9 @@
   \mytikzsetcoordinate{@MTTKPA}{#3}%
   \mytikzsetcoordinate{@MTTKPB}{\@MTTKPApost}%
   \tikzset{@MTTKPstyle/.style={line width=.4pt}}%
-  \@tempdima=3pt\relax%線分の間隔
-  \@tempdimb=8pt\relax%線分の長さ
-  \def\@MTTKPnumber{2}%線分の個数
+%  \@tempdima=3pt\relax%線分の間隔
+%  \@tempdimb=8pt\relax%線分の長さ
+%  \def\@MTTKPnumber{2}%線分の個数
   \setkeys{mytikztouhenkigouput}{#1}%
   \ISub\@MTTKPnumber{1}\@MTTKPtimes
   \@tempdimc=\@tempdima\relax
@@ -1540,18 +1554,19 @@
 %%  radius:半径
 %%  fontsize:配置文字列のサイズdefault=\scriptsize
 %%  arc:弧も描画する
-\define@key{mytikzkakukigouput}{radius}{\def\@MTKPradius{#1}}%
+\define@key{mytikzkakukigouput}{radius}{\def\@MTKP@arc@radius{#1}}%
 \define@key{mytikzkakukigouput}{arc radius}{\def\@MTKP@arc@radius{#1}}%
 \define@key{mytikzkakukigouput}{string radius}{\def\@MTKP@string@radius{#1}}%
 \define@key{mytikzkakukigouput}{fontsize}{\let\@MTKP@fontsize=#1\relax}%
 \define@key{mytikzkakukigouput}{arc}[true]{\def\@MTKKP@arc@flag{1}}%
 \define@key{mytikzkakukigouput}{fill}[true]{\mytikzoutlinetrue}%
+\presetkeys{mytikzkakukigouput}{radius=7.5pt,string radius=15pt,fontsize=\scriptsize}{}%
 \def\mytikzkakukigouput{\@ifnextchar<{\@mytikzkakukigouput}{\@mytikzkakukigouput<>}}%
 \def\@mytikzkakukigouput<#1>{\@ifnextchar[{\@@mytikzkakukigouput<#1>}{\@@mytikzkakukigouput<#1>[]}}%
 \def\@@mytikzkakukigouput<#1>[#2]#3#4{%
- \def\@MTKP@arc@radius{7.5pt}%
- \def\@MTKP@string@radius{15pt}%
- \let\@MTKP@fontsize=\scriptsize
+% \def\@MTKP@arc@radius{7.5pt}%
+% \def\@MTKP@string@radius{15pt}%
+% \let\@MTKP@fontsize=\scriptsize
  \def\@MTKKP@arc@flag{0}%
  \mytikzsetcoordinate{@MTKP@A}{#3}%
  \mytikzsetcoordinate{@MTKP@B}{\@MTKP@Apost}%
@@ -1678,14 +1693,15 @@
 \define@key{mytikzhenko}{inner sep}{\def\@MTHinnersep{#1}}%default=1pt
 \define@key{mytikzhenko}{fontsize}{\let\@MTHfontsize=#1}%default=\scriptsize
 %\define@key{mytikzhenko}{rotate}{\def\@MTH@rotate{#1}}%defalut=0:0で無回転，1で#3->#4の向き，-1で#4->#3の向き
+\presetkeys{mytikzhenko}{distance=.75em,rotate=0,inner sep=1pt,fontsize=\scriptsize}{}%
 \def\mytikzhenko{\@ifnextchar<{\@mytikzhenko}{\@mytikzhenko<>}}%
 \def\@mytikzhenko<#1>{\@ifnextchar[{\@@mytikzhenko<#1>}{\@@mytikzhenko<#1>[]}}%
 \def\@@mytikzhenko<#1>[#2]#3#4{%
- \def\@MTH@distancetance{.75em}%
- \def\@MTHangle{20}%
- \def\@MTHinnersep{1pt}%
- \let\@MTHfontsize=\scriptsize
- \let\@MTH@rotate=\z@
+% \def\@MTH@distancetance{.75em}%
+ \def\@MTHangle{20}%使われていない？
+% \def\@MTHinnersep{1pt}%
+% \let\@MTHfontsize=\scriptsize
+% \let\@MTH@rotate=\z@
  \mytikzsetcoordinate{@MTH@A}{#3}%
  \mytikzsetcoordinate{@MTH@B}{\@MTH@Apost}%
  \setkeys{mytikzhenko}{#1}%
@@ -1719,6 +1735,7 @@
 %% #3:弦を表す2点(始点・終点の順に指定)
 %% #4:表示する文字列の指定
 \define@cmdkeys{mytikzHenko}[@MTH@]{angle,fboxsep,rotate,pos}%xkeyvalで設定
+\presetkeys{mytikzHenko}{angle=\@empty,fboxsep=1pt,rotate=0,pos=.5}{}%
 %\define@key{mytikzHenko}{angle}{\def\@MTH@angle{#1}}%
 %\define@key{mytikzHenko}{fboxsep}{\def\@MTH@fboxsep{#1}}%
 %\define@key{mytikzHenko}{rotate}{\def\@MTH@rotate{#1}}%
@@ -1729,10 +1746,10 @@
 \def\@@@mytikzHenko<#1>[#2]#3#4{%
  \mytikzsetcoordinate{@MTH@F}{#3}%
  \mytikzsetcoordinate{@MTH@S}{\@MTH@Fpost}%
- \let\@MTH@angle=\@empty
- \def\@MTH@fboxsep{1pt}%
- \def\@MTH@rotate{0}%
- \def\@MTH@pos{.5}%
+% \let\@MTH@angle=\@empty
+% \def\@MTH@fboxsep{1pt}%
+% \def\@MTH@rotate{0}%
+% \def\@MTH@pos{.5}%
  \mytikzgetangle{($(@MTH@F)+(1,0)$)(@MTH@F)(@MTH@S)}\@FtoS@angle
  \setkeys{mytikzHenko}{#1}%
  \ifnum\@MTH@flag=\@ne
@@ -1971,6 +1988,7 @@
 %% #5:この関数のパスの名前(交点を求めるときに使える)
 \define@cmdkeys{mytikzfunction}[@MTF@]{rightP,leftP}%
 \define@key{mytikzfunction}{noline}[true]{\mytikzoutlinefalse}%
+\presetkeys{mytikzfunction}{rightP=rightP,leftP=leftP}{}%
 %\define@key{mytikzfunction}{rightP}{\def\@MTF@rightP{#1}}%
 %\define@key{mytikzfunction}{leftP}{\def\@MTF@leftP{#1}}%
 \def\mytikzfunction{\@ifstar{\def\@MTFpath{0}\@mytikzfunction}{\def\@MTFpath{1}\@mytikzfunction}}%
@@ -1978,8 +1996,8 @@
 \def\@@mytikzfunction<#1>{\@ifnextchar[{\@@@mytikzfunction<#1>}{\@@@mytikzfunction<#1>[]}}%
 \def\@@@mytikzfunction<#1>[#2]#3#4#5{%
  \mytikzoutlinetrue
- \def\@MTF@rightP{rightP}%
- \def\@MTF@leftP{leftP}%
+% \def\@MTF@rightP{rightP}%
+% \def\@MTF@leftP{leftP}%
  \setkeys{mytikzfunction}{#1}%
  \ifnum\@MTFpath=\@ne
   \path[smooth,name path=#5,#2,domain=\@xmin-\@MTP@lmargin:\@xmax+\@MTP@rmargin]plot({#3},{#4});
@@ -2330,14 +2348,15 @@
 %% #6:円2の半径
 %% #7:交点の名前接頭文字(Pを指定すると2点P-1，P-2が設定される)
 \define@cmdkeys{mytikzCandC}[@MTCC@]{leftP,rightP}%xkeyvalで設定
+\presetkeys{mytikzCandC}{leftP=\@empty,rightP=\@empty}{}%
 %\define@key{mytikzCandC}{leftP}{\def\@MTCC@leftP{#1}}%
 %\define@key{mytikzCandC}{rightP}{\def\@MTCC@rightP{#1}}%
 \def\mytikzCandC{\@ifstar{\def\@MTCCdraw{1}\@mytikzCandC}{\def\@MTCCdraw{0}\@mytikzCandC}}%
 \def\@mytikzCandC{\@ifnextchar<{\@@mytikzCandC}{\@@mytikzCandC<>}}%
 \def\@@mytikzCandC<#1>{\@ifnextchar[{\@@@mytikzCandC<#1>}{\@@@mytikzCandC<#1>[]}}%
 \def\@@@mytikzCandC<#1>[#2]#3#4#5#6#7{%
- \let\@MTCC@leftP=\@empty
- \let\@MTCC@rightP=\@empty
+% \let\@MTCC@leftP=\@empty
+% \let\@MTCC@rightP=\@empty
  \setkeys{mytikzCandC}{#1}%
  \ifnum\@MTCCdraw=\@ne
   \begin{scope}
@@ -2790,15 +2809,16 @@
 %% #4:弧を表す端点(時計回りに指定)
 %%    ;で区切って複数指定可能
 \define@cmdkeys{mytikztoukokigou}[@MTTKK@]{width,length,num}%xkeyvalで設定
+\presetkeys{mytikztoukokigou}{width=2pt,length=2pt,num=2}{}%
 %\define@key{mytikztoukokigou}{width}{\def\@MTTKK@width{#1}}%
 %\define@key{mytikztoukokigou}{length}{\def\@MTTKK@length{#1}}%
 %\define@key{mytikztoukokigou}{num}{\def\@MTTKK@num{#1}}%
 \def\mytikztoukokigou{\@ifnextchar<{\@mytikztoukokigou}{\@mytikztoukokigou<>}}%
 \def\@mytikztoukokigou<#1>{\@ifnextchar[{\@@mytikztoukokigou<#1>}{\@@mytikztoukokigou<#1>[]}}%
 \def\@@mytikztoukokigou<#1>[#2]#3#4{%
- \def\@MTTKK@width{2pt}%
- \def\@MTTKK@length{5pt}%
- \def\@MTTKK@num{2}%
+% \def\@MTTKK@width{2pt}%
+% \def\@MTTKK@length{5pt}%
+% \def\@MTTKK@num{2}%
  \setkeys{mytikztoukokigou}{#1}%
 % \pgfmathparse{\@MTTKK@length/2}%
 % \let\@MTTKK@length=\pgfmathresult
@@ -3008,6 +3028,8 @@
 \define@key{MTToukakuKigou}{sign num}{\def\@MTTK@SignNum{#1}}%
 \define@key{MTToukakuKigou}{sign length}{\def\@MTTK@SignLength{#1}}%
 \define@key{MTToukakuKigou}{sign space}{\def\@MTTK@SignSpace{#1}}%
+\presetkeys{MTToukakuKigou}{arc radius=12.5pt,string radius=7.5pt,string size=\scriptsize,%
+                            sign num=0,sign length=7.5pt,sign space=1pt}{}%
 \def\ToukakuKigou{\@ifnextchar<{\@ToukakuKigou}{\@ToukakuKigou<>}}%
 \def\@ToukakuKigou<#1>{\@ifnextchar[{\@@ToukakuKigou<#1>}{\@@ToukakuKigou<#1>[]}}%
 \def\@@ToukakuKigou<#1>[#2]#3#4{%
@@ -3016,12 +3038,12 @@
   \def\@MTTK@SOption{#2}%
   \def\@MTTK@String{#4}%
   \mytikzoutlinefalse
-  \def\@MTTK@ArcRadius{12.5pt}%
-  \def\@MTTK@StringRadius{7.5pt}%
-  \def\@MTTK@StringSize{\scriptsize}%
-  \def\@MTTK@SignNum{0}%
-  \def\@MTTK@SignLength{7.5pt}%
-  \def\@MTTK@SignSpace{1pt}%
+%  \def\@MTTK@ArcRadius{12.5pt}%
+%  \def\@MTTK@StringRadius{7.5pt}%
+%  \def\@MTTK@StringSize{\scriptsize}%
+%  \def\@MTTK@SignNum{0}%
+%  \def\@MTTK@SignLength{7.5pt}%
+%  \def\@MTTK@SignSpace{1pt}%
   \setkeys{MTToukakuKigou}{#1}%
   \@@@ToukakuKigou#3;/%
  \egroup
@@ -3143,13 +3165,14 @@
 %% #5:配置文字列#6に関するTikZオプション
 %% #6:配置文字列の指定
 \define@cmdkeys{MTHenko}[@MTH@]{rotate,pos,distance}%xkeyvalで設定
+\presetkeys{HTHenko}{rotate=0,pos=.5,distance=5mm}{}%
 %\define@key{MTHenko}{rotate}{\def\@MTH@rotate{#1}}%
 %\define@key{MTHenko}{pos}{\def\@MTH@pos{#1}}%
 %\define@key{MTHenko}{distance}{\def\@MTH@distance{#1}}%
 \NewDocumentCommand\Henko{D<>{}O{}mO{}m}{%
- \def\@MTH@distance{5mm}%
- \def\@MTH@rotate{0}%
- \def\@MTH@pos{.5}%
+% \def\@MTH@distance{5mm}%
+% \def\@MTH@rotate{0}%
+% \def\@MTH@pos{.5}%
  \setkeys{MTHenko}{#1}%
  \@Henko<#1>[#2](#3)[#4]{#5}%
 }%
@@ -3185,12 +3208,13 @@
 %% #3:直角をなす角をカンマ(,)区切りで指定したものをセミコロン(;)で区切り複数指定する
 \define@key{MTRightAngle}{size}{\def\@MTRA@size{#1}}%
 \define@key{MTRightAngle}{cycle}[true]{\mytikzoutlinetrue}%
+\presetkeys{MTRightAngle}{size=10pt}{}%
 \def\RightAngle{\@ifnextchar<{\@RightAngle}{\@RightAngle<>}}%
 \def\@RightAngle<#1>{\@ifnextchar[{\@@RightAngle<#1>}{\@@RightAngle<#1>[]}}%
 \def\@@RightAngle<#1>[#2]#3{%
  \bgroup
   \mytikzoutlinefalse
-  \def\@MTRA@size{10pt}%
+%  \def\@MTRA@size{10pt}%
   \setkeys{MTRightAngle}{#1}%
   \@@@RightAngle<#1>[#2]#3;/%
  \egroup
@@ -3796,10 +3820,11 @@
 %%    ただし，#2で$(A)!1/2!(C)$などのように$...$のパターンはシフトしない
 %% G($1/3*(A)+1/3*(B)+1/3*(C)$) や A({2*cos(60)},{3*sin(60)}) なども可能に 2015/05/16
 \define@key{SetPoint}{shift}{\coordinate(@SP@BASE@)at#1;}%
+\presetkeys{SetPoint}{shift={(0,0)}}{}%
 \def\SetPoint{\@ifstar{\def\@SP@string@flag{0}\@SetPoint}{\def\@SP@string@flag{1}\@SetPoint}}%
 \def\@SetPoint{\@ifnextchar<{\@@SetPoint}{\@@SetPoint<>}}%
 \def\@@SetPoint<#1>#2{%
- \coordinate(@SP@BASE@)at(0,0);
+% \coordinate(@SP@BASE@)at(0,0);
  \setkeys{SetPoint}{#1}%
  \expandafter\@SetPoint@#2%
 }%
@@ -3919,8 +3944,9 @@
 %% デフォルトで\GRに外接円の半径を格納
 \define@key{Gaishin}{radius name}{\def\@R@Name@{#1}}%
 \define@key{Gaishin}{show points}[true]{\def\@G@Ast{}}%
+\presetkeys{Gaishin}{radius name=GR}{}%
 \NewDocumentCommand\Gaishin{D<>{}mm}{%
- \def\@R@Name@{GR}%
+% \def\@R@Name@{GR}%
  \def\@G@Ast{*}%
  \setkeys{Gaishin}{#1}%
  \@Gaishin#2@{#3}%
@@ -3950,8 +3976,9 @@
 %% #3:内心の名前
 %% デフォルトで\NRに内接円の半径を格納
 \define@key{Naishin}{radius name}{\def\@R@Name@{#1}}%
+\presetkeys{Naishin}{radius name=NR}{}%
 \NewDocumentCommand\Naishin{D<>{}mm}{%
- \def\@R@Name@{NR}%
+% \def\@R@Name@{NR}%
  \setkeys{Naishin}{#1}%
  \@Naishin#2@{#3}% 01/02/2016 \@@Naishinになっていたのを修正
 }%
@@ -3978,8 +4005,9 @@
 %% #3:傍心の名前
 %% デフォルトで\BRに傍接円の半径を格納
 \define@key{Boushin}{radius name}{\def\@R@Name@{#1}}%
+\presetkeys{Boushin}{radius name=BR}{}%
 \NewDocumentCommand\Boushin{D<>{}mm}{%
- \def\@R@Name@{BR}%
+% \def\@R@Name@{BR}%
  \setkeys{Boushin}{#1}%
  \@Boushin#2@{#3}%
 }%
@@ -4095,10 +4123,11 @@
 % \let\Funcval=\mytikzfuncval としていたものを新設 11/10/2015
 \define@key{Funcval}{variable}{\let#1=\@func@variable}%
 \define@key{Funcval}{precision}{\pgfkeys{/pgf/number format/.cd,fixed,precision=#1}}
+\presetkeys{Funcval}{variable=\x,precision=3}{}%
 \NewDocumentCommand\Funcval{D<>{}O{}mmmm}{%
- \pgfkeys{/pgf/number format/.cd,fixed,precision=3}%
+% \pgfkeys{/pgf/number format/.cd,fixed,precision=3}%
  \def\@func@variable{#4}%
- \let\x=\@func@variable
+% \let\x=\@func@variable
  \setkeys{Funcval}{#1}%
  \GetMathparse{#3}\@TEMP@Funcval@result
  \pgfmathroundto{\@TEMP@Funcval@result}%
@@ -4121,10 +4150,11 @@
 % 11/10/2015 に新設
 \define@key{ParaFuncval}{variable}{\let#1=\@para@func@variable\relax}%
 \define@key{ParaFuncval}{precision}{\pgfkeys{/pgf/number format/.cd,fixed,precision=#1}}
+\presetkeys{ParaFuncval}{variable=\t,precision=3}{}%
 \NewDocumentCommand\ParaFuncval{D<>{}O{}mmmmmm}{%
- \pgfkeys{/pgf/number format/.cd,fixed,precision=3}%
+% \pgfkeys{/pgf/number format/.cd,fixed,precision=3}%
  \def\@para@func@variable{#5}%
- \let\t=\@para@func@variable
+% \let\t=\@para@func@variable
  \setkeys{ParaFuncval}{#1}%
  \GetMathparse{#3}\@TEMP@PFuncval@result%
  \pgfmathroundto{\@TEMP@PFuncval@result}%
@@ -4267,6 +4297,7 @@
 \define@key{MTShaei}{x string}{\def\@MTS@X@string{#1}}%
 \define@key{MTShaei}{y string}{\def\@MTS@Y@string{#1}}%
 \define@key{MTShaei}{fillcolor}{\def\@MTS@fillcolor{#1}}%
+\presetkeys{MTShaei}{x pos=\@empty,y pos=\@empty,x string=\@empty,y string=\@empty,fillcolor={}}{}%
 \def\Shaei{\@ifnextchar<{\@Shaei}{\@Shaei<>}}%
 \def\@Shaei<#1>{\@ifnextchar[{\@@Shaei<#1>}{\@@Shaei<#1>[]}}%
 \def\@@Shaei<#1>[#2]#3{%
@@ -4276,11 +4307,11 @@
 }%
 \def\@@@Shaei<#1>[#2]#3,{%
  \def\@MTS@flag{0}%
- \let\@MTS@X@pos=\@empty
- \let\@MTS@Y@pos=\@empty
- \let\@MTS@X@string=\@empty
- \let\@MTS@Y@string=\@empty
- \def\@MTS@fillcolor{}%
+% \let\@MTS@X@pos=\@empty
+% \let\@MTS@Y@pos=\@empty
+% \let\@MTS@X@string=\@empty
+% \let\@MTS@Y@string=\@empty
+% \def\@MTS@fillcolor{}%
  \setkeys{MTShaei}{#1}%
  \path let \p0=(#3) in node
   {%
@@ -5096,16 +5127,17 @@
 %\define@key{Touhenkigou}{space}{\def\@TK@space{#1}}%
 %\define@key{Touhenkigou}{num}{\def\@TK@num{#1}}%
 %\define@key{Touhenkigou}{symbol}{\def\@TK@symbol{#1}}%
+\presetkeys{Touhenkigou}{pos=.5,x size=1,y size=1,space=0pt,num=2,symbol=|}{}%
 \def\Touhenkigou{\@ifnextchar<{\@Touhenkigou}{\@Touhenkigou<>}}%
 \def\@Touhenkigou<#1>{\@ifnextchar[{\@@Touhenkigou<#1>}{\@@Touhenkigou<#1>[]}}%
 \def\@@Touhenkigou<#1>[#2]#3{%
  \bgroup
-  \def\@TK@pos{.5}%
-  \def\@TK@XSize{1}%
-  \def\@TK@YSize{1}%
-  \def\@TK@space{0pt}%
-  \def\@TK@num{2}%
-  \def\@TK@symbol{|}%
+%  \def\@TK@pos{.5}%
+%  \def\@TK@XSize{1}%
+%  \def\@TK@YSize{1}%
+%  \def\@TK@space{0pt}%
+%  \def\@TK@num{2}%
+%  \def\@TK@symbol{|}%
   \setkeys{Touhenkigou}{#1}%
   \edef\@TK@Strings{\@TK@symbol}%
   \foreach\N in {1,...,\@TK@num}{%
@@ -5136,6 +5168,7 @@
 %% #3:平行記号を置く辺を指定
 %%  A,B;C,D;E,F のように複数指定する
 \define@cmdkeys{SetParallels}[@PARA@]{num,angle,space,scale,length,pos}%xkeyvalで設定
+\presetkeys{SetParallels}{num=2,angle=25,space=1.5mm,scale=1,length=2mm,pos=.5}{}%
 %\define@key{SetParallels}{num}{\def\@PARA@num{#1}}%
 %\define@key{SetParallels}{angle}{\def\@PARA@angle{#1}}%
 %\define@key{SetParallels}{space}{\def\@PARA@space{#1}}%
@@ -5145,12 +5178,12 @@
 \def\SetParallels{\@ifnextchar<{\@SetParallels}{\@SetParallels<>}}%
 \def\@SetParallels<#1>{\@ifnextchar[{\@@SetParallels<#1>}{\@@SetParallels<#1>[]}}%
 \def\@@SetParallels<#1>[#2]#3{%
- \def\@PARA@num{2}%
- \def\@PARA@angle{25}%
- \def\@PARA@space{1.5mm}%
- \def\@PARA@scale{1}%
- \def\@PARA@length{2mm}%
- \def\@PARA@pos{.5}%
+% \def\@PARA@num{2}%
+% \def\@PARA@angle{25}%
+% \def\@PARA@space{1.5mm}%
+% \def\@PARA@scale{1}%
+% \def\@PARA@length{2mm}%
+% \def\@PARA@pos{.5}%
  \setkeys{SetParallels}{#1}%
  \tikzset{%
   macroparallels/.pic={%
@@ -5183,14 +5216,15 @@
 %\define@key{SetEquilaterals}{scale}{\def\@EQUI@scale{#1}}%
 %\define@key{SetEquilaterals}{length}{\def\@EQUI@length{#1}}%
 %\define@key{SetEquilaterals}{pos}{\def\@EQUI@pos{#1}}%
+\presetkeys{SetEquilaterals}{num=2,space=.75mm,scale=1,length=2mm,pos=.5}{}%
 \def\SetEquilaterals{\@ifnextchar<{\@SetEquilaterals}{\@SetEquilaterals<>}}%
 \def\@SetEquilaterals<#1>{\@ifnextchar[{\@@SetEquilaterals<#1>}{\@@SetEquilaterals<#1>[]}}%
 \def\@@SetEquilaterals<#1>[#2]#3{%
- \def\@EQUI@num{2}%
- \def\@EQUI@space{.75mm}%
- \def\@EQUI@scale{1}%
- \def\@EQUI@length{2mm}%
- \def\@EQUI@pos{.5}%
+% \def\@EQUI@num{2}%
+% \def\@EQUI@space{.75mm}%
+% \def\@EQUI@scale{1}%
+% \def\@EQUI@length{2mm}%
+% \def\@EQUI@pos{.5}%
  \setkeys{SetEquilaterals}{#1}%
  \tikzset{%
   macroequilaterals/.pic={%
@@ -5243,11 +5277,12 @@
 \define@cmdkeys{DrawSegments}[@DS@]{shift,overratio}%xkeyvalで設定
 %\define@key{DrawSegments}{shift}{\def\@DS@shift{#1}}%
 %\define@key{DrawSegments}{overratio}{\def\@DS@overratio{#1}}%
+\presetkeys{DrawSegments}{shift={0,0},overratio=0}{}%
 \def\DrawSegments{\@ifnextchar<{\@DrawSegments}{\@DrawSegments<>}}%
 \def\@DrawSegments<#1>{\@ifnextchar[{\@@DrawSegments<#1>}{\@@DrawSegments<#1>[]}}%
 \def\@@DrawSegments<#1>[#2]#3{%
- \def\@DS@shift{0,0}%
- \def\@DS@overratio{0}%
+% \def\@DS@shift{0,0}%
+% \def\@DS@overratio{0}%
  \setkeys{DrawSegments}{#1}%
  \@DrawSegmentsSub[#2]#3;/%
 }%
@@ -5293,14 +5328,15 @@
 \define@key{DrawVline}{noline}[noline]{\DVrightfalse\DVleftfalse}%
 %\define@key{DrawVline}{leftP}{\def\@DV@leftP{#1}}%
 %\define@key{DrawVline}{rightP}{\def\@DV@rightP{#1}}%
+\presetkeys{DrawVline}{leftP=leftP,rightP=rightP}{}%
 \def\DrawVline{\@ifstar{\def\@DVline@flag{0}\@DrawVline}{\def\@DVline@flag{1}\@DrawVline}}%
 \def\@DrawVline{\@ifnextchar<{\@@DrawVline}{\@@DrawVline<>}}%
 \def\@@DrawVline<#1>{\@ifnextchar[{\@@@DrawVline<#1>}{\@@@DrawVline<#1>[]}}%
 \def\@@@DrawVline<#1>[#2]#3#4#5{%
  \DVlefttrue
  \DVrighttrue
- \def\@DV@leftP{leftP}%
- \def\@DV@rightP{rightP}%
+% \def\@DV@leftP{leftP}%
+% \def\@DV@rightP{rightP}%
  \setkeys{DrawVline}{#1}%
  \GetCoordinate{#3}\@DV@x\@DV@y
  \pgfkeys{/pgf/number format/.cd,fixed,precision=3}%
@@ -5662,10 +5698,11 @@
 \define@key{ArrayBackSlash}{baseline ratio}{\def\@array@back@slash@baseline@ratio{#1}}%
 \define@key{ArrayBackSlash}{ne option}{\def\@array@back@slash@ne@option{#1}}%
 \define@key{ArrayBackSlash}{sw option}{\def\@array@back@slash@sw@option{#1}}%
+\presetkeys{ArrayBackSlash}{baseline ratio=\@empty,ne option={},sw option={}}{}%
 \NewDocumentCommand\ArrayBackSlash{D<>{}O{}D(){}mm}{%
- \let\@array@back@slash@baseline@ratio=\@empty%
- \def\@array@back@slash@ne@option{}%
- \def\@array@back@slash@sw@option{}%
+% \let\@array@back@slash@baseline@ratio=\@empty%
+% \def\@array@back@slash@ne@option{}%
+% \def\@array@back@slash@sw@option{}%
  \setkeys{ArrayBackSlash}{#1}%
  \ifmmode
   \def\@a@b@s@mmode{1}%
@@ -6121,6 +6158,7 @@
 \define@key{PutMarkAnswer}{title distance}{\def\@PMA@title@distance{#1}}%
 \define@key{PutMarkAnswer}{subtitle distance}{\def\@PMA@title@subdistance{#1}}%
 \define@key{PutMarkAnswer}{title font}{\def\@PMA@title@font{#1}}%
+\presetkeys{PutMarkAnswer}{title=解　答}{}%
 \def\SetPutMarkAnswerFont#1{\let\@PMA@title@font@defalut=#1\relax}%
 \SetPutMarkAnswerFont{\bfseries}%
 \def\SetPutMarkAnswerTitleDistance#1{\def\@PMA@title@distance@default{#1}}%
@@ -6128,7 +6166,7 @@
 \def\SetPutMarkAnswerSubtitleDistance#1{\def\@PMA@subtitle@distance@default{#1}}%
 \SetPutMarkAnswerSubtitleDistance{2.5mm}%
 \NewDocumentCommand\PutMarkAnswer{D<>{}O{}m}{%
- \def\@PMA@title{解　答}%
+% \def\@PMA@title{解　答}%
  \let\@PMA@title@distance=\@PMA@title@distance@default\relax
  \let\@PMA@subtitle@distance=\@PMA@subtitle@distance@default\relax
  \let\@PMA@title@font=\@PMA@title@font@default\relax
@@ -6418,11 +6456,12 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 \define@key{RotationMark}{end angle}{\def\@RM@EA{#1}}%
 \define@key{RotationMark}{x radius}{\def\@RM@XR{#1}}%
 \define@key{RotationMark}{y radius}{\def\@RM@YR{#1}}%
+\presetkeys{RotationMark}{start angle=10,end angle=350,x radius=3.75pt,y radius=7.5pt}{}%
 \NewDocumentCommand\RotationMark{D<>{}D(){}O{}m}{%
- \def\@RM@SA{10}%
- \def\@RM@EA{350}%
- \def\@RM@XR{3.75pt}%
- \def\@RM@YR{7.5pt}%
+% \def\@RM@SA{10}%
+% \def\@RM@EA{350}%
+% \def\@RM@XR{3.75pt}%
+% \def\@RM@YR{7.5pt}%
  \IfNoValueF{#1}{\setkeys{RotationMark}{#1}}%
  \def\@RM@SP{{cos(\@RM@SA)*\@RM@XR},{sin(\@RM@SA)*\@RM@YR}}%
  \pic[#3]at(#4){rotationmark={#2}};
