@@ -1,58 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/28/2018 Ver.0.1157]%
-% xkeyval で \presetkyes を使うようにする
-% tikzpicture 環境の bmargin オプションの修正
-% \Henko の \define@cmdkeys のファミリーネームを修正
-% 下記修正時のエラーの修正
-% xkeyval の \define@cmdkeys で設定し直す
-% 問題環境で equation, tabule, figure カウンタをリセットする
-% \SetPoints の下記の修正の修正
-% \SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
-% \Integers のオプションに string を加える
-% \Integers を expl3 で再定義する
-% \Zahyo を expl3 で再定義する
-% \SetPoints の不要なカンタの削除および修正
-% \SetPoint を expl3 で再定義し \SetPoints に改名
-% \IncludeGraphics を expl3 で再定義
-% \PicMaru を定義し直す \foreach にカンマリストを入れるだけにする
-% \漢数字変換 の引数の数字をカンマ(,)区切りを許容する
-% \漢数字変換 を修正
-% \漢数字変換 を expl3 で作成し直す(念の為 \RenewDocumentCommand で再定義した)
-% \漢数字変換 を修正(1000000001が一億万一と表示されていたのを修正)
-% \漢数字変換 を新設
-% \spacepageref の使用法を記述する
-% spacename 環境を新設さらに \spacelabel，\spaceref，\spacepageref も新設
-% \IncludeGraphics の修正 12/13/2017
-% \XMark 使用時に hyperref ワーニングが出るため修正 12/11/2017
-% \IncludeGraphics[#1]{#2}を新設 12/11/2017
-% \XMark の multi オプション時の設定ミスを修正
-% \XMark で1つの記号に複数の数値を解答とする multi オプションを設置
-% \RefMark を \XMark に合わせて再定義する
-% \HakoHige のスタイルを広域的に設定できるようにする 11/14/2017
-% \HakoHige の平均を出す計算式を修正 11/14/2017
-% \HakoHige を改変(\TateHakoHige が必要になったらそのとき作ることにする) 11/13/2017
-% \SetAngle の弧の中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
-% \MarkBox に代わる \XMark を新設 枠は \node[draw,rectangle] で出力
-% \eqref を再定義
-% \EuclidDiv を定義 expl3 を使用する
-% 内側の正三角形の一辺の長さが1のルーローの三角形を \pic at(X){Reuleaux triangle}; で出力させる
-% inline の enumerate 環境で afterlabel に \nobreak を噛ませる
-% \Re，\Imで数式中にRe，Imをローマン体で表記する(\mathop)を噛ませてある
-% \SetAngle にオリジナルオプション point を新設
-% \Vec の定義に \mathstrut を噛ませる
-% \Vec(*)をesvectに任せる 08/22/2017
-% \PicMaruを追加 08/21/2017
-% \RotationMarkを追加 08/20/2017
-% Attention環境内で\lineskip，\lineskiplimitが初期化されていたので反映されるようにした
-% 増減表の曲がった矢印を定義 07/30/2017
-% \HakoHige (縦の箱ひげ図)が非常に使いにくいので \YokoHakoHige (横の箱ひげ図)を新設 06/09/2017
-% 床関数・天井関数の定義 05/27/2017
-% siunitx.sty を読み込む & \DegOrRad の再定義 04/29/2017
-% \Cmaru の前後に \kanjiskip が入るようにする
-%\Henkoのnodeにsolidを追加 03/17/2017
-%解説および問題環境でsectionカウンタを回す(hyperref対策)
-%\Henkoをbend leftからcontrolsに仕様変更
-%\Zahyoの括弧の調整10/28/2013
+\ProvidesPackage{tikzxelatexsetup}[05/29/2018 Ver.0.1158]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -624,7 +571,6 @@
  #2#1%
 }%
 \define@cmdkeys{Shutten}[Shu@]{no,matter}%xkeyvalで設定
-\presetkeys{Shutten}{year={},term={},university={},faculty={},department={},no={},matter={},level={}}{}%
 \define@key{Shutten}{year}{\def\Shu@Year{#1年}}%
 \define@key{Shutten}{term}{\def\Shu@Term{\Shu@Replace{期}{#1}}}%
 \define@key{Shutten}{university}{\def\Shu@Uni{\Shu@Replace{大学}{#1}}}%
@@ -633,14 +579,14 @@
 %\define@key{Shutten}{no}{\def\Shu@no{#1}}%
 %\define@key{Shutten}{matter}{\def\Shu@matter{#1}}%
 \define@key{Shutten}{level}{\def\Shu@Level{[#1]}}%
-%\def\Shu@Year{}%
-%\def\Shu@Term{}%
-%\def\Shu@Uni{}%
-%\def\Shu@Fac{}%
-%\def\Shu@Dep{}%
-%\def\Shu@no{}%
-%\def\Shu@matter{}%
-%\def\Shu@Level{}%
+\def\Shu@Year{}%
+\def\Shu@Term{}%
+\def\Shu@Uni{}%
+\def\Shu@Fac{}%
+\def\Shu@Dep{}%
+\def\Shu@no{}%
+\def\Shu@matter{}%
+\def\Shu@Level{}%
 \def\Shutten#1{%
  \bgroup
   \setkeys{Shutten}{#1}%
@@ -6988,3 +6934,58 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\prebreakpenalty`．=10000
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
+\endinput
+\Shutten のオプションの設定を修正 05/29/2018
+xkeyval で \presetkeys を使うようにする 05/28/2018
+tikzpicture 環境の bmargin オプションの修正 05/27/2018
+\Henko の \define@cmdkeys のファミリーネームを修正 05/27/2018
+下記修正時のエラーの修正
+xkeyval の \define@cmdkeys で設定し直す
+問題環境で equation, tabule, figure カウンタをリセットする
+\SetPoints の下記の修正の修正
+\SetPoints の座標指定で []A(0,1) など表示文字列が空のときの修正
+\Integers のオプションに string を加える
+\Integers を expl3 で再定義する
+\Zahyo を expl3 で再定義する
+\SetPoints の不要なカンタの削除および修正
+\SetPoint を expl3 で再定義し \SetPoints に改名
+\IncludeGraphics を expl3 で再定義
+\PicMaru を定義し直す \foreach にカンマリストを入れるだけにする
+\漢数字変換 の引数の数字をカンマ(,)区切りを許容する
+\漢数字変換 を修正
+\漢数字変換 を expl3 で作成し直す(念の為 \RenewDocumentCommand で再定義した)
+\漢数字変換 を修正(1000000001が一億万一と表示されていたのを修正)
+\漢数字変換 を新設
+\spacepageref の使用法を記述する
+spacename 環境を新設さらに \spacelabel，\spaceref，\spacepageref も新設
+\IncludeGraphics の修正 12/13/2017
+\XMark 使用時に hyperref ワーニングが出るため修正 12/11/2017
+\IncludeGraphics[#1]{#2}を新設 12/11/2017
+\XMark の multi オプション時の設定ミスを修正
+\XMark で1つの記号に複数の数値を解答とする multi オプションを設置
+\RefMark を \XMark に合わせて再定義する
+\HakoHige のスタイルを広域的に設定できるようにする 11/14/2017
+\HakoHige の平均を出す計算式を修正 11/14/2017
+\HakoHige を改変(\TateHakoHige が必要になったらそのとき作ることにする) 11/13/2017
+\SetAngle の弧の中点が弧の半径(angle radius)に対応していなかったものを修正 11/11/2017
+\MarkBox に代わる \XMark を新設 枠は \node[draw,rectangle] で出力
+\eqref を再定義
+\EuclidDiv を定義 expl3 を使用する
+内側の正三角形の一辺の長さが1のルーローの三角形を \pic at(X){Reuleaux triangle}; で出力させる
+inline の enumerate 環境で afterlabel に \nobreak を噛ませる
+\Re，\Imで数式中にRe，Imをローマン体で表記する(\mathop)を噛ませてある
+\SetAngle にオリジナルオプション point を新設
+\Vec の定義に \mathstrut を噛ませる
+\Vec(*)をesvectに任せる 08/22/2017
+\PicMaruを追加 08/21/2017
+\RotationMarkを追加 08/20/2017
+Attention環境内で\lineskip，\lineskiplimitが初期化されていたので反映されるようにした
+増減表の曲がった矢印を定義 07/30/2017
+\HakoHige (縦の箱ひげ図)が非常に使いにくいので \YokoHakoHige (横の箱ひげ図)を新設 06/09/2017
+床関数・天井関数の定義 05/27/2017
+siunitx.sty を読み込む & \DegOrRad の再定義 04/29/2017
+\Cmaru の前後に \kanjiskip が入るようにする
+\Henkoのnodeにsolidを追加 03/17/2017
+解説および問題環境でsectionカウンタを回す(hyperref対策)
+\Henkoをbend leftからcontrolsに仕様変更
+\Zahyoの括弧の調整10/28/2013
