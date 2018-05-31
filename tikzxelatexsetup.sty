@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/29/2018 Ver.0.1158]%
+\ProvidesPackage{tikzxelatexsetup}[05/31/2018 Ver.0.1159]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -4243,7 +4243,7 @@
 \define@key{MTShaei}{x string}{\def\@MTS@X@string{#1}}%
 \define@key{MTShaei}{y string}{\def\@MTS@Y@string{#1}}%
 \define@key{MTShaei}{fillcolor}{\def\@MTS@fillcolor{#1}}%
-\presetkeys{MTShaei}{x pos=\@empty,y pos=\@empty,x string=\@empty,y string=\@empty,fillcolor={}}{}%
+%\presetkeys{MTShaei}{x pos=\@empty,y pos=\@empty,x string=\@empty,y string=\@empty,fillcolor={}}{}%
 \def\Shaei{\@ifnextchar<{\@Shaei}{\@Shaei<>}}%
 \def\@Shaei<#1>{\@ifnextchar[{\@@Shaei<#1>}{\@@Shaei<#1>[]}}%
 \def\@@Shaei<#1>[#2]#3{%
@@ -4253,11 +4253,11 @@
 }%
 \def\@@@Shaei<#1>[#2]#3,{%
  \def\@MTS@flag{0}%
-% \let\@MTS@X@pos=\@empty
-% \let\@MTS@Y@pos=\@empty
-% \let\@MTS@X@string=\@empty
-% \let\@MTS@Y@string=\@empty
-% \def\@MTS@fillcolor{}%
+ \let\@MTS@X@pos=\@empty
+ \let\@MTS@Y@pos=\@empty
+ \let\@MTS@X@string=\@empty
+ \let\@MTS@Y@string=\@empty
+ \def\@MTS@fillcolor{}%
  \setkeys{MTShaei}{#1}%
  \path let \p0=(#3) in node
   {%
@@ -6935,6 +6935,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Shaei のオプションを修正 05/31/2018
 \Shutten のオプションの設定を修正 05/29/2018
 xkeyval で \presetkeys を使うようにする 05/28/2018
 tikzpicture 環境の bmargin オプションの修正 05/27/2018
