@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/31/2018 Ver.0.1159]%
+\ProvidesPackage{tikzxelatexsetup}[05/31/2018 Ver.0.1160]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -3111,7 +3111,7 @@
 %% #5:配置文字列#6に関するTikZオプション
 %% #6:配置文字列の指定
 \define@cmdkeys{MTHenko}[@MTH@]{rotate,pos,distance}%xkeyvalで設定
-\presetkeys{HTHenko}{rotate=0,pos=.5,distance=5mm}{}%
+\presetkeys{MTHenko}{rotate=0,pos=.5,distance=5mm}{}%
 %\define@key{MTHenko}{rotate}{\def\@MTH@rotate{#1}}%
 %\define@key{MTHenko}{pos}{\def\@MTH@pos{#1}}%
 %\define@key{MTHenko}{distance}{\def\@MTH@distance{#1}}%
@@ -6935,6 +6935,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Henko の \presetkeys 等の修正 05/31/2018
 \Shaei のオプションを修正 05/31/2018
 \Shutten のオプションの設定を修正 05/29/2018
 xkeyval で \presetkeys を使うようにする 05/28/2018
