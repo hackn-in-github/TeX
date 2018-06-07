@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[05/31/2018 Ver.0.1160]%
+\ProvidesPackage{tikzxelatexsetup}[06/08/2018 Ver.0.1161]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -4235,150 +4235,239 @@
 %%   x string,ystring:
 %% #2:TikZオプション
 %% #3:射影線を引く点をカンマ区切りで指定
-\define@key{MTShaei}{xy}[true]{\def\@MTS@flag{0}}%
-\define@key{MTShaei}{x}[true]{\def\@MTS@flag{1}}%
-\define@key{MTShaei}{y}[true]{\def\@MTS@flag{2}}%
-\define@key{MTShaei}{x pos}{\def\@MTS@X@pos{#1}}%
-\define@key{MTShaei}{y pos}{\def\@MTS@Y@pos{#1}}%
-\define@key{MTShaei}{x string}{\def\@MTS@X@string{#1}}%
-\define@key{MTShaei}{y string}{\def\@MTS@Y@string{#1}}%
-\define@key{MTShaei}{fillcolor}{\def\@MTS@fillcolor{#1}}%
-%\presetkeys{MTShaei}{x pos=\@empty,y pos=\@empty,x string=\@empty,y string=\@empty,fillcolor={}}{}%
-\def\Shaei{\@ifnextchar<{\@Shaei}{\@Shaei<>}}%
-\def\@Shaei<#1>{\@ifnextchar[{\@@Shaei<#1>}{\@@Shaei<#1>[]}}%
-\def\@@Shaei<#1>[#2]#3{%
- \bgroup
-  \@@@Shaei<#1>[#2]#3,;%
- \egroup
+%%    P<x string=$e$>[line width=1pt] のように個別にスタイルを設定できる
+\define@cmdkeys{MTShaei}[@MT@Shaei@]{x pos,y pos,x string,y string,fillcolor}%
+\define@boolkeys{MTShaei}[@MT@Shaei@]{xy,x,y}[true]%
+\presetkeys{MTShaei}{x pos=,y pos=,x string=,y string=,fillcolor=,xy=true,x=false,y=false}{}%
+\def\@get@draw@options#1[{%
+ \def\@TMP@P{#1}%
+ \@ifnextchar]{\def\@MT@Shaei@Draw@Option{}\@gobble}{\@@get@draw@options}%
 }%
-\def\@@@Shaei<#1>[#2]#3,{%
- \def\@MTS@flag{0}%
- \let\@MTS@X@pos=\@empty
- \let\@MTS@Y@pos=\@empty
- \let\@MTS@X@string=\@empty
- \let\@MTS@Y@string=\@empty
- \def\@MTS@fillcolor{}%
+\def\@@get@draw@options#1][]{%
+ \def\@MT@Shaei@Draw@Option{#1}%
+}%
+\def\@sub@Shaei#1<{%
+ \tikzmath{%
+  coordinate \@P@,\@E@;
+  int \@Vx,\Vy;
+  \@P@=(#1);
+  \@E@=(1,0);
+  \@Vx=int(round(\@P@x/\@E@x));
+  \@Vy=int(round(\@P@y/\@E@x));
+ }%
+ \@ifnextchar>{\def\@MT@Shaei@Option{}\@gobble}{\@@sub@Shaei}%
+}%
+\def\@@sub@Shaei#1><>{%
+ \def\@MT@Shaei@Option{#1}%
+}%
+\NewDocumentCommand{\Shaei}{D<>{}O{}m}{%
  \setkeys{MTShaei}{#1}%
- \path let \p0=(#3) in node
-  {%
-   \pgfmathparse{\x0/28.45274}%
-   \xdef\@MTS@X@{\pgfmathresult}%
-   \pgfmathparse{\y0/28.45274}%
-   \xdef\@MTS@Y@{\pgfmathresult}%
-  };%
- \ifx\@MTS@X@string\@empty
-  \path let \p0=(#3) in node
-   {%
-    \pgfmathparse{\x0/28.45274}%
-    \pgfmathroundto{\pgfmathresult}%
-    \xdef\@MTS@X@string{$\pgfmathresult$}%
-   };%
- \fi
- \ifx\@MTS@Y@string\@empty
-  \path let \p0=(#3) in node
-   {%
-    \pgfmathparse{\y0/28.45274}%
-    \pgfmathroundto{\pgfmathresult}%
-    \xdef\@MTS@Y@string{$\pgfmathresult$}%
-   };%
- \fi
- \ifcase\@MTS@flag
-  %=0
-  \draw[mydash,#2](#3-|O)--(#3)--(#3|-O);
-  \ifx\@MTS@X@pos\@empty
-   \ifdim\@MTS@Y@ pt<0pt\relax 
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3|-O)[above]{\@MTS@X@string};
-    \else
-     \node at(#3|-O)[above,fill=\@MTS@fillcolor]{\@MTS@X@string};
-    \fi
+ \foreach\@P@ in {#3}{%
+  \expandafter\@get@draw@options\@P@[]%
+  \expandafter\@sub@Shaei\@TMP@P<>%
+  \def\@TEMP@CMD{\setkeys{MTShaei}}%
+  \expandafter\@TEMP@CMD\expandafter{\@MT@Shaei@Option}%
+  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@x string}\@empty
+   \def\@X@String{$\@Vx$}\else
+   \expandafter\def\expandafter\@X@String\expandafter{\csname @MT@Shaei@x string\endcsname}\fi
+  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@y string}\@empty
+   \def\@Y@String{$\@Vy$}\else\edef\@Y@String{\@nameuse{@MT@Shaei@y string}}\fi
+  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@x pos}\@empty
+   \ifnum\@Vy>\z@\relax
+    \def\@X@Pos{s}%
    \else
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3|-O)[below]{\@MTS@X@string};
-    \else
-     \node at(#3|-O)[below,fill=\@MTS@fillcolor]{\@MTS@X@string};
-    \fi
+    \def\@X@Pos{n}%
    \fi
-  \else
-   \ifx\@MTS@fillcolor\@empty
-    \node at(#3|-O)[\@MTS@X@pos]{\@MTS@X@string};
+  \else\edef\@X@Pos{\@nameuse{@MT@Shaei@x pos}}\fi
+  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@y pos}\@empty
+   \ifnum\@Vx>\z@\relax
+    \def\@Y@Pos{w}%
    \else
-    \node at(#3|-O)[\@MTS@X@pos,fill=\@MTS@fillcolor]{\@MTS@X@string};
+    \def\@Y@Pos{e}%
    \fi
-  \fi
-  \ifx\@MTS@Y@pos\@empty
-   \ifdim\@MTS@X@ pt<0pt\relax
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3-|O)[right]{\@MTS@Y@string};
-    \else
-     \node at(#3-|O)[right,fill=\@MTS@fillcolor]{\@MTS@Y@string};
-    \fi
+  \else\edef\@Y@Pos{\@nameuse{@MT@Shaei@y pos}}\fi
+  \ifx\@MT@Shaei@fillcolor\@empty
+   \if@MT@Shaei@y
+    \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
+    \expandafter\@TMP@DRAW@CMD\@MT@Shaei@Draw@Option](\@P@-|O)node[\@Y@Pos]{\@Y@String}--(\@P@);
    \else
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3-|O)[left]{\@MTS@Y@string};
+    \if@MT@Shaei@x
+     \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
+     \expandafter\@TMP@DRAW@CMD\@MT@Shaei@Draw@Option](\@P@)--(\@P@|-O)node[\@X@Pos]{\@X@String};
     \else
-     \node at(#3-|O)[left,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+     \if@MT@Shaei@xy
+      \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
+      \expandafter\@TMP@DRAW@CMD\@MT@Shaei@Draw@Option](\@P@-|O)node[\@Y@Pos]{\@Y@String}--(\@P@)%
+       --(\@P@|-O)node[\@X@Pos]{\@X@String};
+     \fi
     \fi
    \fi
   \else
-   \ifx\@MTS@fillcolor\@empty
-    \node at(#3-|O)[\@MTS@Y@pos]{\@MTS@Y@string};
+   \if@MT@Shaei@y
+    \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
+    \expandafter\@TMP@DRAW@CMD\@MT@Shaei@Draw@Option]%
+     (\@P@-|O)node[\@Y@Pos,fill=\@MT@Shaei@fillcolor]{\@Y@String}--(\@P@);
    \else
-    \node at(#3-|O)[\@MTS@Y@pos,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+    \if@MT@Shaei@x
+     \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
+     \expandafter\@TMP@DRAW@CMD\@MT@Shaei@Draw@Option]%%
+      (\@P@)--(\@P@|-O)node[\@X@Pos,fill=\@MT@Shaei@fillcolor]{\@X@String};
+    \else
+     \if@MT@Shaei@xy
+      \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
+      \expandafter\@TMP@DRAW@CMD\@MT@Shaei@Draw@Option]%
+       (\@P@-|O)node[\@Y@Pos,fill=\@MT@Shaei@fillcolor]{\@Y@String}--(\@P@)%
+        --(\@P@|-O)node[\@X@Pos,fill=\@MT@Shaei@fillcolor]{\@X@String};
+     \fi
+    \fi
    \fi
   \fi
- \or
-  %=1
-  \draw[mydash,#2](#3)--(#3|-O);
-  \ifx\@MTS@X@pos\@empty
-   \ifdim\@MTS@Y@ pt<0pt\relax
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3|-O)[above]{\@MTS@X@string};
-    \else
-     \node at(#3|-O)[above,fill=\@MTS@fillcolor]{\@MTS@X@string};
-    \fi
-   \else
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3|-O)[below]{\@MTS@X@string};
-    \else
-     \node at(#3|-O)[below,fill=\@MTS@fillcolor]{\@MTS@X@string};
-    \fi
-   \fi
-  \else
-   \ifx\@MTS@fillcolor\@empty
-    \node at(#3|-O)[\@MTS@X@pos]{\@MTS@X@string};
-   \else
-    \node at(#3|-O)[\@MTS@X@pos,fill=\@MTS@fillcolor]{\@MTS@X@string};
-   \fi
-  \fi
- \or
-  %=2
-  \draw[mydash,#2](#3)--(#3-|O);
-  \ifx\@MTS@Y@pos\@empty
-   \ifdim\@MTS@X@ pt<0pt\relax
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3-|O)[right]{\@MTS@Y@string};
-    \else
-     \node at(#3-|O)[right,fill=\@MTS@fillcolor]{\@MTS@Y@string};
-    \fi
-   \else
-    \ifx\@MTS@fillcolor\@empty
-     \node at(#3-|O)[left]{\@MTS@Y@string};
-    \else
-     \node at(#3-|O)[left,fill=\@MTS@fillcolor]{\@MTS@Y@string};
-    \fi
-   \fi
-  \else
-   \ifx\@MTS@fillcolor\@empty
-    \node at(#3-|O)[\@MTS@Y@pos]{\@MTS@Y@string};
-   \else
-    \node at(#3-|O)[\@MTS@Y@pos,fill=\@MTS@fillcolor]{\@MTS@Y@string};
-   \fi
-  \fi
- \else
- \fi
- \@ifnextchar;{\@gobble}{\@@@Shaei<#1>[#2]}%
+ }%
 }%
+%\define@key{MTShaei}{xy}[true]{\def\@MTS@flag{0}}%
+%\define@key{MTShaei}{x}[true]{\def\@MTS@flag{1}}%
+%\define@key{MTShaei}{y}[true]{\def\@MTS@flag{2}}%
+%\define@key{MTShaei}{x pos}{\def\@MTS@X@pos{#1}}%
+%\define@key{MTShaei}{y pos}{\def\@MTS@Y@pos{#1}}%
+%\define@key{MTShaei}{x string}{\def\@MTS@X@string{#1}}%
+%\define@key{MTShaei}{y string}{\def\@MTS@Y@string{#1}}%
+%\define@key{MTShaei}{fillcolor}{\def\@MTS@fillcolor{#1}}%
+%%\presetkeys{MTShaei}{x pos=\@empty,y pos=\@empty,x string=\@empty,y string=\@empty,fillcolor={}}{}%
+%\def\Shaei{\@ifnextchar<{\@Shaei}{\@Shaei<>}}%
+%\def\@Shaei<#1>{\@ifnextchar[{\@@Shaei<#1>}{\@@Shaei<#1>[]}}%
+%\def\@@Shaei<#1>[#2]#3{%
+% \bgroup
+%  \@@@Shaei<#1>[#2]#3,;%
+% \egroup
+%}%
+%\def\@@@Shaei<#1>[#2]#3,{%
+% \def\@MTS@flag{0}%
+% \let\@MTS@X@pos=\@empty
+% \let\@MTS@Y@pos=\@empty
+% \let\@MTS@X@string=\@empty
+% \let\@MTS@Y@string=\@empty
+% \def\@MTS@fillcolor{}%
+% \setkeys{MTShaei}{#1}%
+% \path let \p0=(#3) in node
+%  {%
+%   \pgfmathparse{\x0/28.45274}%
+%   \xdef\@MTS@X@{\pgfmathresult}%
+%   \pgfmathparse{\y0/28.45274}%
+%   \xdef\@MTS@Y@{\pgfmathresult}%
+%  };%
+% \ifx\@MTS@X@string\@empty
+%  \path let \p0=(#3) in node
+%   {%
+%    \pgfmathparse{\x0/28.45274}%
+%    \pgfmathroundto{\pgfmathresult}%
+%    \xdef\@MTS@X@string{$\pgfmathresult$}%
+%   };%
+% \fi
+% \ifx\@MTS@Y@string\@empty
+%  \path let \p0=(#3) in node
+%   {%
+%    \pgfmathparse{\y0/28.45274}%
+%    \pgfmathroundto{\pgfmathresult}%
+%    \xdef\@MTS@Y@string{$\pgfmathresult$}%
+%   };%
+% \fi
+% \ifcase\@MTS@flag
+%  %=0
+%  \draw[mydash,#2](#3-|O)--(#3)--(#3|-O);
+%  \ifx\@MTS@X@pos\@empty
+%   \ifdim\@MTS@Y@ pt<0pt\relax 
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3|-O)[above]{\@MTS@X@string};
+%    \else
+%     \node at(#3|-O)[above,fill=\@MTS@fillcolor]{\@MTS@X@string};
+%    \fi
+%   \else
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3|-O)[below]{\@MTS@X@string};
+%    \else
+%     \node at(#3|-O)[below,fill=\@MTS@fillcolor]{\@MTS@X@string};
+%    \fi
+%   \fi
+%  \else
+%   \ifx\@MTS@fillcolor\@empty
+%    \node at(#3|-O)[\@MTS@X@pos]{\@MTS@X@string};
+%   \else
+%    \node at(#3|-O)[\@MTS@X@pos,fill=\@MTS@fillcolor]{\@MTS@X@string};
+%   \fi
+%  \fi
+%  \ifx\@MTS@Y@pos\@empty
+%   \ifdim\@MTS@X@ pt<0pt\relax
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3-|O)[right]{\@MTS@Y@string};
+%    \else
+%     \node at(#3-|O)[right,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+%    \fi
+%   \else
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3-|O)[left]{\@MTS@Y@string};
+%    \else
+%     \node at(#3-|O)[left,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+%    \fi
+%   \fi
+%  \else
+%   \ifx\@MTS@fillcolor\@empty
+%    \node at(#3-|O)[\@MTS@Y@pos]{\@MTS@Y@string};
+%   \else
+%    \node at(#3-|O)[\@MTS@Y@pos,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+%   \fi
+%  \fi
+% \or
+%  %=1
+%  \draw[mydash,#2](#3)--(#3|-O);
+%  \ifx\@MTS@X@pos\@empty
+%   \ifdim\@MTS@Y@ pt<0pt\relax
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3|-O)[above]{\@MTS@X@string};
+%    \else
+%     \node at(#3|-O)[above,fill=\@MTS@fillcolor]{\@MTS@X@string};
+%    \fi
+%   \else
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3|-O)[below]{\@MTS@X@string};
+%    \else
+%     \node at(#3|-O)[below,fill=\@MTS@fillcolor]{\@MTS@X@string};
+%    \fi
+%   \fi
+%  \else
+%   \ifx\@MTS@fillcolor\@empty
+%    \node at(#3|-O)[\@MTS@X@pos]{\@MTS@X@string};
+%   \else
+%    \node at(#3|-O)[\@MTS@X@pos,fill=\@MTS@fillcolor]{\@MTS@X@string};
+%   \fi
+%  \fi
+% \or
+%  %=2
+%  \draw[mydash,#2](#3)--(#3-|O);
+%  \ifx\@MTS@Y@pos\@empty
+%   \ifdim\@MTS@X@ pt<0pt\relax
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3-|O)[right]{\@MTS@Y@string};
+%    \else
+%     \node at(#3-|O)[right,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+%    \fi
+%   \else
+%    \ifx\@MTS@fillcolor\@empty
+%     \node at(#3-|O)[left]{\@MTS@Y@string};
+%    \else
+%     \node at(#3-|O)[left,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+%    \fi
+%   \fi
+%  \else
+%   \ifx\@MTS@fillcolor\@empty
+%    \node at(#3-|O)[\@MTS@Y@pos]{\@MTS@Y@string};
+%   \else
+%    \node at(#3-|O)[\@MTS@Y@pos,fill=\@MTS@fillcolor]{\@MTS@Y@string};
+%   \fi
+%  \fi
+% \else
+% \fi
+% \@ifnextchar;{\@gobble}{\@@@Shaei<#1>[#2]}%
+%}%
 %% \Put % 2015/10/21 改訂 第2引数を使用可能に xparse を用いる
 %% \Put<#1>[#2]{#3}[#4]{#5}%
 %% #1:未定義
@@ -6935,6 +7024,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Shaei で各点のスタイルを各々設定できるようにする 06/08/2018
 \Henko の \presetkeys 等の修正 05/31/2018
 \Shaei のオプションを修正 05/31/2018
 \Shutten のオプションの設定を修正 05/29/2018
