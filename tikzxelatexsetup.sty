@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/09/2018 Ver.0.1163]%
+\ProvidesPackage{tikzxelatexsetup}[06/10/2018 Ver.0.1164]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -4263,7 +4263,7 @@
 \NewDocumentCommand{\Shaei}{D<>{}O{}m}{%
  \setkeys{MTShaei}{#1}%
  \foreach\@P@ in {#3}{%
-  \delpresetkeys{MTShaei}{x pos,y pos,x string,y string,xy,x,y}{}%
+  \delpresetkeys{MTShaei}{x pos,y pos,x string,y string,xy,x,y,fillcolor}{}%
   \expandafter\@get@draw@options\@P@[]%
   \expandafter\@sub@Shaei\@TMP@P<>%
   \def\@TEMP@CMD{\setkeys{MTShaei}}%
@@ -7027,6 +7027,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+下記の修正で fillcolor が抜けていたのを修正
 \Shaei の #1 オプションが引数 #3 の個別のオプション指定で取り消されていたのを修正
 \Shaei の y string 部分の修正 06/09/2018
 \Shaei で各点のスタイルを各々設定できるようにする 06/08/2018
