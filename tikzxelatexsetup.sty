@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/09/2018 Ver.0.1162]%
+\ProvidesPackage{tikzxelatexsetup}[06/09/2018 Ver.0.1163]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -4263,30 +4263,32 @@
 \NewDocumentCommand{\Shaei}{D<>{}O{}m}{%
  \setkeys{MTShaei}{#1}%
  \foreach\@P@ in {#3}{%
+  \delpresetkeys{MTShaei}{x pos,y pos,x string,y string,xy,x,y}{}%
   \expandafter\@get@draw@options\@P@[]%
   \expandafter\@sub@Shaei\@TMP@P<>%
   \def\@TEMP@CMD{\setkeys{MTShaei}}%
   \expandafter\@TEMP@CMD\expandafter{\@MT@Shaei@Option}%
-  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@x string}\@empty
+  \expandafter\ifx\csname @MT@Shaei@x string\endcsname\@empty
    \def\@X@String{$\@Vx$}\else
    \expandafter\def\expandafter\@X@String\expandafter{\csname @MT@Shaei@x string\endcsname}\fi
-  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@y string}\@empty
+  \expandafter\ifx\csname @MT@Shaei@y string\endcsname\@empty
    \def\@Y@String{$\@Vy$}\else
    \expandafter\def\expandafter\@Y@String\expandafter{\csname @MT@Shaei@y string\endcsname}\fi
-  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@x pos}\@empty
+  \expandafter\ifx\csname @MT@Shaei@x pos\endcsname\@empty
    \ifnum\@Vy>\z@\relax
     \def\@X@Pos{s}%
    \else
     \def\@X@Pos{n}%
    \fi
   \else\edef\@X@Pos{\@nameuse{@MT@Shaei@x pos}}\fi
-  \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@y pos}\@empty
+  \expandafter\ifx\csname @MT@Shaei@y pos\endcsname\@empty
    \ifnum\@Vx>\z@\relax
     \def\@Y@Pos{w}%
    \else
     \def\@Y@Pos{e}%
    \fi
-  \else\edef\@Y@Pos{\@nameuse{@MT@Shaei@y pos}}\fi
+  \else
+   \edef\@Y@Pos{\@nameuse{@MT@Shaei@y pos}}\fi
   \ifx\@MT@Shaei@fillcolor\@empty
    \if@MT@Shaei@y
     \def\@TMP@DRAW@CMD{\draw[mydash,#2,}%
@@ -7025,6 +7027,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Shaei の #1 オプションが引数 #3 の個別のオプション指定で取り消されていたのを修正
 \Shaei の y string 部分の修正 06/09/2018
 \Shaei で各点のスタイルを各々設定できるようにする 06/08/2018
 \Henko の \presetkeys 等の修正 05/31/2018
