@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/08/2018 Ver.0.1161]%
+\ProvidesPackage{tikzxelatexsetup}[06/09/2018 Ver.0.1162]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -4271,7 +4271,8 @@
    \def\@X@String{$\@Vx$}\else
    \expandafter\def\expandafter\@X@String\expandafter{\csname @MT@Shaei@x string\endcsname}\fi
   \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@y string}\@empty
-   \def\@Y@String{$\@Vy$}\else\edef\@Y@String{\@nameuse{@MT@Shaei@y string}}\fi
+   \def\@Y@String{$\@Vy$}\else
+   \expandafter\def\expandafter\@Y@String\expandafter{\csname @MT@Shaei@y string\endcsname}\fi
   \expandafter\expandafter\expandafter\ifx\@nameuse{@MT@Shaei@x pos}\@empty
    \ifnum\@Vy>\z@\relax
     \def\@X@Pos{s}%
@@ -7024,6 +7025,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Shaei の y string 部分の修正 06/09/2018
 \Shaei で各点のスタイルを各々設定できるようにする 06/08/2018
 \Henko の \presetkeys 等の修正 05/31/2018
 \Shaei のオプションを修正 05/31/2018
