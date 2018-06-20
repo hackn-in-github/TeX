@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/10/2018 Ver.0.1164]%
+\ProvidesPackage{tikzxelatexsetup}[06/20/2018 Ver.0.1165]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -4254,6 +4254,8 @@
   \@E@=(1,0);
   \@Vx=int(round(\@P@x/\@E@x));
   \@Vy=int(round(\@P@y/\@E@x));
+  \@Vxfp=\@P@x/\@E@x;
+  \@Vyfp=\@P@y/\@E@x;
  }%
  \@ifnextchar>{\def\@MT@Shaei@Option{}\@gobble}{\@@sub@Shaei}%
 }%
@@ -4275,14 +4277,16 @@
    \def\@Y@String{$\@Vy$}\else
    \expandafter\def\expandafter\@Y@String\expandafter{\csname @MT@Shaei@y string\endcsname}\fi
   \expandafter\ifx\csname @MT@Shaei@x pos\endcsname\@empty
-   \ifnum\@Vy>\z@\relax
+   \ifdim\@Vyfp pt>\z@\relax
+%   \ifnum\@Vy>\z@\relax
     \def\@X@Pos{s}%
    \else
     \def\@X@Pos{n}%
    \fi
   \else\edef\@X@Pos{\@nameuse{@MT@Shaei@x pos}}\fi
   \expandafter\ifx\csname @MT@Shaei@y pos\endcsname\@empty
-   \ifnum\@Vx>\z@\relax
+   \ifdim\@Vxfp pt>\z@\relax
+%   \ifnum\@Vx>\z@\relax
     \def\@Y@Pos{w}%
    \else
     \def\@Y@Pos{e}%
@@ -7027,6 +7031,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Shaei の 文字列配置を丸めた数値から実際の数値へと変更
 下記の修正で fillcolor が抜けていたのを修正
 \Shaei の #1 オプションが引数 #3 の個別のオプション指定で取り消されていたのを修正
 \Shaei の y string 部分の修正 06/09/2018
