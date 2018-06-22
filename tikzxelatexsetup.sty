@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/20/2018 Ver.0.1165]%
+\ProvidesPackage{tikzxelatexsetup}[06/23/2018 Ver.0.1166]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -6990,6 +6990,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %     string : 文字の指定(n)
 %     alph   : 文字の指定(n)
 %     first  : 最初の数字(1)
+%     start  : 最初の数字(1)
 %     end    : 最後の数字(3)
 %     space  : , と次の数字との間隔(\ )
 %     dots   : dots の指定(\ldots)
@@ -6998,6 +6999,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
  string .tl_set:N = \l_my_integers_alph_tl,
  alph .tl_set:N = \l_my_integers_alph_tl,
  first .int_set:N = \l_my_integers_first_int,
+ start .int_set:N = \l_my_integers_first_int,
  end .int_set:N = \l_my_integers_end_int,
  space .tl_set:N = \l_my_integers_space_tl,
  dots .tl_set:N = \l_my_integers_dots_tl,
@@ -7031,6 +7033,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\Integers に start オプションを追加 06/23/2018
 \Shaei の 文字列配置を丸めた数値から実際の数値へと変更
 下記の修正で fillcolor が抜けていたのを修正
 \Shaei の #1 オプションが引数 #3 の個別のオプション指定で取り消されていたのを修正
