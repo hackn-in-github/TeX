@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[06/23/2018 Ver.0.1166]%
+\ProvidesPackage{tikzxelatexsetup}[11/29/2018 Ver.0.1167]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -6138,9 +6138,9 @@
   \,%
  }{%
   \IfBooleanTF{#1}{%
-   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxScriptNode,#2](@M@O@){\ref{mark:#3}};\,
+   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxScriptNode,#2](@M@O@){\ref{mark:#3}};\,%
   }{%
-   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxNode,#2](@M@O@){\ref{mark:#3}};\,
+   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxNode,#2](@M@O@){\ref{mark:#3}};\,%
   }%
  }%
 }%
@@ -7033,6 +7033,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+\RefMarkの最後に半角空白が挿入されていたことへの対策 11/19/2018
 \Integers に start オプションを追加 06/23/2018
 \Shaei の 文字列配置を丸めた数値から実際の数値へと変更
 下記の修正で fillcolor が抜けていたのを修正
