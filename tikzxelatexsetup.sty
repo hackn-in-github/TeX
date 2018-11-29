@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/29/2018 Ver.0.1167]%
+\ProvidesPackage{tikzxelatexsetup}[11/29/2018 Ver.0.1168]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -6129,8 +6129,8 @@
 \tikzset{RefMarkBoxNode/.style={inner xsep=\MarkXSep,inner ysep=\MarkYSep,draw,rectangle,%
                                 minimum width=3\zw+2*\MarkXSep,align=center},%
          RefMarkBoxScriptNode/.style={inner sep=1pt,draw,rectangle,font=\scriptsize}}%
-\RenewDocumentCommand\RefMark{sO{}m}{%
- \IfRefUndefinedExpandable{mark:#3}{%
+\RenewDocumentCommand\RefMark{sO{}D(){}m}{%
+ \IfRefUndefinedExpandable{mark:#4}{%
   \,%
   \tikz[x={(1\zw,0)},y={(0,1\zw)},baseline=(@O@.base)]{%
    \node[draw,text width=3\zw,inner ysep=2.5pt,text=red,align=center](@O@){??};
@@ -6138,9 +6138,9 @@
   \,%
  }{%
   \IfBooleanTF{#1}{%
-   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxScriptNode,#2](@M@O@){\ref{mark:#3}};\,%
+   \,\tikz[baseline=(@M@O@.base),#3]\node[RefMarkBoxScriptNode,#2](@M@O@){\ref{mark:#4}};\,%
   }{%
-   \,\tikz[baseline=(@M@O@.base)]\node[RefMarkBoxNode,#2](@M@O@){\ref{mark:#3}};\,%
+   \,\tikz[baseline=(@M@O@.base),#3]\node[RefMarkBoxNode,#2](@M@O@){\ref{mark:#4}};\,%
   }%
  }%
 }%
@@ -7033,7 +7033,8 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
-\RefMarkの最後に半角空白が挿入されていたことへの対策 11/19/2018
+\RefMarkに\tikzのオプションを設定するオプションを追加 11/29/2018
+\RefMarkの最後に半角空白が挿入されていたことへの対策 11/29/2018
 \Integers に start オプションを追加 06/23/2018
 \Shaei の 文字列配置を丸めた数値から実際の数値へと変更
 下記の修正で fillcolor が抜けていたのを修正
