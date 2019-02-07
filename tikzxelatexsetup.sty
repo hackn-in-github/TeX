@@ -1,5 +1,5 @@
 %Setup
-\ProvidesPackage{tikzxelatexsetup}[11/29/2018 Ver.0.1168]%
+\ProvidesPackage{tikzxelatexsetup}[02/07/2019 Ver.0.1169]%
 \newif\ifenumitem
 \DeclareOption{enumitem}{\enumitemtrue}%
 \ProcessOptions\relax
@@ -221,6 +221,11 @@
 %%共役複素数
 \def\Overline#1{\ensuremath{\overline{\vphantom{M}#1}}}%
 %
+%% 和集合・積集合の記号を変更
+\let\ltxcap=\cap
+\let\ltxcup=\cup
+\def\cap{\mathrel{\text{∩}}}%
+\def\cup{\mathrel{\text{∪}}}%
 %%かっこ類 \@brace 等削除 20150614 -> \abs のために復活
 % \@braces{#1}{#2}[#3]{#4}
 % #1:左の括弧,#2:右の括弧,#3:options,#4:括弧をつける内容
@@ -7033,6 +7038,7 @@ s\or t\or u\or v\or w\or x\or y\or z\else\@ctrerr\fi}%
 %\postbreakpenalty`「=10000
 %\prebreakpenalty`」=10000
 \endinput
+和集合・積集合の記号を変更 02/07/2019
 \RefMarkに\tikzのオプションを設定するオプションを追加 11/29/2018
 \RefMarkの最後に半角空白が挿入されていたことへの対策 11/29/2018
 \Integers に start オプションを追加 06/23/2018
