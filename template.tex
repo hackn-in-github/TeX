@@ -47,14 +47,28 @@
 %\setjasansfont{M+ 1p}
 %\setmonofont{M+ 1m}
 %% LuaLaTeX-ja こっちの方が綺麗かも…
-%\setmainjfont[BoldFont=IPAexGothic]{IPAexMincho}
+%\setmainjfont[BoldFont={IPAexGothic},
+%              BoldItalicFont={IPAexGothic},
+%              BoldSlantedFont={IPAexGothic},
+%              AutoFakeSlant=0.2,
+%              SlantedFeatures={FakeSlant=0.2},
+%              BoldItalicFeatures={FakeSlant=0.2},
+%              BoldSlantedFeatures={FakeSlant=0.2}]{IPAexMincho}
 %\setsansjfont{IPAexGothic}
 %\setmonofont{IPAexGothic}
 %\setmainjfont[BoldFont=MogaMinExB]{MogaMinEx}
 %\setsansjfont{MogaGoEx}
 %\setmonofont{MogaGo}
-\setmainjfont[BoldFont=Source Han Serif JP Bold]{Source Han Serif JP Light}
-\setsansjfont[BoldFont=Source Han Sans JP Bold]{Source Han Sans JP Light}
+\setmainjfont[BoldFont=Source Han Serif JP Bold,
+              AutoFakeSlant=0.2,
+              SlantedFeatures={FakeSlant=0.2},
+              BoldItalicFeatures={FakeSlant=0.2},
+              BoldSlantedFeatures={FakeSlant=0.2}]{Source Han Serif JP Light}
+\setsansjfont[BoldFont=Source Han Sans JP Bold,%
+              AutoFakeSlant=0.2,
+              SlantedFeatures={FakeSlant=0.2},
+              BoldItalicFeatures={FakeSlant=0.2},
+              BoldSlantedFeatures={FakeSlant=0.2}]{Source Han Sans JP Light}
 \setmonofont{Source Han Code JP Light}
 %\setmainjfont[BoldFont=YOzNb]{YOzN}
 %\setsansjfont{YOzNb}
